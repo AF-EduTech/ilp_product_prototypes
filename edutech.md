@@ -23,7 +23,6 @@ Erwachsenenfortbildung eingesetzt, um Weiterbildungen und Umschulungen als Selbs
 ** Dauer: 3 Wochen bis 3 Monate
 * Tooltraining
 ** Office-Programme, Microsoft Server, Betriebssysteme
-** Microsoft-Server
 ** Dauer: 3 Wochen bis 3 Monate
 
 ##Nutzer (getrennte Rollen)
