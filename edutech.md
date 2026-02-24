@@ -22,7 +22,7 @@ Erwachsenenfortbildung eingesetzt, um Weiterbildungen und Umschulungen als Selbs
 ** Projektmanagementmethoden wie Scrum, Kanban, Prince2
 ** Dauer: 3 Wochen bis 3 Monate
 * Tooltraining
-** Office-Programme
+** Office-Programme, Microsoft Server, Betriebssysteme
 ** Microsoft-Server
 ** Dauer: 3 Wochen bis 3 Monate
 
