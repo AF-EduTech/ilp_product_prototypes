@@ -1,0 +1,2567 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lernbegleiter-Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f0f2f5;
+            color: #1a1a2e;
+            line-height: 1.5;
+        }
+
+        /* ── Header ── */
+        .header {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: white;
+            padding: 20px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-left h1 {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .header-left span {
+            font-size: 13px;
+            opacity: 0.7;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #a855f7;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 16px;
+            color: white;
+        }
+
+        .header-right .name {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .header-badge {
+            font-size: 11px;
+            background: rgba(255,255,255,0.15);
+            padding: 3px 10px;
+            border-radius: 6px;
+        }
+
+        /* ── KPI Strip ── */
+        .kpi-strip {
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 20px 24px 0;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+        }
+
+        .kpi-card {
+            background: white;
+            border-radius: 14px;
+            padding: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .kpi-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            flex-shrink: 0;
+        }
+
+        .kpi-icon.red { background: #fef2f2; }
+        .kpi-icon.green { background: #ecfdf5; }
+        .kpi-icon.blue { background: #eff6ff; }
+        .kpi-icon.purple { background: #faf5ff; }
+
+        .kpi-value {
+            font-size: 28px;
+            font-weight: 700;
+            line-height: 1.1;
+        }
+
+        .kpi-value.red { color: #dc2626; }
+        .kpi-value.green { color: #059669; }
+        .kpi-value.blue { color: #4361ee; }
+        .kpi-value.purple { color: #7c3aed; }
+
+        .kpi-label {
+            font-size: 12px;
+            color: #6b7280;
+            font-weight: 500;
+        }
+
+        /* ── Main Grid ── */
+        .main {
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 20px 24px 32px;
+            display: grid;
+            grid-template-columns: 1fr 380px;
+            grid-template-rows: auto 1fr auto;
+            gap: 20px;
+        }
+
+        /* ── Cards ── */
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .card-title {
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #6b7280;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .filter-btn {
+            font-size: 12px;
+            padding: 5px 12px;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+            background: white;
+            color: #6b7280;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.15s;
+        }
+
+        .filter-btn:hover {
+            border-color: #4361ee;
+            color: #4361ee;
+        }
+
+        .filter-btn.active {
+            background: #4361ee;
+            color: white;
+            border-color: #4361ee;
+        }
+
+        /* ── Lernenden-Matrix ── */
+        .matrix-section {
+            grid-column: 1 / 2;
+            grid-row: 1 / 3;
+            overflow-x: auto;
+        }
+
+        .matrix-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            font-size: 13px;
+        }
+
+        .matrix-table thead th {
+            text-align: left;
+            padding: 10px 12px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #9ca3af;
+            border-bottom: 2px solid #e5e7eb;
+            white-space: nowrap;
+            position: sticky;
+            top: 0;
+            background: white;
+        }
+
+        .matrix-table thead th.module-col {
+            text-align: center;
+            min-width: 80px;
+        }
+
+        .mod-empty {
+            text-align: center;
+            color: #d1d5db;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .matrix-table tbody tr {
+            cursor: pointer;
+            transition: background 0.1s;
+        }
+
+        .matrix-table tbody tr:hover {
+            background: #f9fafb;
+        }
+
+        .matrix-table tbody tr.needs-support {
+            background: #fef2f2;
+        }
+
+        .matrix-table tbody tr.needs-support:hover {
+            background: #fee2e2;
+        }
+
+        .matrix-table td {
+            padding: 12px;
+            border-bottom: 1px solid #f3f4f6;
+            vertical-align: middle;
+        }
+
+        /* Learner cell */
+        .learner-cell {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 180px;
+        }
+
+        .learner-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+            color: white;
+            flex-shrink: 0;
+            position: relative;
+        }
+
+        .learner-avatar .online-dot {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            border: 2px solid white;
+        }
+
+        .online-dot.on { background: #10b981; }
+        .online-dot.off { background: #d1d5db; }
+
+        .learner-name {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .learner-last-seen {
+            font-size: 11px;
+            color: #9ca3af;
+        }
+
+        /* Status badge */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 10px;
+            border-radius: 99px;
+            font-size: 11px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .status-badge.slow {
+            background: #fef2f2;
+            color: #dc2626;
+        }
+
+        .status-badge.normal {
+            background: #ecfdf5;
+            color: #059669;
+        }
+
+        .status-badge.fast {
+            background: #eff6ff;
+            color: #2563eb;
+        }
+
+        .status-badge::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+        }
+
+        .status-badge.slow::before { background: #dc2626; }
+        .status-badge.normal::before { background: #059669; }
+        .status-badge.fast::before { background: #2563eb; }
+
+        /* Module progress bars in table */
+        .module-progress {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .progress-mini-bar {
+            width: 80px;
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 99px;
+            overflow: hidden;
+        }
+
+        .progress-mini-bar .fill {
+            height: 100%;
+            border-radius: 99px;
+            transition: width 0.5s;
+        }
+
+        .fill.complete { background: #059669; }
+        .fill.in-progress { background: #4361ee; }
+        .fill.not-started { background: #e5e7eb; }
+
+        .progress-mini-label {
+            font-size: 10px;
+            color: #9ca3af;
+            font-weight: 500;
+        }
+
+        .current-marker {
+            font-size: 9px;
+            background: #4361ee;
+            color: white;
+            padding: 1px 6px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        /* Quiz score */
+        .quiz-score {
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        .quiz-score.low { color: #dc2626; }
+        .quiz-score.mid { color: #d97706; }
+        .quiz-score.high { color: #059669; }
+
+        /* Actions column */
+        .action-btns {
+            display: flex;
+            gap: 6px;
+        }
+
+        .action-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.15s;
+        }
+
+        .action-btn:hover {
+            border-color: #4361ee;
+            background: #f0f4ff;
+        }
+
+        .action-btn.alert {
+            border-color: #fca5a5;
+            background: #fef2f2;
+        }
+
+        .action-btn.alert:hover {
+            background: #fee2e2;
+        }
+
+        /* ── Alert Panel ── */
+        .alert-section {
+            grid-column: 2 / 3;
+            grid-row: 1;
+        }
+
+        .alert-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .alert-card {
+            border: 1px solid #fecaca;
+            background: #fff7f7;
+            border-radius: 12px;
+            padding: 16px;
+            position: relative;
+        }
+
+        .alert-card::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 12px;
+            bottom: 12px;
+            width: 3px;
+            background: #dc2626;
+            border-radius: 0 3px 3px 0;
+        }
+
+        .alert-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+
+        .alert-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 600;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .alert-name {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .alert-time {
+            font-size: 11px;
+            color: #9ca3af;
+            margin-left: auto;
+        }
+
+        .alert-reason {
+            font-size: 13px;
+            color: #4b5563;
+            margin-bottom: 4px;
+            padding-left: 42px;
+        }
+
+        .alert-detail {
+            font-size: 12px;
+            color: #9ca3af;
+            padding-left: 42px;
+            margin-bottom: 12px;
+        }
+
+        .alert-actions {
+            display: flex;
+            gap: 8px;
+            padding-left: 42px;
+        }
+
+        .alert-btn {
+            font-size: 12px;
+            padding: 6px 14px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.15s;
+        }
+
+        .alert-btn.primary {
+            background: #4361ee;
+            color: white;
+        }
+
+        .alert-btn.primary:hover {
+            background: #3a50d9;
+        }
+
+        .alert-btn.secondary {
+            background: #f3f4f6;
+            color: #4b5563;
+        }
+
+        .alert-btn.secondary:hover {
+            background: #e5e7eb;
+        }
+
+        .alert-empty {
+            text-align: center;
+            padding: 24px;
+            color: #9ca3af;
+            font-size: 13px;
+        }
+
+        /* ── Detail Panel (Sidebar) ── */
+        .detail-section {
+            grid-column: 2 / 3;
+            grid-row: 2;
+        }
+
+        .detail-empty {
+            text-align: center;
+            padding: 40px 20px;
+            color: #9ca3af;
+        }
+
+        .detail-empty-icon {
+            font-size: 36px;
+            margin-bottom: 12px;
+        }
+
+        .detail-empty p {
+            font-size: 13px;
+        }
+
+        .detail-content {
+            display: none;
+        }
+
+        .detail-content.active {
+            display: block;
+        }
+
+        .detail-profile {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .detail-avatar {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: 700;
+            color: white;
+        }
+
+        .detail-name {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .detail-meta {
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .detail-stat {
+            background: #f9fafb;
+            border-radius: 10px;
+            padding: 14px;
+        }
+
+        .detail-stat-label {
+            font-size: 11px;
+            color: #9ca3af;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            margin-bottom: 4px;
+        }
+
+        .detail-stat-value {
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .detail-stat-value.red { color: #dc2626; }
+        .detail-stat-value.green { color: #059669; }
+        .detail-stat-value.blue { color: #4361ee; }
+        .detail-stat-value.orange { color: #d97706; }
+
+        .detail-subtitle {
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #9ca3af;
+            margin-bottom: 10px;
+        }
+
+        .detail-position {
+            background: #f0f4ff;
+            border-radius: 10px;
+            padding: 14px;
+            margin-bottom: 20px;
+        }
+
+        .detail-position-path {
+            font-size: 14px;
+            font-weight: 600;
+            color: #4361ee;
+            margin-bottom: 4px;
+        }
+
+        .detail-position-sub {
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .detail-quiz-history {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .quiz-dot {
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .quiz-dot.pass {
+            background: #d1fae5;
+            color: #059669;
+        }
+
+        .quiz-dot.fail {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .detail-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .detail-btn {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.15s;
+            border: none;
+        }
+
+        .detail-btn.primary {
+            background: #4361ee;
+            color: white;
+        }
+
+        .detail-btn.primary:hover {
+            background: #3a50d9;
+        }
+
+        .detail-btn.outline {
+            background: white;
+            color: #4b5563;
+            border: 2px solid #e5e7eb;
+        }
+
+        .detail-btn.outline:hover {
+            border-color: #4361ee;
+            color: #4361ee;
+        }
+
+        .speed-indicator {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .speed-indicator .arrow-down { color: #dc2626; }
+        .speed-indicator .arrow-up { color: #059669; }
+        .speed-indicator .arrow-flat { color: #6b7280; }
+
+        /* ── Kursplan / Zeitplan ── */
+        .schedule-section {
+            grid-column: 1 / -1;
+            grid-row: 3;
+        }
+
+        .schedule-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .schedule-week-nav {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .week-nav-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+            background: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: #6b7280;
+            transition: all 0.15s;
+        }
+
+        .week-nav-btn:hover {
+            border-color: #4361ee;
+            color: #4361ee;
+        }
+
+        .week-label {
+            font-size: 15px;
+            font-weight: 600;
+            color: #1a1a2e;
+        }
+
+        .week-date-range {
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .schedule-days {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .schedule-day {
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            overflow: hidden;
+            transition: box-shadow 0.15s;
+        }
+
+        .schedule-day:hover {
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+
+        .schedule-day.today {
+            border-color: #4361ee;
+            box-shadow: 0 0 0 1px #4361ee;
+        }
+
+        .schedule-day.past {
+            opacity: 0.6;
+        }
+
+        .day-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            background: #f9fafb;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .schedule-day.today .day-header {
+            background: #eef2ff;
+        }
+
+        .day-header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .day-name {
+            font-weight: 700;
+            font-size: 14px;
+            min-width: 30px;
+        }
+
+        .day-date {
+            font-size: 13px;
+            color: #6b7280;
+        }
+
+        .today-badge {
+            font-size: 11px;
+            background: #4361ee;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-weight: 600;
+        }
+
+        .day-times {
+            font-size: 13px;
+            color: #6b7280;
+            font-weight: 500;
+        }
+
+        .day-chevron {
+            font-size: 10px;
+            color: #9ca3af;
+            transition: transform 0.2s;
+            margin-left: 8px;
+        }
+
+        .day-chevron.open {
+            transform: rotate(90deg);
+        }
+
+        .day-body {
+            display: none;
+            padding: 0 16px 16px;
+        }
+
+        .day-body.open {
+            display: block;
+        }
+
+        .day-timeline {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+            position: relative;
+            padding-left: 60px;
+        }
+
+        .timeline-block {
+            display: flex;
+            align-items: stretch;
+            position: relative;
+            min-height: 48px;
+        }
+
+        .timeline-time {
+            position: absolute;
+            left: -60px;
+            top: 0;
+            width: 50px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #6b7280;
+            text-align: right;
+            padding-top: 10px;
+        }
+
+        .timeline-line {
+            position: absolute;
+            left: -22px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #e5e7eb;
+        }
+
+        .timeline-dot {
+            position: absolute;
+            left: -26px;
+            top: 12px;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #e5e7eb;
+            border: 2px solid white;
+            z-index: 1;
+        }
+
+        .timeline-dot.module { background: #4361ee; }
+        .timeline-dot.break { background: #fbbf24; }
+        .timeline-dot.done { background: #059669; }
+        .timeline-dot.current { background: #4361ee; box-shadow: 0 0 0 3px rgba(67,97,238,0.2); }
+
+        .timeline-content {
+            flex: 1;
+            padding: 8px 0;
+        }
+
+        .timeline-module {
+            background: #f0f4ff;
+            border-radius: 10px;
+            padding: 10px 14px;
+            border-left: 3px solid #4361ee;
+        }
+
+        .timeline-module.done {
+            background: #ecfdf5;
+            border-left-color: #059669;
+        }
+
+        .timeline-module.current {
+            background: #eef2ff;
+            border-left-color: #4361ee;
+            box-shadow: 0 1px 4px rgba(67,97,238,0.12);
+        }
+
+        .timeline-module.locked {
+            background: #f9fafb;
+            border-left-color: #d1d5db;
+        }
+
+        .timeline-module-name {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .timeline-module.done .timeline-module-name { color: #059669; }
+        .timeline-module.current .timeline-module-name { color: #4361ee; }
+        .timeline-module.locked .timeline-module-name { color: #9ca3af; }
+
+        .timeline-module-detail {
+            font-size: 12px;
+            color: #6b7280;
+            margin-top: 2px;
+        }
+
+        .timeline-module-chapters {
+            display: flex;
+            gap: 6px;
+            margin-top: 6px;
+            flex-wrap: wrap;
+        }
+
+        .chapter-chip {
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 6px;
+            background: rgba(255,255,255,0.7);
+            color: #4b5563;
+            font-weight: 500;
+        }
+
+        .chapter-chip.done { background: #d1fae5; color: #059669; }
+        .chapter-chip.current { background: #4361ee; color: white; }
+
+        .timeline-break {
+            background: #fffbeb;
+            border-radius: 8px;
+            padding: 8px 14px;
+            border-left: 3px solid #fbbf24;
+            font-size: 13px;
+            color: #92400e;
+            font-weight: 500;
+        }
+
+        .timeline-end-time {
+            font-size: 12px;
+            font-weight: 600;
+            color: #9ca3af;
+            padding-top: 10px;
+        }
+
+        .day-progress {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .day-progress-bar {
+            width: 80px;
+            height: 6px;
+            background: #e5e7eb;
+            border-radius: 99px;
+            overflow: hidden;
+        }
+
+        .day-progress-bar .fill {
+            height: 100%;
+            border-radius: 99px;
+        }
+
+        .day-progress-bar .fill.done { background: #059669; }
+        .day-progress-bar .fill.active { background: #4361ee; }
+
+        .day-progress-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #6b7280;
+            min-width: 32px;
+            text-align: right;
+        }
+
+        .day-progress-label.complete { color: #059669; }
+
+        .schedule-legend {
+            display: flex;
+            gap: 16px;
+            margin-top: 16px;
+            padding-top: 12px;
+            border-top: 1px solid #e5e7eb;
+            font-size: 12px;
+            color: #6b7280;
+            flex-wrap: wrap;
+        }
+
+        .schedule-legend span {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .legend-bar {
+            width: 12px;
+            height: 12px;
+            border-radius: 3px;
+            display: inline-block;
+        }
+
+        .legend-bar.done { background: #ecfdf5; border-left: 2px solid #059669; }
+        .legend-bar.current { background: #eef2ff; border-left: 2px solid #4361ee; }
+        .legend-bar.upcoming { background: #f9fafb; border-left: 2px solid #d1d5db; }
+        .legend-bar.break { background: #fffbeb; border-left: 2px solid #fbbf24; }
+
+        /* ── Responsive ── */
+        @media (max-width: 1100px) {
+            .kpi-strip {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .main {
+                grid-template-columns: 1fr;
+            }
+
+            .matrix-section {
+                grid-column: 1;
+                grid-row: auto;
+            }
+
+            .alert-section {
+                grid-column: 1;
+                grid-row: auto;
+            }
+
+            .detail-section {
+                grid-column: 1;
+                grid-row: auto;
+            }
+
+            .schedule-section {
+                grid-column: 1;
+                grid-row: auto;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .kpi-strip {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* ── Sticky first two columns ── */
+        .matrix-table th:first-child,
+        .matrix-table td:first-child {
+            position: sticky;
+            left: 0;
+            z-index: 2;
+            background: white;
+            width: 210px;
+        }
+
+        .matrix-table th:nth-child(2),
+        .matrix-table td:nth-child(2) {
+            position: sticky;
+            left: 210px;
+            z-index: 2;
+            background: white;
+            box-shadow: 3px 0 6px -2px rgba(0,0,0,0.08);
+        }
+
+        .matrix-table thead th:first-child,
+        .matrix-table thead th:nth-child(2) {
+            z-index: 3;
+        }
+
+        .matrix-table tbody tr.needs-support td:first-child,
+        .matrix-table tbody tr.needs-support td:nth-child(2) {
+            background: #fef2f2;
+        }
+
+        .matrix-table tbody tr.needs-support:hover td:first-child,
+        .matrix-table tbody tr.needs-support:hover td:nth-child(2) {
+            background: #fee2e2;
+        }
+
+        .matrix-table tbody tr:not(.needs-support):hover td:first-child,
+        .matrix-table tbody tr:not(.needs-support):hover td:nth-child(2) {
+            background: #f9fafb;
+        }
+
+        /* ── Row selected state ── */
+        .matrix-table tbody tr.selected {
+            background: #eef2ff;
+        }
+
+        .matrix-table tbody tr.selected.needs-support {
+            background: #fde8e8;
+        }
+
+        .matrix-table tbody tr.selected td:first-child,
+        .matrix-table tbody tr.selected td:nth-child(2) {
+            background: #eef2ff;
+        }
+
+        .matrix-table tbody tr.selected.needs-support td:first-child,
+        .matrix-table tbody tr.selected.needs-support td:nth-child(2) {
+            background: #fde8e8;
+        }
+
+        /* ── Trend sparkline ── */
+        .trend-cell {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .trend-arrow {
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .trend-arrow.up { color: #059669; }
+        .trend-arrow.down { color: #dc2626; }
+        .trend-arrow.flat { color: #9ca3af; }
+    </style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+    <div class="header-left">
+        <h1>Projektmanagement mit Scrum</h1>
+        <span>Lerngruppe A · 10 Teilnehmer · Methodikkurs</span>
+    </div>
+    <div class="header-right">
+        <span class="header-badge">Lernbegleiter</span>
+        <span class="name">Maria Schmidt</span>
+        <div class="avatar">MS</div>
+    </div>
+</div>
+
+<!-- KPI Strip -->
+<div class="kpi-strip">
+    <div class="kpi-card">
+        <div class="kpi-icon red">⚠️</div>
+        <div>
+            <div class="kpi-value red">2</div>
+            <div class="kpi-label">Brauchen Unterstützung</div>
+        </div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-icon green">✅</div>
+        <div>
+            <div class="kpi-value green">6</div>
+            <div class="kpi-label">Im Plan</div>
+        </div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-icon blue">⚡</div>
+        <div>
+            <div class="kpi-value blue">2</div>
+            <div class="kpi-label">Schnell unterwegs</div>
+        </div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-icon purple">📊</div>
+        <div>
+            <div class="kpi-value purple">47%</div>
+            <div class="kpi-label">Ø Gruppenfortschritt</div>
+        </div>
+    </div>
+</div>
+
+<!-- Main Grid -->
+<div class="main">
+
+    <!-- Lernenden-Matrix -->
+    <div class="card matrix-section">
+        <div class="card-header">
+            <div class="card-title">Teilnehmerübersicht</div>
+            <div class="card-actions">
+                <button class="filter-btn active" onclick="filterAll(this)">Alle</button>
+                <button class="filter-btn" onclick="filterStatus(this, 'needs-support')">⚠ Brauchen Hilfe</button>
+                <button class="filter-btn" onclick="filterStatus(this, 'slow')">Langsam</button>
+                <button class="filter-btn" onclick="filterStatus(this, 'fast')">Schnell</button>
+            </div>
+        </div>
+        <table class="matrix-table">
+            <thead>
+                <tr>
+                    <th>Lernende/r</th>
+                    <th>Status</th>
+                    <th class="module-col">M 1</th>
+                    <th class="module-col">M 2</th>
+                    <th class="module-col">M 3</th>
+                    <th class="module-col">M 4</th>
+                    <th class="module-col">M 5</th>
+                    <th class="module-col">M 6</th>
+                    <th class="module-col">M 7</th>
+                    <th class="module-col">M 8</th>
+                    <th class="module-col">M 9</th>
+                    <th class="module-col">M 10</th>
+                    <th class="module-col">M 11</th>
+                    <th class="module-col">M 12</th>
+                    <th class="module-col">M 13</th>
+                    <th class="module-col">M 14</th>
+                    <th class="module-col">M 15</th>
+                    <th class="module-col">M 16</th>
+                    <th class="module-col">M 17</th>
+                    <th class="module-col">M 18</th>
+                    <th class="module-col">M 19</th>
+                    <th class="module-col">M 20</th>
+                    <th>Quiz Ø</th>
+                    <th>Trend</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- David R. – braucht Hilfe -->
+                <tr class="needs-support" data-status="slow" data-learner="david" onclick="showDetail('david')">
+                    <td>
+                        <div class="learner-cell">
+                            <div class="learner-avatar" style="background: #4361ee">DR<span class="online-dot on"></span></div>
+                            <div>
+                                <div class="learner-name">David R.</div>
+                                <div class="learner-last-seen">Jetzt aktiv</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td><span class="status-badge slow">Langsam</span></td>
+                    <td>
+                        <div class="module-progress">
+                            <div class="progress-mini-bar"><div class="fill complete" style="width: 100%"></div></div>
+                            <span class="progress-mini-label">100%</span>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="module-progress">
+                            <div class="progress-mini-bar"><div class="fill in-progress" style="width: 30%"></div></div>
+                            <span class="current-marker">Hier</span>
+                        </div>
+                    </td>
+                    <td><div class="module-progress"><div class="progress-mini-bar"><div class="fill not-started" style="width: 0%"></div></div><span class="progress-mini-label">—</span></div></td>
+                    <td><div class="module-progress"><div class="progress-mini-bar"><div class="fill not-started" style="width: 0%"></div></div><span class="progress-mini-label">—</span></div></td>
+                    <td><div class="module-progress"><div class="progress-mini-bar"><div class="fill not-started" style="width: 0%"></div></div><span class="progress-mini-label">—</span></div></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td><span class="quiz-score low">32%</span></td>
+                    <td><div class="trend-cell"><span class="trend-arrow down">↓</span></div></td>
+                    <td>
+                        <div class="action-btns">
+                            <button class="action-btn alert" title="Nachricht senden">💬</button>
+                        </div>
+                    </td>
+                </tr>
+                <!-- Greta W. – braucht Hilfe -->
+                <tr class="needs-support" data-status="slow" data-learner="greta" onclick="showDetail('greta')">
+                    <td>
+                        <div class="learner-cell">
+                            <div class="learner-avatar" style="background: #f87171">GW<span class="online-dot off"></span></div>
+                            <div>
+                                <div class="learner-name">Greta W.</div>
+                                <div class="learner-last-seen">Zuletzt vor 2 Tagen</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td><span class="status-badge slow">Langsam</span></td>
+                    <td>
+                        <div class="module-progress">
+                            <div class="progress-mini-bar"><div class="fill complete" style="width: 100%"></div></div>
+                            <span class="progress-mini-label">100%</span>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="module-progress">
+                            <div class="progress-mini-bar"><div class="fill in-progress" style="width: 60%"></div></div>
+                            <span class="current-marker">Hier</span>
+                        </div>
+                    </td>
+                    <td><div class="module-progress"><div class="progress-mini-bar"><div class="fill not-started" style="width: 0%"></div></div><span class="progress-mini-label">—</span></div></td>
+                    <td><div class="module-progress"><div class="progress-mini-bar"><div class="fill not-started" style="width: 0%"></div></div><span class="progress-mini-label">—</span></div></td>
+                    <td><div class="module-progress"><div class="progress-mini-bar"><div class="fill not-started" style="width: 0%"></div></div><span class="progress-mini-label">—</span></div></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td><span class="quiz-score low">41%</span></td>
+                    <td><div class="trend-cell"><span class="trend-arrow down">↓</span></div></td>
+                    <td>
+                        <div class="action-btns">
+                            <button class="action-btn alert" title="Nachricht senden">💬</button>
+                        </div>
+                    </td>
+                </tr>
+                <!-- Ben K. – normal -->
+                <tr data-status="normal" data-learner="ben" onclick="showDetail('ben')">
+                    <td>
+                        <div class="learner-cell">
+                            <div class="learner-avatar" style="background: #60a5fa">BK<span class="online-dot on"></span></div>
+                            <div>
+                                <div class="learner-name">Ben K.</div>
+                                <div class="learner-last-seen">Jetzt aktiv</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td><span class="status-badge normal">Normal</span></td>
+                    <td><div class="module-progress"><div class="progress-mini-bar"><div class="fill complete" style="width: 100%"></div></div><span class="progress-mini-label">100%</span></div></td>
+                    <td><div class="module-progress"><div class="progress-mini-bar"><div class="fill complete" style="width: 100%"></div></div><span class="progress-mini-label">100%</span></div></td>
+                    <td>
+                        <div class="module-progress">
+                            <div class="progress-mini-bar"><div class="fill in-progress" style="width: 45%"></div></div>
+                            <span class="current-marker">Hier</span>
+                        </div>
+                    </td>
+                    <td><div class="module-progress"><div class="progress-mini-bar"><div class="fill not-started" style="width: 0%"></div></div><span class="progress-mini-label">—</span></div></td>
+                    <td><div class="module-progress"><div class="progress-mini-bar"><div class="fill not-started" style="width: 0%"></div></div><span class="progress-mini-label">—</span></div></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td><span class="quiz-score high">78%</span></td>
+                    <td><div class="trend-cell"><span class="trend-arrow flat">→</span></div></td>
+                    <td><div class="action-btns"><button class="action-btn" title="Nachricht senden">💬</button></div></td>
+                </tr>
+                <!-- Clara S. – normal -->
+                <tr data-status="normal" data-learner="clara" onclick="showDetail('clara')">
+                    <td>
+                        <div class="learner-cell">
+                            <div class="learner-avatar" style="background: #a78bfa">CS<span class="online-dot off"></span></div>
+                            <div>
+                                <div class="learner-name">Clara S.</div>
+                                <div class="learner-last-seen">Zuletzt vor 1 Std.</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td><span class="status-badge normal">Normal</span></td>
+                    <td><div class="module-progress"><div class="progress-mini-bar"><div class="fill complete" style="width: 100%"></div></div><span class="progress-mini-label">100%</span></div></td>
+                    <td><div class="module-progress"><div class="progress-mini-bar"><div class="fill complete" style="width: 100%"></div></div><span class="progress-mini-label">100%</span></div></td>
+                    <td>
+                        <div class="module-progress">
+                            <div class="progress-mini-bar"><div class="fill in-progress" style="width: 30%"></div></div>
+                            <span class="current-marker">Hier</span>
+                        </div>
+                    </td>
+                    <td><div class="module-progress"><div class="progress-mini-bar"><div class="fill not-started" style="width: 0%"></div></div><span class="progress-mini-label">—</span></div></td>
+                    <td><div class="module-progress"><div class="progress-mini-bar"><div class="fill not-started" style="width: 0%"></div></div><span class="progress-mini-label">—</span></div></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td><span class="quiz-score high">71%</span></td>
+                    <td><div class="trend-cell"><span class="trend-arrow flat">→</span></div></td>
+                    <td><div class="action-btns"><button class="action-btn" title="Nachricht senden">💬</button></div></td>
+                </tr>
+                <!-- Eva L. – normal -->
+                <tr data-status="normal" data-learner="eva" onclick="showDetail('eva')">
+                    <td>
+                        <div class="learner-cell">
+                            <div class="learner-avatar" style="background: #34d399">EL<span class="online-dot on"></span></div>
+                            <div>
+                                <div class="learner-name">Eva L.</div>
+                                <div class="learner-last-seen">Jetzt aktiv</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td><span class="status-badge normal">Normal</span></td>
+                    <td><div class="module-progress"><div class="progress-mini-bar"><div class="fill complete" style="width: 100%"></div></div><span class="progress-mini-label">100%</span></div></td>
+                    <td>
+                        <div class="module-progress">
+                            <div class="progress-mini-bar"><div class="fill in-progress" style="width: 75%"></div></div>
+                            <span class="current-marker">Hier</span>
+                        </div>
+                    </td>
+                    <td><div class="module-progress"><div class="progress-mini-bar"><div class="fill not-started" style="width: 0%"></div></div><span class="progress-mini-label">—</span></div></td>
+                    <td><div class="module-progress"><div class="progress-mini-bar"><div class="fill not-started" style="width: 0%"></div></div><span class="progress-mini-label">—</span></div></td>
+                    <td><div class="module-progress"><div class="progress-mini-bar"><div class="fill not-started" style="width: 0%"></div></div><span class="progress-mini-label">—</span></div></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td><span class="quiz-score high">68%</span></td>
+                    <td><div class="trend-cell"><span class="trend-arrow up">↑</span></div></td>
+                    <td><div class="action-btns"><button class="action-btn" title="Nachricht senden">💬</button></div></td>
+                </tr>
+                <!-- Hans P. – normal -->
+                <tr data-status="normal" data-learner="hans" onclick="showDetail('hans')">
+                    <td>
+                        <div class="learner-cell">
+                            <div class="learner-avatar" style="background: #2dd4bf">HP<span class="online-dot on"></span></div>
+                            <div>
+                                <div class="learner-name">Hans P.</div>
+                                <div class="learner-last-seen">Jetzt aktiv</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td><span class="status-badge normal">Normal</span></td>
+                    <td><div class="module-progress"><div class="progress-mini-bar"><div class="fill complete" style="width: 100%"></div></div><span class="progress-mini-label">100%</span></div></td>
+                    <td><div class="module-progress"><div class="progress-mini-bar"><div class="fill complete" style="width: 100%"></div></div><span class="progress-mini-label">100%</span></div></td>
+                    <td>
+                        <div class="module-progress">
+                            <div class="progress-mini-bar"><div class="fill in-progress" style="width: 55%"></div></div>
+                            <span class="current-marker">Hier</span>
+                        </div>
+                    </td>
+                    <td><div class="module-progress"><div class="progress-mini-bar"><div class="fill not-started" style="width: 0%"></div></div><span class="progress-mini-label">—</span></div></td>
+                    <td><div class="module-progress"><div class="progress-mini-bar"><div class="fill not-started" style="width: 0%"></div></div><span class="progress-mini-label">—</span></div></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td><span class="quiz-score high">74%</span></td>
+                    <td><div class="trend-cell"><span class="trend-arrow flat">→</span></div></td>
+                    <td><div class="action-btns"><button class="action-btn" title="Nachricht senden">💬</button></div></td>
+                </tr>
+                <!-- Ines T. – normal -->
+                <tr data-status="normal" data-learner="ines" onclick="showDetail('ines')">
+                    <td>
+                        <div class="learner-cell">
+                            <div class="learner-avatar" style="background: #c084fc">IT<span class="online-dot on"></span></div>
+                            <div>
+                                <div class="learner-name">Ines T.</div>
+                                <div class="learner-last-seen">Jetzt aktiv</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td><span class="status-badge normal">Normal</span></td>
+                    <td><div class="module-progress"><div class="progress-mini-bar"><div class="fill complete" style="width: 100%"></div></div><span class="progress-mini-label">100%</span></div></td>
+                    <td>
+                        <div class="module-progress">
+                            <div class="progress-mini-bar"><div class="fill in-progress" style="width: 85%"></div></div>
+                            <span class="current-marker">Hier</span>
+                        </div>
+                    </td>
+                    <td><div class="module-progress"><div class="progress-mini-bar"><div class="fill not-started" style="width: 0%"></div></div><span class="progress-mini-label">—</span></div></td>
+                    <td><div class="module-progress"><div class="progress-mini-bar"><div class="fill not-started" style="width: 0%"></div></div><span class="progress-mini-label">—</span></div></td>
+                    <td><div class="module-progress"><div class="progress-mini-bar"><div class="fill not-started" style="width: 0%"></div></div><span class="progress-mini-label">—</span></div></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td><span class="quiz-score high">82%</span></td>
+                    <td><div class="trend-cell"><span class="trend-arrow up">↑</span></div></td>
+                    <td><div class="action-btns"><button class="action-btn" title="Nachricht senden">💬</button></div></td>
+                </tr>
+                <!-- Anna M. – schnell -->
+                <tr data-status="fast" data-learner="anna" onclick="showDetail('anna')">
+                    <td>
+                        <div class="learner-cell">
+                            <div class="learner-avatar" style="background: #f472b6">AM<span class="online-dot on"></span></div>
+                            <div>
+                                <div class="learner-name">Anna M.</div>
+                                <div class="learner-last-seen">Jetzt aktiv</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td><span class="status-badge fast">Schnell</span></td>
+                    <td><div class="module-progress"><div class="progress-mini-bar"><div class="fill complete" style="width: 100%"></div></div><span class="progress-mini-label">100%</span></div></td>
+                    <td><div class="module-progress"><div class="progress-mini-bar"><div class="fill complete" style="width: 100%"></div></div><span class="progress-mini-label">100%</span></div></td>
+                    <td><div class="module-progress"><div class="progress-mini-bar"><div class="fill complete" style="width: 100%"></div></div><span class="progress-mini-label">100%</span></div></td>
+                    <td>
+                        <div class="module-progress">
+                            <div class="progress-mini-bar"><div class="fill in-progress" style="width: 40%"></div></div>
+                            <span class="current-marker">Hier</span>
+                        </div>
+                    </td>
+                    <td><div class="module-progress"><div class="progress-mini-bar"><div class="fill not-started" style="width: 0%"></div></div><span class="progress-mini-label">—</span></div></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td><span class="quiz-score high">91%</span></td>
+                    <td><div class="trend-cell"><span class="trend-arrow up">↑</span></div></td>
+                    <td><div class="action-btns"><button class="action-btn" title="Nachricht senden">💬</button></div></td>
+                </tr>
+                <!-- Farid A. – schnell -->
+                <tr data-status="fast" data-learner="farid" onclick="showDetail('farid')">
+                    <td>
+                        <div class="learner-cell">
+                            <div class="learner-avatar" style="background: #fbbf24">FA<span class="online-dot on"></span></div>
+                            <div>
+                                <div class="learner-name">Farid A.</div>
+                                <div class="learner-last-seen">Jetzt aktiv</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td><span class="status-badge fast">Schnell</span></td>
+                    <td><div class="module-progress"><div class="progress-mini-bar"><div class="fill complete" style="width: 100%"></div></div><span class="progress-mini-label">100%</span></div></td>
+                    <td><div class="module-progress"><div class="progress-mini-bar"><div class="fill complete" style="width: 100%"></div></div><span class="progress-mini-label">100%</span></div></td>
+                    <td><div class="module-progress"><div class="progress-mini-bar"><div class="fill complete" style="width: 100%"></div></div><span class="progress-mini-label">100%</span></div></td>
+                    <td>
+                        <div class="module-progress">
+                            <div class="progress-mini-bar"><div class="fill in-progress" style="width: 60%"></div></div>
+                            <span class="current-marker">Hier</span>
+                        </div>
+                    </td>
+                    <td><div class="module-progress"><div class="progress-mini-bar"><div class="fill not-started" style="width: 0%"></div></div><span class="progress-mini-label">—</span></div></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td><span class="quiz-score high">88%</span></td>
+                    <td><div class="trend-cell"><span class="trend-arrow up">↑</span></div></td>
+                    <td><div class="action-btns"><button class="action-btn" title="Nachricht senden">💬</button></div></td>
+                </tr>
+                <!-- Jan B. – normal -->
+                <tr data-status="normal" data-learner="jan" onclick="showDetail('jan')">
+                    <td>
+                        <div class="learner-cell">
+                            <div class="learner-avatar" style="background: #fb923c">JB<span class="online-dot off"></span></div>
+                            <div>
+                                <div class="learner-name">Jan B.</div>
+                                <div class="learner-last-seen">Zuletzt vor 4 Std.</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td><span class="status-badge normal">Normal</span></td>
+                    <td><div class="module-progress"><div class="progress-mini-bar"><div class="fill complete" style="width: 100%"></div></div><span class="progress-mini-label">100%</span></div></td>
+                    <td><div class="module-progress"><div class="progress-mini-bar"><div class="fill complete" style="width: 100%"></div></div><span class="progress-mini-label">100%</span></div></td>
+                    <td><div class="module-progress"><div class="progress-mini-bar"><div class="fill complete" style="width: 100%"></div></div><span class="progress-mini-label">100%</span></div></td>
+                    <td>
+                        <div class="module-progress">
+                            <div class="progress-mini-bar"><div class="fill in-progress" style="width: 20%"></div></div>
+                            <span class="current-marker">Hier</span>
+                        </div>
+                    </td>
+                    <td><div class="module-progress"><div class="progress-mini-bar"><div class="fill not-started" style="width: 0%"></div></div><span class="progress-mini-label">—</span></div></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td class="mod-empty"><span class="mod-empty">—</span></td>
+                    <td><span class="quiz-score mid">63%</span></td>
+                    <td><div class="trend-cell"><span class="trend-arrow flat">→</span></div></td>
+                    <td><div class="action-btns"><button class="action-btn" title="Nachricht senden">💬</button></div></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Alert Panel -->
+    <div class="card alert-section">
+        <div class="card-header">
+            <div class="card-title">⚠️ Unterstützung empfohlen</div>
+            <span style="font-size: 12px; color: #dc2626; font-weight: 600;">2 Alerts</span>
+        </div>
+        <div class="alert-list">
+            <div class="alert-card">
+                <div class="alert-header">
+                    <div class="alert-avatar" style="background: #4361ee">DR</div>
+                    <div class="alert-name">David R.</div>
+                    <div class="alert-time">Seit 45 Min.</div>
+                </div>
+                <div class="alert-reason">Steckt in Modul 2, Kap. 1 fest</div>
+                <div class="alert-detail">Quiz-Erfolgsrate: 32% · 3× gescheitert · Verweildauer 2× über Durchschnitt</div>
+                <div class="alert-actions">
+                    <button class="alert-btn primary">💬 Nachricht</button>
+                    <button class="alert-btn secondary" onclick="showDetail('david')">Details</button>
+                </div>
+            </div>
+            <div class="alert-card">
+                <div class="alert-header">
+                    <div class="alert-avatar" style="background: #f87171">GW</div>
+                    <div class="alert-name">Greta W.</div>
+                    <div class="alert-time">Seit 2 Tagen</div>
+                </div>
+                <div class="alert-reason">Keine Aktivität seit 2 Tagen</div>
+                <div class="alert-detail">Fortschritt verlangsamt · Letzte Aktivität: Mo., 14:23 Uhr · 38% Gesamtfortschritt</div>
+                <div class="alert-actions">
+                    <button class="alert-btn primary">💬 Nachricht</button>
+                    <button class="alert-btn secondary" onclick="showDetail('greta')">Details</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Detail Panel -->
+    <div class="card detail-section">
+        <!-- Empty state -->
+        <div class="detail-empty" id="detail-empty">
+            <div class="detail-empty-icon">👈</div>
+            <p>Klicke auf einen Lernenden in der Tabelle, um Details zu sehen.</p>
+        </div>
+
+        <!-- David Detail -->
+        <div class="detail-content" id="detail-david">
+            <div class="detail-profile">
+                <div class="detail-avatar" style="background: #4361ee">DR</div>
+                <div>
+                    <div class="detail-name">David Richter</div>
+                    <div class="detail-meta">🟢 Jetzt aktiv · Gestartet am 6. Jan. 2026</div>
+                </div>
+            </div>
+            <div class="detail-grid">
+                <div class="detail-stat">
+                    <div class="detail-stat-label">Fortschritt</div>
+                    <div class="detail-stat-value red">28%</div>
+                </div>
+                <div class="detail-stat">
+                    <div class="detail-stat-label">Quiz Ø</div>
+                    <div class="detail-stat-value red">32%</div>
+                </div>
+                <div class="detail-stat">
+                    <div class="detail-stat-label">Ø Min./Inhalt</div>
+                    <div class="detail-stat-value orange">14</div>
+                </div>
+                <div class="detail-stat">
+                    <div class="detail-stat-label">Gruppen-Ø</div>
+                    <div class="detail-stat-value blue">6</div>
+                </div>
+            </div>
+            <div class="detail-subtitle">Aktuelle Position</div>
+            <div class="detail-position">
+                <div class="detail-position-path">Modul 2 › Kap. 1 › Rollen in Scrum</div>
+                <div class="detail-position-sub">Content-Element 3 von 8 · Seit 45 Min. hier</div>
+            </div>
+            <div class="detail-subtitle">Letzte 10 Quiz-Antworten</div>
+            <div class="detail-quiz-history">
+                <div class="quiz-dot pass">✓</div>
+                <div class="quiz-dot pass">✓</div>
+                <div class="quiz-dot fail">✗</div>
+                <div class="quiz-dot fail">✗</div>
+                <div class="quiz-dot fail">✗</div>
+                <div class="quiz-dot pass">✓</div>
+                <div class="quiz-dot fail">✗</div>
+                <div class="quiz-dot fail">✗</div>
+                <div class="quiz-dot fail">✗</div>
+                <div class="quiz-dot fail">✗</div>
+            </div>
+            <div class="detail-actions">
+                <button class="detail-btn primary">💬 Nachricht senden</button>
+                <button class="detail-btn outline">📝 Notiz hinzufügen</button>
+            </div>
+        </div>
+
+        <!-- Greta Detail -->
+        <div class="detail-content" id="detail-greta">
+            <div class="detail-profile">
+                <div class="detail-avatar" style="background: #f87171">GW</div>
+                <div>
+                    <div class="detail-name">Greta Weber</div>
+                    <div class="detail-meta">⚫ Offline seit 2 Tagen · Gestartet am 6. Jan. 2026</div>
+                </div>
+            </div>
+            <div class="detail-grid">
+                <div class="detail-stat">
+                    <div class="detail-stat-label">Fortschritt</div>
+                    <div class="detail-stat-value orange">38%</div>
+                </div>
+                <div class="detail-stat">
+                    <div class="detail-stat-label">Quiz Ø</div>
+                    <div class="detail-stat-value red">41%</div>
+                </div>
+                <div class="detail-stat">
+                    <div class="detail-stat-label">Ø Min./Inhalt</div>
+                    <div class="detail-stat-value orange">11</div>
+                </div>
+                <div class="detail-stat">
+                    <div class="detail-stat-label">Gruppen-Ø</div>
+                    <div class="detail-stat-value blue">6</div>
+                </div>
+            </div>
+            <div class="detail-subtitle">Aktuelle Position</div>
+            <div class="detail-position">
+                <div class="detail-position-path">Modul 2 › Kap. 3 › Events & Zeremonien</div>
+                <div class="detail-position-sub">Content-Element 5 von 6 · Inaktiv seit Mo., 14:23</div>
+            </div>
+            <div class="detail-subtitle">Letzte 10 Quiz-Antworten</div>
+            <div class="detail-quiz-history">
+                <div class="quiz-dot pass">✓</div>
+                <div class="quiz-dot pass">✓</div>
+                <div class="quiz-dot pass">✓</div>
+                <div class="quiz-dot fail">✗</div>
+                <div class="quiz-dot pass">✓</div>
+                <div class="quiz-dot fail">✗</div>
+                <div class="quiz-dot fail">✗</div>
+                <div class="quiz-dot fail">✗</div>
+                <div class="quiz-dot fail">✗</div>
+                <div class="quiz-dot pass">✓</div>
+            </div>
+            <div class="detail-actions">
+                <button class="detail-btn primary">💬 Nachricht senden</button>
+                <button class="detail-btn outline">📝 Notiz hinzufügen</button>
+            </div>
+        </div>
+
+        <!-- Ben Detail -->
+        <div class="detail-content" id="detail-ben">
+            <div class="detail-profile">
+                <div class="detail-avatar" style="background: #60a5fa">BK</div>
+                <div>
+                    <div class="detail-name">Ben Krüger</div>
+                    <div class="detail-meta">🟢 Jetzt aktiv · Gestartet am 6. Jan. 2026</div>
+                </div>
+            </div>
+            <div class="detail-grid">
+                <div class="detail-stat">
+                    <div class="detail-stat-label">Fortschritt</div>
+                    <div class="detail-stat-value blue">52%</div>
+                </div>
+                <div class="detail-stat">
+                    <div class="detail-stat-label">Quiz Ø</div>
+                    <div class="detail-stat-value green">78%</div>
+                </div>
+                <div class="detail-stat">
+                    <div class="detail-stat-label">Ø Min./Inhalt</div>
+                    <div class="detail-stat-value green">5</div>
+                </div>
+                <div class="detail-stat">
+                    <div class="detail-stat-label">Gruppen-Ø</div>
+                    <div class="detail-stat-value blue">6</div>
+                </div>
+            </div>
+            <div class="detail-subtitle">Aktuelle Position</div>
+            <div class="detail-position">
+                <div class="detail-position-path">Modul 3 › Kap. 2 › Kommunikationsmodelle</div>
+                <div class="detail-position-sub">Content-Element 4 von 8 · Seit 12 Min. hier</div>
+            </div>
+            <div class="detail-subtitle">Letzte 10 Quiz-Antworten</div>
+            <div class="detail-quiz-history">
+                <div class="quiz-dot pass">✓</div>
+                <div class="quiz-dot pass">✓</div>
+                <div class="quiz-dot pass">✓</div>
+                <div class="quiz-dot fail">✗</div>
+                <div class="quiz-dot pass">✓</div>
+                <div class="quiz-dot pass">✓</div>
+                <div class="quiz-dot pass">✓</div>
+                <div class="quiz-dot pass">✓</div>
+                <div class="quiz-dot fail">✗</div>
+                <div class="quiz-dot pass">✓</div>
+            </div>
+            <div class="detail-actions">
+                <button class="detail-btn primary">💬 Nachricht senden</button>
+                <button class="detail-btn outline">📝 Notiz hinzufügen</button>
+            </div>
+        </div>
+
+        <!-- Generic detail for others -->
+        <div class="detail-content" id="detail-anna">
+            <div class="detail-profile">
+                <div class="detail-avatar" style="background: #f472b6">AM</div>
+                <div>
+                    <div class="detail-name">Anna Meier</div>
+                    <div class="detail-meta">🟢 Jetzt aktiv · Gestartet am 6. Jan. 2026</div>
+                </div>
+            </div>
+            <div class="detail-grid">
+                <div class="detail-stat"><div class="detail-stat-label">Fortschritt</div><div class="detail-stat-value green">72%</div></div>
+                <div class="detail-stat"><div class="detail-stat-label">Quiz Ø</div><div class="detail-stat-value green">91%</div></div>
+                <div class="detail-stat"><div class="detail-stat-label">Ø Min./Inhalt</div><div class="detail-stat-value green">4</div></div>
+                <div class="detail-stat"><div class="detail-stat-label">Gruppen-Ø</div><div class="detail-stat-value blue">6</div></div>
+            </div>
+            <div class="detail-subtitle">Aktuelle Position</div>
+            <div class="detail-position">
+                <div class="detail-position-path">Modul 4 › Kap. 1 › Projektbriefing</div>
+                <div class="detail-position-sub">Content-Element 3 von 7 · Seit 8 Min. hier</div>
+            </div>
+            <div class="detail-subtitle">Letzte 10 Quiz-Antworten</div>
+            <div class="detail-quiz-history">
+                <div class="quiz-dot pass">✓</div><div class="quiz-dot pass">✓</div><div class="quiz-dot pass">✓</div><div class="quiz-dot pass">✓</div><div class="quiz-dot pass">✓</div>
+                <div class="quiz-dot pass">✓</div><div class="quiz-dot fail">✗</div><div class="quiz-dot pass">✓</div><div class="quiz-dot pass">✓</div><div class="quiz-dot pass">✓</div>
+            </div>
+            <div class="detail-actions">
+                <button class="detail-btn primary">💬 Nachricht senden</button>
+                <button class="detail-btn outline">📝 Notiz hinzufügen</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Kursplan / Zeitplan -->
+    <div class="card schedule-section">
+        <div class="schedule-header">
+            <div class="card-title" style="margin-bottom: 0;">Kursplan</div>
+            <div class="schedule-week-nav">
+                <button class="week-nav-btn" onclick="changeWeek(-1)">‹</button>
+                <div style="text-align: center;">
+                    <div class="week-label">Woche 3 von 6</div>
+                    <div class="week-date-range">17. – 21. Feb. 2026</div>
+                </div>
+                <button class="week-nav-btn" onclick="changeWeek(1)">›</button>
+            </div>
+        </div>
+
+        <div class="schedule-days">
+
+            <!-- Montag (vergangen) -->
+            <div class="schedule-day past">
+                <div class="day-header" onclick="toggleDay(this)">
+                    <div class="day-header-left">
+                        <div class="day-name">Mo</div>
+                        <div class="day-date">17. Feb.</div>
+                    </div>
+                    <div class="day-progress">
+                        <div class="day-times">08:30 – 16:00</div>
+                        <div class="day-progress-bar"><div class="fill done" style="width: 100%"></div></div>
+                        <div class="day-progress-label complete">100%</div>
+                    </div>
+                    <span class="day-chevron">▶</span>
+                </div>
+                <div class="day-body">
+                    <div class="day-timeline">
+                        <div class="timeline-block">
+                            <div class="timeline-time">08:30</div>
+                            <div class="timeline-line"></div>
+                            <div class="timeline-dot done"></div>
+                            <div class="timeline-content">
+                                <div class="timeline-module done">
+                                    <div class="timeline-module-name">Modul 3: Praxistransfer</div>
+                                    <div class="timeline-module-detail">08:30 – 10:00 · Kap. 1: Fallbeispiele</div>
+                                    <div class="timeline-module-chapters">
+                                        <span class="chapter-chip done">✓ UK 1.1 Fallbeispiel Automotive</span>
+                                        <span class="chapter-chip done">✓ UK 1.2 Fallbeispiel IT-Branche</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="timeline-block">
+                            <div class="timeline-time">10:00</div>
+                            <div class="timeline-line"></div>
+                            <div class="timeline-dot break"></div>
+                            <div class="timeline-content">
+                                <div class="timeline-break">☕ Pause · 10:00 – 10:15</div>
+                            </div>
+                        </div>
+                        <div class="timeline-block">
+                            <div class="timeline-time">10:15</div>
+                            <div class="timeline-line"></div>
+                            <div class="timeline-dot done"></div>
+                            <div class="timeline-content">
+                                <div class="timeline-module done">
+                                    <div class="timeline-module-name">Modul 3: Praxistransfer</div>
+                                    <div class="timeline-module-detail">10:15 – 12:00 · Kap. 1: Fallbeispiele (Forts.)</div>
+                                    <div class="timeline-module-chapters">
+                                        <span class="chapter-chip done">✓ UK 1.3 Vergleich &amp; Analyse</span>
+                                        <span class="chapter-chip done">✓ UK 1.4 Lessons Learned</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="timeline-block">
+                            <div class="timeline-time">12:00</div>
+                            <div class="timeline-line"></div>
+                            <div class="timeline-dot break"></div>
+                            <div class="timeline-content">
+                                <div class="timeline-break">🍽 Mittagspause · 12:00 – 13:00</div>
+                            </div>
+                        </div>
+                        <div class="timeline-block">
+                            <div class="timeline-time">13:00</div>
+                            <div class="timeline-line"></div>
+                            <div class="timeline-dot done"></div>
+                            <div class="timeline-content">
+                                <div class="timeline-module done">
+                                    <div class="timeline-module-name">Modul 3: Praxistransfer</div>
+                                    <div class="timeline-module-detail">13:00 – 14:30 · Kap. 1: Fallbeispiele (Forts.)</div>
+                                    <div class="timeline-module-chapters">
+                                        <span class="chapter-chip done">✓ UK 1.5 Best Practices</span>
+                                        <span class="chapter-chip done">✓ UK 1.6 Gruppenübung</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="timeline-block">
+                            <div class="timeline-time">14:30</div>
+                            <div class="timeline-line"></div>
+                            <div class="timeline-dot break"></div>
+                            <div class="timeline-content">
+                                <div class="timeline-break">☕ Pause · 14:30 – 14:45</div>
+                            </div>
+                        </div>
+                        <div class="timeline-block">
+                            <div class="timeline-time">14:45</div>
+                            <div class="timeline-line"></div>
+                            <div class="timeline-dot done"></div>
+                            <div class="timeline-content">
+                                <div class="timeline-module done">
+                                    <div class="timeline-module-name">Modul 3: Praxistransfer</div>
+                                    <div class="timeline-module-detail">14:45 – 16:00 · Kap. 1: Fallbeispiele (Forts.)</div>
+                                    <div class="timeline-module-chapters">
+                                        <span class="chapter-chip done">✓ UK 1.7 Quiz &amp; Zusammenfassung</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="timeline-block">
+                            <div class="timeline-time">16:00</div>
+                            <div class="timeline-line" style="height: 0;"></div>
+                            <div class="timeline-dot" style="background: #9ca3af;"></div>
+                            <div class="timeline-content">
+                                <div class="timeline-end-time">Feierabend</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dienstag (vergangen) -->
+            <div class="schedule-day past">
+                <div class="day-header" onclick="toggleDay(this)">
+                    <div class="day-header-left">
+                        <div class="day-name">Di</div>
+                        <div class="day-date">18. Feb.</div>
+                    </div>
+                    <div class="day-progress">
+                        <div class="day-times">08:30 – 16:00</div>
+                        <div class="day-progress-bar"><div class="fill done" style="width: 100%"></div></div>
+                        <div class="day-progress-label complete">100%</div>
+                    </div>
+                    <span class="day-chevron">▶</span>
+                </div>
+                <div class="day-body">
+                    <div class="day-timeline">
+                        <div class="timeline-block">
+                            <div class="timeline-time">08:30</div>
+                            <div class="timeline-line"></div>
+                            <div class="timeline-dot done"></div>
+                            <div class="timeline-content">
+                                <div class="timeline-module done">
+                                    <div class="timeline-module-name">Modul 3: Praxistransfer</div>
+                                    <div class="timeline-module-detail">08:30 – 10:00 · Kap. 2: Kommunikationsmodelle</div>
+                                    <div class="timeline-module-chapters">
+                                        <span class="chapter-chip done">✓ UK 2.1 Schulz von Thun</span>
+                                        <span class="chapter-chip done">✓ UK 2.2 Gewaltfreie Kommunikation</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="timeline-block">
+                            <div class="timeline-time">10:00</div>
+                            <div class="timeline-line"></div>
+                            <div class="timeline-dot break"></div>
+                            <div class="timeline-content">
+                                <div class="timeline-break">☕ Pause · 10:00 – 10:15</div>
+                            </div>
+                        </div>
+                        <div class="timeline-block">
+                            <div class="timeline-time">10:15</div>
+                            <div class="timeline-line"></div>
+                            <div class="timeline-dot done"></div>
+                            <div class="timeline-content">
+                                <div class="timeline-module done">
+                                    <div class="timeline-module-name">Modul 3: Praxistransfer</div>
+                                    <div class="timeline-module-detail">10:15 – 12:00 · Kap. 2: Kommunikationsmodelle (Forts.)</div>
+                                    <div class="timeline-module-chapters">
+                                        <span class="chapter-chip done">✓ UK 2.3 Aktives Zuhören – Theorie</span>
+                                        <span class="chapter-chip done">✓ UK 2.4 Feedback-Methoden</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="timeline-block">
+                            <div class="timeline-time">12:00</div>
+                            <div class="timeline-line"></div>
+                            <div class="timeline-dot break"></div>
+                            <div class="timeline-content">
+                                <div class="timeline-break">🍽 Mittagspause · 12:00 – 13:00</div>
+                            </div>
+                        </div>
+                        <div class="timeline-block">
+                            <div class="timeline-time">13:00</div>
+                            <div class="timeline-line"></div>
+                            <div class="timeline-dot done"></div>
+                            <div class="timeline-content">
+                                <div class="timeline-module done">
+                                    <div class="timeline-module-name">Modul 3: Praxistransfer</div>
+                                    <div class="timeline-module-detail">13:00 – 14:30 · Kap. 2: Kommunikationsmodelle (Forts.)</div>
+                                    <div class="timeline-module-chapters">
+                                        <span class="chapter-chip done">✓ UK 2.5 Rollenspiel-Übung</span>
+                                        <span class="chapter-chip done">✓ UK 2.6 Anwendungsübung</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="timeline-block">
+                            <div class="timeline-time">14:30</div>
+                            <div class="timeline-line"></div>
+                            <div class="timeline-dot break"></div>
+                            <div class="timeline-content">
+                                <div class="timeline-break">☕ Pause · 14:30 – 14:45</div>
+                            </div>
+                        </div>
+                        <div class="timeline-block">
+                            <div class="timeline-time">14:45</div>
+                            <div class="timeline-line"></div>
+                            <div class="timeline-dot done"></div>
+                            <div class="timeline-content">
+                                <div class="timeline-module done">
+                                    <div class="timeline-module-name">Modul 3: Praxistransfer</div>
+                                    <div class="timeline-module-detail">14:45 – 16:00 · Kap. 2: Kommunikationsmodelle (Forts.)</div>
+                                    <div class="timeline-module-chapters">
+                                        <span class="chapter-chip done">✓ UK 2.7 Quiz Kommunikation</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="timeline-block">
+                            <div class="timeline-time">16:00</div>
+                            <div class="timeline-line" style="height: 0;"></div>
+                            <div class="timeline-dot" style="background: #9ca3af;"></div>
+                            <div class="timeline-content">
+                                <div class="timeline-end-time">Feierabend</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mittwoch (HEUTE) -->
+            <div class="schedule-day today">
+                <div class="day-header" onclick="toggleDay(this)">
+                    <div class="day-header-left">
+                        <div class="day-name">Mi</div>
+                        <div class="day-date">19. Feb.</div>
+                        <span class="today-badge">Heute</span>
+                    </div>
+                    <div class="day-progress">
+                        <div class="day-times">08:30 – 16:00</div>
+                        <div class="day-progress-bar"><div class="fill active" style="width: 35%"></div></div>
+                        <div class="day-progress-label">35%</div>
+                    </div>
+                    <span class="day-chevron open">▶</span>
+                </div>
+                <div class="day-body open">
+                    <div class="day-timeline">
+                        <div class="timeline-block">
+                            <div class="timeline-time">08:30</div>
+                            <div class="timeline-line"></div>
+                            <div class="timeline-dot done"></div>
+                            <div class="timeline-content">
+                                <div class="timeline-module done">
+                                    <div class="timeline-module-name">Modul 3: Praxistransfer</div>
+                                    <div class="timeline-module-detail">08:30 – 10:00 · Kap. 3: Aktives Zuhören &amp; Feedback</div>
+                                    <div class="timeline-module-chapters">
+                                        <span class="chapter-chip done">✓ UK 3.1 Aktives Zuhören – Vertiefung</span>
+                                        <span class="chapter-chip done">✓ UK 3.2 Paraphrasieren</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="timeline-block">
+                            <div class="timeline-time">10:00</div>
+                            <div class="timeline-line"></div>
+                            <div class="timeline-dot break"></div>
+                            <div class="timeline-content">
+                                <div class="timeline-break">☕ Pause · 10:00 – 10:15</div>
+                            </div>
+                        </div>
+                        <div class="timeline-block">
+                            <div class="timeline-time">10:15</div>
+                            <div class="timeline-line"></div>
+                            <div class="timeline-dot current"></div>
+                            <div class="timeline-content">
+                                <div class="timeline-module current">
+                                    <div class="timeline-module-name">▶ Modul 3: Praxistransfer</div>
+                                    <div class="timeline-module-detail">10:15 – 12:00 · Kap. 3: Aktives Zuhören &amp; Feedback (Forts.)</div>
+                                    <div class="timeline-module-chapters">
+                                        <span class="chapter-chip current">▶ UK 3.3 Ich-Botschaften</span>
+                                        <span class="chapter-chip">UK 3.4 Feedback-Regeln</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="timeline-block">
+                            <div class="timeline-time">12:00</div>
+                            <div class="timeline-line"></div>
+                            <div class="timeline-dot break"></div>
+                            <div class="timeline-content">
+                                <div class="timeline-break">🍽 Mittagspause · 12:00 – 13:00</div>
+                            </div>
+                        </div>
+                        <div class="timeline-block">
+                            <div class="timeline-time">13:00</div>
+                            <div class="timeline-line"></div>
+                            <div class="timeline-dot module"></div>
+                            <div class="timeline-content">
+                                <div class="timeline-module locked">
+                                    <div class="timeline-module-name">Modul 3: Praxistransfer</div>
+                                    <div class="timeline-module-detail">13:00 – 14:30 · Kap. 3: Aktives Zuhören &amp; Feedback (Forts.)</div>
+                                    <div class="timeline-module-chapters">
+                                        <span class="chapter-chip">UK 3.5 Schwierige Gespräche</span>
+                                        <span class="chapter-chip">UK 3.6 Konfliktübung</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="timeline-block">
+                            <div class="timeline-time">14:30</div>
+                            <div class="timeline-line"></div>
+                            <div class="timeline-dot break"></div>
+                            <div class="timeline-content">
+                                <div class="timeline-break">☕ Pause · 14:30 – 14:45</div>
+                            </div>
+                        </div>
+                        <div class="timeline-block">
+                            <div class="timeline-time">14:45</div>
+                            <div class="timeline-line"></div>
+                            <div class="timeline-dot module"></div>
+                            <div class="timeline-content">
+                                <div class="timeline-module locked">
+                                    <div class="timeline-module-name">Modul 3: Praxistransfer</div>
+                                    <div class="timeline-module-detail">14:45 – 16:00 · Kap. 3: Aktives Zuhören &amp; Feedback (Forts.)</div>
+                                    <div class="timeline-module-chapters">
+                                        <span class="chapter-chip">UK 3.7 Quiz &amp; Reflexion</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="timeline-block">
+                            <div class="timeline-time">16:00</div>
+                            <div class="timeline-line" style="height: 0;"></div>
+                            <div class="timeline-dot" style="background: #9ca3af;"></div>
+                            <div class="timeline-content">
+                                <div class="timeline-end-time">Feierabend</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Donnerstag (kommend) -->
+            <div class="schedule-day">
+                <div class="day-header" onclick="toggleDay(this)">
+                    <div class="day-header-left">
+                        <div class="day-name">Do</div>
+                        <div class="day-date">20. Feb.</div>
+                    </div>
+                    <div class="day-progress">
+                        <div class="day-times">08:30 – 16:00</div>
+                        <div class="day-progress-bar"><div class="fill" style="width: 0%"></div></div>
+                        <div class="day-progress-label">0%</div>
+                    </div>
+                    <span class="day-chevron">▶</span>
+                </div>
+                <div class="day-body">
+                    <div class="day-timeline">
+                        <div class="timeline-block">
+                            <div class="timeline-time">08:30</div>
+                            <div class="timeline-line"></div>
+                            <div class="timeline-dot module"></div>
+                            <div class="timeline-content">
+                                <div class="timeline-module locked">
+                                    <div class="timeline-module-name">Modul 3: Praxistransfer</div>
+                                    <div class="timeline-module-detail">08:30 – 10:00 · Kap. 4: Reflexion &amp; Retrospektive</div>
+                                    <div class="timeline-module-chapters">
+                                        <span class="chapter-chip">UK 4.1 Retrospektive-Formate</span>
+                                        <span class="chapter-chip">UK 4.2 Start-Stop-Continue</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="timeline-block">
+                            <div class="timeline-time">10:00</div>
+                            <div class="timeline-line"></div>
+                            <div class="timeline-dot break"></div>
+                            <div class="timeline-content">
+                                <div class="timeline-break">☕ Pause · 10:00 – 10:15</div>
+                            </div>
+                        </div>
+                        <div class="timeline-block">
+                            <div class="timeline-time">10:15</div>
+                            <div class="timeline-line"></div>
+                            <div class="timeline-dot module"></div>
+                            <div class="timeline-content">
+                                <div class="timeline-module locked">
+                                    <div class="timeline-module-name">Modul 3: Praxistransfer</div>
+                                    <div class="timeline-module-detail">10:15 – 12:00 · Kap. 4: Reflexion &amp; Retrospektive (Forts.)</div>
+                                    <div class="timeline-module-chapters">
+                                        <span class="chapter-chip">UK 4.3 Teamdynamik</span>
+                                        <span class="chapter-chip">UK 4.4 Selbstreflexion</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="timeline-block">
+                            <div class="timeline-time">12:00</div>
+                            <div class="timeline-line"></div>
+                            <div class="timeline-dot break"></div>
+                            <div class="timeline-content">
+                                <div class="timeline-break">🍽 Mittagspause · 12:00 – 13:00</div>
+                            </div>
+                        </div>
+                        <div class="timeline-block">
+                            <div class="timeline-time">13:00</div>
+                            <div class="timeline-line"></div>
+                            <div class="timeline-dot module"></div>
+                            <div class="timeline-content">
+                                <div class="timeline-module locked">
+                                    <div class="timeline-module-name">Modul 3: Praxistransfer</div>
+                                    <div class="timeline-module-detail">13:00 – 14:30 · Kap. 4: Reflexion &amp; Retrospektive (Forts.)</div>
+                                    <div class="timeline-module-chapters">
+                                        <span class="chapter-chip">UK 4.5 Retrospektive planen</span>
+                                        <span class="chapter-chip">UK 4.6 Ergebnisse nutzen</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="timeline-block">
+                            <div class="timeline-time">14:30</div>
+                            <div class="timeline-line"></div>
+                            <div class="timeline-dot break"></div>
+                            <div class="timeline-content">
+                                <div class="timeline-break">☕ Pause · 14:30 – 14:45</div>
+                            </div>
+                        </div>
+                        <div class="timeline-block">
+                            <div class="timeline-time">14:45</div>
+                            <div class="timeline-line"></div>
+                            <div class="timeline-dot module"></div>
+                            <div class="timeline-content">
+                                <div class="timeline-module locked">
+                                    <div class="timeline-module-name">Modul 3: Praxistransfer</div>
+                                    <div class="timeline-module-detail">14:45 – 16:00 · Kap. 4: Reflexion &amp; Retrospektive (Forts.)</div>
+                                    <div class="timeline-module-chapters">
+                                        <span class="chapter-chip">UK 4.7 Quiz &amp; Abschluss Kap. 4</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="timeline-block">
+                            <div class="timeline-time">16:00</div>
+                            <div class="timeline-line" style="height: 0;"></div>
+                            <div class="timeline-dot" style="background: #9ca3af;"></div>
+                            <div class="timeline-content">
+                                <div class="timeline-end-time">Feierabend</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Freitag (kommend) -->
+            <div class="schedule-day">
+                <div class="day-header" onclick="toggleDay(this)">
+                    <div class="day-header-left">
+                        <div class="day-name">Fr</div>
+                        <div class="day-date">21. Feb.</div>
+                    </div>
+                    <div class="day-progress">
+                        <div class="day-times">08:30 – 14:00</div>
+                        <div class="day-progress-bar"><div class="fill" style="width: 0%"></div></div>
+                        <div class="day-progress-label">0%</div>
+                    </div>
+                    <span class="day-chevron">▶</span>
+                </div>
+                <div class="day-body">
+                    <div class="day-timeline">
+                        <div class="timeline-block">
+                            <div class="timeline-time">08:30</div>
+                            <div class="timeline-line"></div>
+                            <div class="timeline-dot module"></div>
+                            <div class="timeline-content">
+                                <div class="timeline-module locked">
+                                    <div class="timeline-module-name">Modul 3: Praxistransfer</div>
+                                    <div class="timeline-module-detail">08:30 – 10:00 · Kap. 5: Modul-Abschluss</div>
+                                    <div class="timeline-module-chapters">
+                                        <span class="chapter-chip">UK 5.1 Wiederholung Kap. 1–2</span>
+                                        <span class="chapter-chip">UK 5.2 Wiederholung Kap. 3–4</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="timeline-block">
+                            <div class="timeline-time">10:00</div>
+                            <div class="timeline-line"></div>
+                            <div class="timeline-dot break"></div>
+                            <div class="timeline-content">
+                                <div class="timeline-break">☕ Pause · 10:00 – 10:15</div>
+                            </div>
+                        </div>
+                        <div class="timeline-block">
+                            <div class="timeline-time">10:15</div>
+                            <div class="timeline-line"></div>
+                            <div class="timeline-dot module"></div>
+                            <div class="timeline-content">
+                                <div class="timeline-module locked">
+                                    <div class="timeline-module-name">Modul 3: Praxistransfer</div>
+                                    <div class="timeline-module-detail">10:15 – 12:00 · Kap. 5: Modul-Abschluss (Forts.)</div>
+                                    <div class="timeline-module-chapters">
+                                        <span class="chapter-chip">UK 5.3 Modul-Quiz</span>
+                                        <span class="chapter-chip">UK 5.4 Abschlusspräsentation</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="timeline-block">
+                            <div class="timeline-time">12:00</div>
+                            <div class="timeline-line"></div>
+                            <div class="timeline-dot break"></div>
+                            <div class="timeline-content">
+                                <div class="timeline-break">🍽 Mittagspause · 12:00 – 13:00</div>
+                            </div>
+                        </div>
+                        <div class="timeline-block">
+                            <div class="timeline-time">13:00</div>
+                            <div class="timeline-line"></div>
+                            <div class="timeline-dot module"></div>
+                            <div class="timeline-content">
+                                <div class="timeline-module locked">
+                                    <div class="timeline-module-name">Modul 3: Praxistransfer</div>
+                                    <div class="timeline-module-detail">13:00 – 14:00 · Kap. 5: Modul-Abschluss (Forts.)</div>
+                                    <div class="timeline-module-chapters">
+                                        <span class="chapter-chip">UK 5.5 Ausblick Modul 4 &amp; Abschluss</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="timeline-block">
+                            <div class="timeline-time">14:00</div>
+                            <div class="timeline-line" style="height: 0;"></div>
+                            <div class="timeline-dot" style="background: #9ca3af;"></div>
+                            <div class="timeline-content">
+                                <div class="timeline-end-time">Kursende Woche 3 🎉</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="schedule-legend">
+            <span><span class="legend-bar done"></span> Abgeschlossen</span>
+            <span><span class="legend-bar current"></span> Aktuell</span>
+            <span><span class="legend-bar upcoming"></span> Kommend</span>
+            <span><span class="legend-bar break"></span> Pause</span>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    // Show learner detail
+    function showDetail(learner) {
+        // Hide all details
+        document.getElementById('detail-empty').style.display = 'none';
+        document.querySelectorAll('.detail-content').forEach(el => el.classList.remove('active'));
+
+        // Show selected
+        const detail = document.getElementById('detail-' + learner);
+        if (detail) {
+            detail.classList.add('active');
+        } else {
+            // Fallback: show empty with name
+            document.getElementById('detail-empty').style.display = 'block';
+        }
+
+        // Highlight row
+        document.querySelectorAll('.matrix-table tbody tr').forEach(tr => tr.classList.remove('selected'));
+        const row = document.querySelector(`tr[data-learner="${learner}"]`);
+        if (row) row.classList.add('selected');
+    }
+
+    // Filter buttons
+    function filterAll(btn) {
+        setActiveFilter(btn);
+        document.querySelectorAll('.matrix-table tbody tr').forEach(tr => {
+            tr.style.display = '';
+        });
+    }
+
+    function filterStatus(btn, status) {
+        setActiveFilter(btn);
+        document.querySelectorAll('.matrix-table tbody tr').forEach(tr => {
+            if (status === 'needs-support') {
+                tr.style.display = tr.classList.contains('needs-support') ? '' : 'none';
+            } else {
+                tr.style.display = tr.dataset.status === status ? '' : 'none';
+            }
+        });
+    }
+
+    function setActiveFilter(btn) {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+    }
+
+    // Schedule
+    function toggleDay(header) {
+        const body = header.nextElementSibling;
+        const chevron = header.querySelector('.day-chevron');
+        if (body) {
+            body.classList.toggle('open');
+            chevron.classList.toggle('open');
+        }
+    }
+
+    function changeWeek(direction) {
+        const label = document.querySelector('.week-label');
+        const range = document.querySelector('.week-date-range');
+        if (direction === -1) {
+            label.textContent = 'Woche 2 von 6';
+            range.textContent = '10. – 14. Feb. 2026';
+        } else {
+            label.textContent = 'Woche 3 von 6';
+            range.textContent = '17. – 21. Feb. 2026';
+        }
+    }
+</script>
+
+</body>
+</html>

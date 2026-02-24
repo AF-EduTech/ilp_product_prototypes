@@ -1,0 +1,1314 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Intelligent Learning Assistant</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f0f2f5;
+            color: #1a1a2e;
+            line-height: 1.6;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ── Header (Kurs-Kontext) ── */
+        .course-header {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: white;
+            padding: 14px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .course-header-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .back-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.2);
+            background: transparent;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.15s;
+        }
+
+        .back-btn:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .course-breadcrumb {
+            font-size: 13px;
+            opacity: 0.6;
+        }
+
+        .course-title {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .course-header-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: #4361ee;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        /* ── Main Layout ── */
+        .main-layout {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* ── Course Content (Left) ── */
+        .course-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 32px 48px;
+            background: white;
+        }
+
+        .content-module-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #4361ee;
+            background: #eef2ff;
+            padding: 4px 12px;
+            border-radius: 6px;
+            margin-bottom: 12px;
+        }
+
+        .content-heading {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #1a1a2e;
+        }
+
+        .content-subheading {
+            font-size: 15px;
+            color: #6b7280;
+            margin-bottom: 28px;
+        }
+
+        .content-section {
+            margin-bottom: 28px;
+        }
+
+        .content-section h3 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: #1a1a2e;
+        }
+
+        .content-section p {
+            font-size: 15px;
+            color: #374151;
+            margin-bottom: 12px;
+        }
+
+        .content-highlight {
+            background: #f0f4ff;
+            border-left: 3px solid #4361ee;
+            padding: 16px 20px;
+            border-radius: 0 10px 10px 0;
+            margin: 16px 0;
+        }
+
+        .content-highlight p {
+            font-size: 14px;
+            color: #1e3a5f;
+            margin: 0;
+            margin-bottom: 6px;
+        }
+
+        .content-highlight p:last-child { margin-bottom: 0; }
+
+        .content-highlight strong {
+            color: #4361ee;
+        }
+
+        .content-image-placeholder {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #9ca3af;
+            font-size: 14px;
+            margin: 16px 0;
+        }
+
+        /* ILA-Intervention-Banner im Kursinhalt */
+        .ila-intervention-banner {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            background: #fdf4ff;
+            border: 1px solid #e9d5ff;
+            border-left: 4px solid #7c3aed;
+            border-radius: 0 12px 12px 0;
+            padding: 14px 18px;
+            margin: 24px 0;
+            animation: bannerSlideIn 0.4s ease-out;
+        }
+
+        @keyframes bannerSlideIn {
+            from { opacity: 0; transform: translateY(-8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .ila-intervention-banner .banner-icon {
+            font-size: 20px;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .ila-intervention-banner .banner-text {
+            flex: 1;
+        }
+
+        .ila-intervention-banner .banner-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: #6d28d9;
+            margin-bottom: 2px;
+        }
+
+        .ila-intervention-banner .banner-desc {
+            font-size: 13px;
+            color: #5b21b6;
+            opacity: 0.85;
+        }
+
+        .ila-intervention-banner .banner-cta {
+            font-size: 12px;
+            font-weight: 600;
+            color: #7c3aed;
+            background: white;
+            border: 1px solid #c4b5fd;
+            border-radius: 8px;
+            padding: 6px 14px;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.15s;
+            flex-shrink: 0;
+            align-self: center;
+        }
+
+        .ila-intervention-banner .banner-cta:hover {
+            background: #7c3aed;
+            color: white;
+            border-color: #7c3aed;
+        }
+
+        .content-nav {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 32px;
+            padding-top: 24px;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .content-nav-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            border-radius: 10px;
+            border: 1px solid #e5e7eb;
+            background: white;
+            font-size: 14px;
+            font-weight: 500;
+            color: #4b5563;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .content-nav-btn:hover {
+            border-color: #4361ee;
+            color: #4361ee;
+        }
+
+        .content-nav-btn.primary {
+            background: #4361ee;
+            color: white;
+            border-color: #4361ee;
+        }
+
+        .content-nav-btn.primary:hover {
+            background: #3a50d9;
+        }
+
+        .content-nav-btn.primary.disabled {
+            background: #d1d5db;
+            border-color: #d1d5db;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        /* ── ILA Sidebar (Right) ── */
+        .ila-sidebar {
+            width: 420px;
+            border-left: 1px solid #e5e7eb;
+            display: flex;
+            flex-direction: column;
+            background: #fafbfc;
+            flex-shrink: 0;
+        }
+
+        /* ILA Header */
+        .ila-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: white;
+        }
+
+        .ila-header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .ila-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #4361ee, #7c3aed);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            position: relative;
+        }
+
+        /* Pulsing ring when ILA is actively monitoring */
+        .ila-avatar.active::after {
+            content: '';
+            position: absolute;
+            inset: -4px;
+            border-radius: 16px;
+            border: 2px solid #7c3aed;
+            animation: avatarPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes avatarPulse {
+            0%, 100% { opacity: 0.4; transform: scale(1); }
+            50% { opacity: 0.9; transform: scale(1.06); }
+        }
+
+        .ila-name {
+            font-weight: 700;
+            font-size: 15px;
+        }
+
+        .ila-status {
+            font-size: 12px;
+            color: #7c3aed;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .ila-status .status-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #7c3aed;
+            animation: dotBlink 1.6s ease-in-out infinite;
+        }
+
+        @keyframes dotBlink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        .ila-header-actions {
+            display: flex;
+            gap: 6px;
+        }
+
+        .ila-header-btn {
+            width: 34px;
+            height: 34px;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 14px;
+            color: #6b7280;
+            transition: all 0.15s;
+        }
+
+        .ila-header-btn:hover {
+            border-color: #4361ee;
+            color: #4361ee;
+        }
+
+        /* Context bar */
+        .ila-context {
+            padding: 10px 20px;
+            background: #eef2ff;
+            border-bottom: 1px solid #dbeafe;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: #4361ee;
+            font-weight: 500;
+        }
+
+        .ila-context-icon {
+            font-size: 14px;
+        }
+
+        /* Chat area */
+        .ila-chat {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        /* Messages */
+        .msg {
+            display: flex;
+            gap: 10px;
+            max-width: 95%;
+        }
+
+        .msg.assistant {
+            align-self: flex-start;
+        }
+
+        .msg.user {
+            align-self: flex-end;
+            flex-direction: row-reverse;
+        }
+
+        .msg-avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            flex-shrink: 0;
+        }
+
+        .msg.assistant .msg-avatar {
+            background: linear-gradient(135deg, #4361ee, #7c3aed);
+        }
+
+        .msg.user .msg-avatar {
+            background: #4361ee;
+            color: white;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .msg-bubble {
+            padding: 12px 16px;
+            border-radius: 14px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .msg.assistant .msg-bubble {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-top-left-radius: 4px;
+            color: #1a1a2e;
+        }
+
+        .msg.user .msg-bubble {
+            background: #4361ee;
+            color: white;
+            border-top-right-radius: 4px;
+        }
+
+        .msg-bubble p {
+            margin-bottom: 8px;
+        }
+
+        .msg-bubble p:last-child {
+            margin-bottom: 0;
+        }
+
+        .msg-bubble strong {
+            font-weight: 600;
+        }
+
+        .msg-bubble ul {
+            margin: 8px 0;
+            padding-left: 18px;
+        }
+
+        .msg-bubble li {
+            margin-bottom: 4px;
+            font-size: 13px;
+        }
+
+        /* ── Proaktive Meldung ── */
+        .proactive-wrapper {
+            align-self: flex-start;
+            width: 95%;
+        }
+
+        .proactive-label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            color: #7c3aed;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+            padding-left: 40px;
+        }
+
+        .proactive-label .pulse-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #7c3aed;
+            animation: dotBlink 1.2s ease-in-out infinite;
+        }
+
+        .msg.proactive {
+            align-self: flex-start;
+            max-width: 100%;
+            width: 100%;
+        }
+
+        .msg.proactive .msg-bubble {
+            background: #fdf4ff;
+            border: 1px solid #e9d5ff;
+            border-top-left-radius: 4px;
+            border-left: 3px solid #7c3aed;
+        }
+
+        /* ── Content Link Card ── */
+        .content-link-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 12px 14px;
+            margin-top: 10px;
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+            transition: border-color 0.15s, box-shadow 0.15s;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .content-link-card:hover {
+            border-color: #a78bfa;
+            box-shadow: 0 2px 8px rgba(124,58,237,0.1);
+        }
+
+        .content-link-card .card-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            background: #f5f3ff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .content-link-card .card-body {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .content-link-card .card-badge {
+            font-size: 10px;
+            font-weight: 700;
+            color: #7c3aed;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            margin-bottom: 3px;
+        }
+
+        .content-link-card .card-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #1a1a2e;
+            margin-bottom: 3px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .content-link-card .card-desc {
+            font-size: 12px;
+            color: #6b7280;
+            line-height: 1.4;
+        }
+
+        .content-link-card .card-meta {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 8px;
+        }
+
+        .content-link-card .card-time {
+            font-size: 11px;
+            color: #9ca3af;
+            display: flex;
+            align-items: center;
+            gap: 3px;
+        }
+
+        .content-link-card .card-btn {
+            font-size: 11px;
+            font-weight: 600;
+            color: white;
+            background: #7c3aed;
+            border: none;
+            border-radius: 6px;
+            padding: 4px 10px;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: background 0.15s;
+        }
+
+        .content-link-card .card-btn:hover {
+            background: #6d28d9;
+        }
+
+        /* ── Socratic question card ── */
+        .msg-socratic {
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            border-left: 3px solid #059669;
+            border-radius: 0 8px 8px 0;
+            padding: 12px 14px;
+            margin-top: 10px;
+            font-size: 13px;
+            color: #065f46;
+        }
+
+        .msg-socratic .socratic-label {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #059669;
+            margin-bottom: 4px;
+        }
+
+        /* ── Suggestion chips ── */
+        .msg-suggestions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 10px;
+        }
+
+        .suggestion-chip {
+            font-size: 12px;
+            padding: 6px 14px;
+            border-radius: 99px;
+            border: 1px solid #e5e7eb;
+            background: white;
+            color: #4361ee;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.15s;
+        }
+
+        .suggestion-chip:hover {
+            background: #4361ee;
+            color: white;
+            border-color: #4361ee;
+        }
+
+        /* ── Escalation card ── */
+        .msg-escalation {
+            background: #fffbeb;
+            border: 1px solid #fde68a;
+            border-radius: 10px;
+            padding: 14px;
+            margin-top: 10px;
+        }
+
+        .escalation-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #92400e;
+            margin-bottom: 8px;
+        }
+
+        .escalation-text {
+            font-size: 13px;
+            color: #78350f;
+            margin-bottom: 10px;
+        }
+
+        .escalation-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: none;
+            background: #f59e0b;
+            color: white;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+
+        .escalation-btn:hover {
+            background: #d97706;
+        }
+
+        /* ── Source reference ── */
+        .msg-source {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 11px;
+            color: #9ca3af;
+            margin-top: 6px;
+            cursor: pointer;
+        }
+
+        .msg-source:hover {
+            color: #4361ee;
+        }
+
+        /* ── Typing indicator ── */
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            align-self: flex-start;
+            padding: 0 0 4px 0;
+        }
+
+        .typing-indicator .msg-avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #4361ee, #7c3aed);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+        }
+
+        .typing-dots {
+            display: flex;
+            gap: 4px;
+            padding: 12px 16px;
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 14px;
+            border-top-left-radius: 4px;
+        }
+
+        .typing-dots span {
+            width: 7px;
+            height: 7px;
+            background: #9ca3af;
+            border-radius: 50%;
+            animation: typing 1.4s infinite;
+        }
+
+        .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes typing {
+            0%, 60%, 100% { opacity: 0.3; transform: translateY(0); }
+            30% { opacity: 1; transform: translateY(-4px); }
+        }
+
+        /* ── Timestamp / divider ── */
+        .msg-timestamp {
+            text-align: center;
+            font-size: 11px;
+            color: #9ca3af;
+            margin: 4px 0;
+            position: relative;
+        }
+
+        .msg-timestamp::before,
+        .msg-timestamp::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            width: 28%;
+            height: 1px;
+            background: #e5e7eb;
+        }
+
+        .msg-timestamp::before { left: 0; }
+        .msg-timestamp::after { right: 0; }
+
+        .msg-timestamp.alert {
+            color: #7c3aed;
+            font-weight: 600;
+        }
+
+        .msg-timestamp.alert::before,
+        .msg-timestamp.alert::after {
+            background: #e9d5ff;
+        }
+
+        /* ── Quiz in chat ── */
+        .msg-quiz {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 14px;
+            margin-top: 10px;
+        }
+
+        .msg-quiz-label {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #6b7280;
+            margin-bottom: 8px;
+        }
+
+        .msg-quiz-question {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .quiz-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            margin-bottom: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.15s;
+        }
+
+        .quiz-option:hover { border-color: #4361ee; background: #f0f4ff; }
+        .quiz-option.correct { border-color: #059669; background: #ecfdf5; }
+        .quiz-option.wrong { border-color: #dc2626; background: #fef2f2; }
+
+        .quiz-radio {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            border: 2px solid #d1d5db;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .quiz-option.correct .quiz-radio { border-color: #059669; background: #059669; }
+        .quiz-option.correct .quiz-radio::after { content: '✓'; color: white; font-size: 11px; font-weight: 700; }
+        .quiz-option.wrong .quiz-radio { border-color: #dc2626; background: #dc2626; }
+        .quiz-option.wrong .quiz-radio::after { content: '✗'; color: white; font-size: 11px; font-weight: 700; }
+
+        /* ── Input Area ── */
+        .ila-input-area {
+            padding: 16px 20px;
+            border-top: 1px solid #e5e7eb;
+            background: white;
+        }
+
+        .ila-input-wrapper {
+            display: flex;
+            align-items: flex-end;
+            gap: 8px;
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 14px;
+            padding: 8px 8px 8px 16px;
+            transition: border-color 0.15s;
+        }
+
+        .ila-input-wrapper:focus-within {
+            border-color: #4361ee;
+            box-shadow: 0 0 0 3px rgba(67,97,238,0.1);
+        }
+
+        .ila-input {
+            flex: 1;
+            border: none;
+            background: transparent;
+            font-size: 14px;
+            font-family: inherit;
+            resize: none;
+            outline: none;
+            min-height: 22px;
+            max-height: 120px;
+            line-height: 1.5;
+            color: #1a1a2e;
+        }
+
+        .ila-input::placeholder {
+            color: #9ca3af;
+        }
+
+        .ila-send-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            border: none;
+            background: #4361ee;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.15s;
+            flex-shrink: 0;
+        }
+
+        .ila-send-btn:hover {
+            background: #3a50d9;
+        }
+
+        .ila-input-hints {
+            display: flex;
+            gap: 6px;
+            margin-top: 8px;
+            flex-wrap: wrap;
+        }
+
+        .input-hint {
+            font-size: 11px;
+            padding: 4px 10px;
+            border-radius: 6px;
+            background: #f3f4f6;
+            color: #6b7280;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .input-hint:hover {
+            background: #eef2ff;
+            color: #4361ee;
+        }
+
+        /* ── Responsive ── */
+        @media (max-width: 900px) {
+            .ila-sidebar {
+                position: fixed;
+                top: 0; right: 0; bottom: 0;
+                width: 100%;
+                z-index: 50;
+                transform: translateX(100%);
+                transition: transform 0.3s ease;
+            }
+            .ila-sidebar.open { transform: translateX(0); }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Course Header -->
+<div class="course-header">
+    <div class="course-header-left">
+        <button class="back-btn">←</button>
+        <div>
+            <div class="course-breadcrumb">Modul 3 › Kap. 3 › Unterkapitel 3.3</div>
+            <div class="course-title">Aktives Zuhören & Feedback</div>
+        </div>
+    </div>
+    <div class="course-header-right">
+        <span style="font-size: 13px; opacity: 0.7;">David Richter</span>
+        <div class="header-avatar">DR</div>
+    </div>
+</div>
+
+<!-- Main Layout -->
+<div class="main-layout">
+
+    <!-- Course Content (Left) -->
+    <div class="course-content">
+        <div class="content-module-badge">📖 Modul 3: Praxistransfer</div>
+        <h1 class="content-heading">Aktives Zuhören</h1>
+        <p class="content-subheading">Techniken, um Gesprächspartnern vollständig zuzuhören, ihre Botschaft zu verstehen und angemessen zu reagieren.</p>
+
+        <div class="content-section">
+            <h3>Was bedeutet aktives Zuhören?</h3>
+            <p>Aktives Zuhören ist weit mehr als das bloße Schweigen, während jemand anderes spricht. Es ist ein bewusster Prozess, bei dem der Zuhörer vollständig präsent ist, die Aussagen des Gegenübers versteht und durch verbale und non-verbale Signale Aufmerksamkeit signalisiert.</p>
+            <div class="content-highlight">
+                <p><strong>Die vier Ebenen des aktiven Zuhörens:</strong></p>
+                <p>1. <strong>Hören</strong> – Schallwellen wahrnehmen</p>
+                <p>2. <strong>Zuhören</strong> – Wörter und Sätze verstehen</p>
+                <p>3. <strong>Verstehen</strong> – Bedeutung und Kontext erfassen</p>
+                <p>4. <strong>Aktives Zuhören</strong> – Empathisch reagieren und bestätigen</p>
+            </div>
+        </div>
+
+        <div class="content-section">
+            <h3>Techniken im Überblick</h3>
+            <p>Zu den zentralen Techniken des aktiven Zuhörens gehören Paraphrasieren (Wiedergeben mit eigenen Worten), Verbalisieren (Gefühle benennen) sowie offene Fragen stellen, um das Gespräch zu vertiefen.</p>
+            <div class="content-image-placeholder">📊 Diagramm: Aktives Zuhören – Techniken & Signale</div>
+        </div>
+
+        <!-- ILA-Intervention-Banner: erscheint im Kursinhalt -->
+        <div class="ila-intervention-banner">
+            <span class="banner-icon">🤖</span>
+            <div class="banner-text">
+                <div class="banner-title">Lernassistent hat etwas bemerkt</div>
+                <div class="banner-desc">Du bist bereits 22 Min. hier und hast den letzten Lerncheck nicht bestanden. Im Chat findest du gezielte Hilfe und Leseempfehlungen.</div>
+            </div>
+            <button class="banner-cta" onclick="document.getElementById('ilaChat').scrollTop = document.getElementById('ilaChat').scrollHeight">Zum Chat →</button>
+        </div>
+
+        <div class="content-section">
+            <h3>Feedback geben – Grundregeln</h3>
+            <p>Gutes Feedback folgt klaren Regeln: Es ist <strong>beschreibend</strong> statt wertend, <strong>konkret</strong> statt abstrakt und <strong>zeitnah</strong> zur beobachteten Situation. Feedback sollte immer erbeten oder zumindest willkommen sein.</p>
+        </div>
+
+        <div class="content-nav">
+            <button class="content-nav-btn">← Nonverbale Kommunikation</button>
+            <button class="content-nav-btn primary disabled" title="Schließe zuerst den Lerncheck ab">Lerncheck bestehen →</button>
+        </div>
+    </div>
+
+    <!-- Intelligent Learning Assistant (Right Sidebar) -->
+    <div class="ila-sidebar" id="ilaSidebar">
+
+        <!-- ILA Header -->
+        <div class="ila-header">
+            <div class="ila-header-left">
+                <div class="ila-avatar active">🤖</div>
+                <div>
+                    <div class="ila-name">Lernassistent</div>
+                    <div class="ila-status">
+                        <span class="status-dot"></span>
+                        Analysiert deinen Lernfortschritt
+                    </div>
+                </div>
+            </div>
+            <div class="ila-header-actions">
+                <button class="ila-header-btn" title="Verlauf leeren">🗑</button>
+                <button class="ila-header-btn" title="Minimieren" onclick="toggleILA()">—</button>
+            </div>
+        </div>
+
+        <!-- Context Bar -->
+        <div class="ila-context">
+            <span class="ila-context-icon">📍</span>
+            Kontext: Modul 3 · Kap. 3 · UK 3.3 – Aktives Zuhören & Feedback
+        </div>
+
+        <!-- Chat Messages -->
+        <div class="ila-chat" id="ilaChat">
+
+            <!-- Timestamp: Beginn der Session -->
+            <div class="msg-timestamp">Heute, 10:14 Uhr – UK 3.3 geöffnet</div>
+
+            <!-- Welcome: kurz, nicht aufdringlich -->
+            <div class="msg assistant">
+                <div class="msg-avatar">🤖</div>
+                <div class="msg-bubble">
+                    <p>Hallo David! Ich begleite dich durch UK 3.3. Frag mich jederzeit, wenn etwas unklar ist.</p>
+                </div>
+            </div>
+
+            <!-- Lerncheck-Ergebnis (System-Event) -->
+            <div class="msg-timestamp">10:29 Uhr – Lerncheck abgeschlossen: 1 von 3 richtig</div>
+
+            <!-- ─── Proaktive Meldung #1: Feststecken erkannt ─── -->
+            <div class="proactive-wrapper">
+                <div class="proactive-label">
+                    <span class="pulse-dot"></span>
+                    Proaktive Meldung
+                </div>
+                <div class="msg proactive">
+                    <div class="msg-avatar">🤖</div>
+                    <div class="msg-bubble">
+                        <p>David, ich habe zwei Dinge bemerkt:</p>
+                        <ul>
+                            <li>Du bist seit <strong>22 Minuten</strong> bei diesem Unterkapitel</li>
+                            <li>Im Lerncheck hast du <strong>1 von 3 Fragen</strong> richtig beantwortet – das Thema Selbst- vs. Fremdwahrnehmung war dabei schwierig</li>
+                        </ul>
+                        <p>Das ist kein Problem! Es deutet aber darauf hin, dass ein Grundlagenbegriff fehlt. Ich empfehle dir, diese beiden Inhalte nochmal zu lesen, bevor du weitermachst:</p>
+
+                        <!-- Content Link Card 1 -->
+                        <a class="content-link-card" href="#">
+                            <div class="card-icon">📖</div>
+                            <div class="card-body">
+                                <div class="card-badge">Modul 2 · Kap. 2.3</div>
+                                <div class="card-title">Das Johari-Fenster</div>
+                                <div class="card-desc">Selbst- und Fremdwahrnehmung – Grundlage für Feedback und aktives Zuhören</div>
+                                <div class="card-meta">
+                                    <span class="card-time">⏱ ca. 8 Min.</span>
+                                    <button class="card-btn">Jetzt aufrufen →</button>
+                                </div>
+                            </div>
+                        </a>
+
+                        <!-- Content Link Card 2 -->
+                        <a class="content-link-card" href="#">
+                            <div class="card-icon">📖</div>
+                            <div class="card-body">
+                                <div class="card-badge">Modul 2 · Kap. 2.4</div>
+                                <div class="card-title">Feedback-Regeln nach Schulz von Thun</div>
+                                <div class="card-desc">Die vier Seiten einer Nachricht – erklärt, warum Zuhören mehr als Hören ist</div>
+                                <div class="card-meta">
+                                    <span class="card-time">⏱ ca. 6 Min.</span>
+                                    <button class="card-btn">Jetzt aufrufen →</button>
+                                </div>
+                            </div>
+                        </a>
+
+                        <div class="msg-suggestions">
+                            <span class="suggestion-chip" onclick="simulateMessage('Was habe ich beim Lerncheck falsch gemacht?')">Was war falsch?</span>
+                            <span class="suggestion-chip" onclick="simulateMessage('Erkläre mir Selbst- und Fremdwahrnehmung kurz')">Kurzerklärung</span>
+                            <span class="suggestion-chip" onclick="simulateMessage('Ich komme alleine weiter')">Ich komm alleine weiter</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- User reagiert -->
+            <div class="msg user">
+                <div class="msg-avatar">DR</div>
+                <div class="msg-bubble">
+                    Was habe ich beim Lerncheck falsch gemacht?
+                </div>
+            </div>
+
+            <!-- ILA: Sokratischer Dialog – keine direkte Antwort -->
+            <div class="msg assistant">
+                <div class="msg-avatar">🤖</div>
+                <div class="msg-bubble">
+                    <p>Gute Frage – aber ich verrate dir die Antwort nicht direkt, denn du wirst sie selbst besser im Gedächtnis behalten, wenn du sie selbst erschließt. 😊</p>
+                    <div class="msg-socratic">
+                        <div class="socratic-label">Sokratische Frage</div>
+                        Stell dir vor: Dein Kollege erzählt dir von einem Problem mit seinem Team. Du unterbrichst ihn nicht, aber du schaust dabei aufs Handy. Würdest du das als „aktives Zuhören" bezeichnen – und warum (nicht)?
+                    </div>
+                    <p style="margin-top: 10px; font-size: 13px; color: #6b7280;">Schreib einfach, was dir spontan dazu einfällt. Es gibt keine falsche Antwort.</p>
+                </div>
+            </div>
+
+            <!-- User antwortet -->
+            <div class="msg user">
+                <div class="msg-avatar">DR</div>
+                <div class="msg-bubble">
+                    Nein, weil ich zwar nicht spreche, aber meine Aufmerksamkeit woanders ist. Aktives Zuhören bedeutet wohl mehr als nur schweigen?
+                </div>
+            </div>
+
+            <!-- ILA bestätigt und führt tiefer -->
+            <div class="msg assistant">
+                <div class="msg-avatar">🤖</div>
+                <div class="msg-bubble">
+                    <p><strong>Genau das ist der Kern!</strong> Aktives Zuhören schließt volle Präsenz ein – körperlich, mental und emotional. Du hast das selbst gerade erschlossen.</p>
+                    <p>Jetzt die Verbindung zum Lerncheck: Frage 2 fragte, was Fremdwahrnehmung mit Feedback zu tun hat. Das beantwortet das Johari-Fenster aus Kap. 2.3 sehr gut – dort geht es genau darum, was andere in uns sehen, das wir selbst nicht sehen.</p>
+                    <div class="msg-source">📄 Direkt zum Abschnitt: Modul 2 · Kap. 2.3 · Abschnitt „Blinder Fleck"</div>
+                    <div class="msg-suggestions">
+                        <span class="suggestion-chip" onclick="simulateMessage('Ich lese es jetzt und versuche den Lerncheck nochmal')">Lesen & nochmal versuchen</span>
+                        <span class="suggestion-chip" onclick="simulateMessage('Erkläre mir den blinden Fleck')">Blinder Fleck erklären</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Timestamp: nach Wiederholung -->
+            <div class="msg-timestamp alert">10:41 Uhr – Lerncheck erneut abgeschlossen: 2 von 3 richtig</div>
+
+            <!-- ─── Proaktive Meldung #2: Fortschritt, aber noch nicht ganz ─── -->
+            <div class="proactive-wrapper">
+                <div class="proactive-label">
+                    <span class="pulse-dot"></span>
+                    Proaktive Meldung
+                </div>
+                <div class="msg proactive">
+                    <div class="msg-avatar">🤖</div>
+                    <div class="msg-bubble">
+                        <p>Gut gemacht – du hast dich verbessert! <strong>2 von 3</strong> beim zweiten Versuch ist ein klarer Fortschritt. 🎉</p>
+                        <p>Frage 3 zum Thema <em>„Feedback zeitnah vs. verzögert geben"</em> war noch falsch. Das ist ein häufiger Stolperstein. Dazu gibt es einen kurzen Abschnitt:</p>
+
+                        <!-- Content Link Card 3 -->
+                        <a class="content-link-card" href="#">
+                            <div class="card-icon">📖</div>
+                            <div class="card-body">
+                                <div class="card-badge">Modul 3 · Kap. 3.1</div>
+                                <div class="card-title">Wann ist der richtige Zeitpunkt für Feedback?</div>
+                                <div class="card-desc">Zeitnah, konkret und situationsbezogen – warum das Timing entscheidend ist</div>
+                                <div class="card-meta">
+                                    <span class="card-time">⏱ ca. 4 Min.</span>
+                                    <button class="card-btn">Jetzt aufrufen →</button>
+                                </div>
+                            </div>
+                        </a>
+
+                        <p style="margin-top: 12px; font-size: 13px;">Wenn du auch beim dritten Versuch nicht weiterkommst, kann ich deine Lernbegleiterin informieren.</p>
+                        <div class="msg-escalation">
+                            <div class="escalation-header">👩‍🏫 Lernbegleiterin einschalten?</div>
+                            <div class="escalation-text">Maria Schmidt ist heute verfügbar und kann dir das Thema in einem kurzen Gespräch erklären.</div>
+                            <button class="escalation-btn">💬 Maria kontaktieren</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Input Area -->
+        <div class="ila-input-area">
+            <div class="ila-input-wrapper">
+                <textarea class="ila-input" id="ilaInput" placeholder="Frag mich etwas zum Kursinhalt..." rows="1" onkeydown="handleKeyDown(event)"></textarea>
+                <button class="ila-send-btn" onclick="sendMessage()">↑</button>
+            </div>
+            <div class="ila-input-hints">
+                <span class="input-hint" onclick="simulateMessage('Erkläre das einfacher')">Einfacher erklären</span>
+                <span class="input-hint" onclick="simulateMessage('Gib mir ein Beispiel')">Beispiel</span>
+                <span class="input-hint" onclick="simulateMessage('Lerncheck nochmal versuchen')">Lerncheck wiederholen</span>
+                <span class="input-hint" onclick="simulateMessage('Zusammenfassung')">Zusammenfassung</span>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+    // Auto-resize textarea
+    const input = document.getElementById('ilaInput');
+    input.addEventListener('input', function() {
+        this.style.height = 'auto';
+        this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+    });
+
+    function handleKeyDown(e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            sendMessage();
+        }
+    }
+
+    function sendMessage() {
+        const text = input.value.trim();
+        if (!text) return;
+
+        addMessage(text, 'user');
+        input.value = '';
+        input.style.height = 'auto';
+
+        showTyping();
+
+        setTimeout(() => {
+            hideTyping();
+            addMessage('Das ist eine gute Frage! In einem echten System würde hier die KI-Antwort erscheinen, die auf den Kursinhalt und deinen Lernfortschritt abgestimmt ist.', 'assistant');
+        }, 1500);
+    }
+
+    function addMessage(text, type) {
+        const chat = document.getElementById('ilaChat');
+        const msg = document.createElement('div');
+        msg.className = `msg ${type}`;
+        msg.innerHTML = `
+            <div class="msg-avatar">${type === 'user' ? 'DR' : '🤖'}</div>
+            <div class="msg-bubble"><p>${text}</p></div>
+        `;
+        chat.appendChild(msg);
+        chat.scrollTop = chat.scrollHeight;
+    }
+
+    function simulateMessage(text) {
+        input.value = text;
+        sendMessage();
+    }
+
+    let typingEl = null;
+    function showTyping() {
+        const chat = document.getElementById('ilaChat');
+        typingEl = document.createElement('div');
+        typingEl.className = 'typing-indicator';
+        typingEl.innerHTML = `
+            <div class="msg-avatar">🤖</div>
+            <div class="typing-dots"><span></span><span></span><span></span></div>
+        `;
+        chat.appendChild(typingEl);
+        chat.scrollTop = chat.scrollHeight;
+    }
+
+    function hideTyping() {
+        if (typingEl) typingEl.remove();
+    }
+
+    function toggleILA() {
+        const sidebar = document.getElementById('ilaSidebar');
+        sidebar.classList.toggle('open');
+    }
+
+    // Scroll ILA chat to bottom on load
+    window.addEventListener('load', () => {
+        const chat = document.getElementById('ilaChat');
+        chat.scrollTop = chat.scrollHeight;
+    });
+</script>
+
+</body>
+</html>

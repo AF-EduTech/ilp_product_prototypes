@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(\"/Users/consu/Claude Projects/Reza/replace_schedule.py\":*)",
+      "Bash(python3:*)"
+    ]
+  }
+}

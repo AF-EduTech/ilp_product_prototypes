@@ -1,0 +1,1116 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Content Delivery – Kursansicht</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f0f2f5;
+            color: #1a1a2e;
+            line-height: 1.6;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ══════════════════════════════════════
+           TOP NAV
+           ══════════════════════════════════════ */
+        .top-nav {
+            background: #1a1a2e;
+            color: white;
+            padding: 0 24px;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
+            z-index: 20;
+        }
+
+        .top-nav-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .nav-back {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: rgba(255,255,255,0.7);
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 500;
+            padding: 6px 14px;
+            border-radius: 8px;
+            transition: all 0.15s;
+            border: 1px solid rgba(255,255,255,0.15);
+        }
+
+        .nav-back:hover {
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+
+        .nav-back-icon {
+            font-size: 16px;
+        }
+
+        .nav-divider {
+            width: 1px;
+            height: 28px;
+            background: rgba(255,255,255,0.15);
+        }
+
+        .nav-course-name {
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        .nav-course-meta {
+            font-size: 12px;
+            opacity: 0.5;
+        }
+
+        .top-nav-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .nav-progress {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-progress-bar {
+            width: 100px;
+            height: 6px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 99px;
+            overflow: hidden;
+        }
+
+        .nav-progress-bar .fill {
+            height: 100%;
+            background: #4361ee;
+            border-radius: 99px;
+        }
+
+        .nav-progress-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: rgba(255,255,255,0.7);
+        }
+
+        .nav-avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: #4361ee;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 13px;
+            color: white;
+        }
+
+        /* ══════════════════════════════════════
+           MAIN LAYOUT
+           ══════════════════════════════════════ */
+        .app-layout {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* ══════════════════════════════════════
+           SIDEBAR – Kursstruktur
+           ══════════════════════════════════════ */
+        .course-sidebar {
+            width: 300px;
+            background: white;
+            border-right: 1px solid #e5e7eb;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+
+        .sidebar-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .sidebar-title {
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #6b7280;
+            margin-bottom: 8px;
+        }
+
+        .sidebar-search {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 13px;
+            font-family: inherit;
+            outline: none;
+            transition: border-color 0.15s;
+        }
+
+        .sidebar-search:focus {
+            border-color: #4361ee;
+        }
+
+        .sidebar-tree {
+            flex: 1;
+            overflow-y: auto;
+            padding: 8px 0;
+        }
+
+        /* Module */
+        .tree-module {
+            margin-bottom: 2px;
+        }
+
+        .tree-module-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            cursor: pointer;
+            user-select: none;
+            font-size: 13px;
+            font-weight: 600;
+            color: #1a1a2e;
+            transition: background 0.1s;
+        }
+
+        .tree-module-header:hover {
+            background: #f9fafb;
+        }
+
+        .tree-module-header.active {
+            color: #4361ee;
+        }
+
+        .tree-chevron {
+            font-size: 9px;
+            color: #9ca3af;
+            transition: transform 0.2s;
+            width: 14px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .tree-chevron.open { transform: rotate(90deg); }
+
+        .tree-module-icon {
+            width: 22px;
+            height: 22px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            flex-shrink: 0;
+        }
+
+        .tree-module-icon.done { background: #d1fae5; color: #059669; }
+        .tree-module-icon.active { background: #dbeafe; color: #4361ee; }
+        .tree-module-icon.locked { background: #f3f4f6; color: #9ca3af; }
+
+        .tree-module-name {
+            flex: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Chapters */
+        .tree-chapters {
+            display: none;
+        }
+
+        .tree-chapters.open { display: block; }
+
+        .tree-chapter {
+            margin-bottom: 1px;
+        }
+
+        .tree-chapter-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 7px 20px 7px 46px;
+            cursor: pointer;
+            font-size: 13px;
+            color: #4b5563;
+            transition: background 0.1s;
+        }
+
+        .tree-chapter-header:hover { background: #f9fafb; }
+
+        .tree-chapter-header.active {
+            color: #4361ee;
+            font-weight: 600;
+        }
+
+        .tree-status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .tree-status-dot.done { background: #059669; }
+        .tree-status-dot.active { background: #4361ee; }
+        .tree-status-dot.todo { background: #d1d5db; }
+        .tree-status-dot.locked { background: #e5e7eb; }
+
+        /* Subchapters */
+        .tree-subchapters {
+            display: none;
+        }
+
+        .tree-subchapters.open { display: block; }
+
+        .tree-subchapter {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 20px 6px 68px;
+            cursor: pointer;
+            font-size: 12px;
+            color: #6b7280;
+            transition: all 0.1s;
+        }
+
+        .tree-subchapter:hover { background: #f9fafb; }
+
+        .tree-subchapter.active {
+            background: #eef2ff;
+            color: #4361ee;
+            font-weight: 600;
+        }
+
+        .tree-subchapter.done { color: #059669; }
+
+        .tree-sub-icon {
+            font-size: 10px;
+            flex-shrink: 0;
+            width: 14px;
+            text-align: center;
+        }
+
+        /* Sidebar footer */
+        .sidebar-footer {
+            padding: 12px 20px;
+            border-top: 1px solid #e5e7eb;
+            background: #f9fafb;
+        }
+
+        .sidebar-progress {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+
+        .sidebar-progress-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: #6b7280;
+        }
+
+        .sidebar-progress-value {
+            font-size: 11px;
+            font-weight: 700;
+            color: #4361ee;
+        }
+
+        .sidebar-progress-bar {
+            width: 100%;
+            height: 4px;
+            background: #e5e7eb;
+            border-radius: 99px;
+            overflow: hidden;
+        }
+
+        .sidebar-progress-bar .fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4361ee, #7c3aed);
+            border-radius: 99px;
+        }
+
+        /* ══════════════════════════════════════
+           MAIN CONTENT
+           ══════════════════════════════════════ */
+        .content-area {
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Content Element Indicator */
+        .ce-indicator {
+            padding: 12px 48px;
+            background: white;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .ce-breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .ce-breadcrumb span {
+            color: #9ca3af;
+        }
+
+        .ce-breadcrumb a {
+            color: #6b7280;
+            text-decoration: none;
+        }
+
+        .ce-breadcrumb a:hover {
+            color: #4361ee;
+        }
+
+        .ce-breadcrumb .current {
+            color: #4361ee;
+            font-weight: 600;
+        }
+
+        .ce-steps {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .ce-step {
+            width: 28px;
+            height: 6px;
+            border-radius: 3px;
+            background: #e5e7eb;
+        }
+
+        .ce-step.done { background: #059669; }
+        .ce-step.active { background: #4361ee; }
+
+        .ce-step-label {
+            font-size: 11px;
+            color: #6b7280;
+            margin-left: 8px;
+            font-weight: 500;
+        }
+
+        /* Content Body */
+        .content-body {
+            flex: 1;
+            padding: 40px 48px;
+            max-width: 820px;
+        }
+
+        .content-type-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 4px 12px;
+            border-radius: 6px;
+            margin-bottom: 16px;
+        }
+
+        .content-type-badge.text { background: #eef2ff; color: #4361ee; }
+        .content-type-badge.quiz { background: #fef3c7; color: #92400e; }
+        .content-type-badge.video { background: #fce7f3; color: #9d174d; }
+        .content-type-badge.image { background: #ecfdf5; color: #065f46; }
+
+        .content-h1 {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1a1a2e;
+            margin-bottom: 8px;
+        }
+
+        .content-subtitle {
+            font-size: 15px;
+            color: #6b7280;
+            margin-bottom: 32px;
+        }
+
+        .content-section {
+            margin-bottom: 28px;
+        }
+
+        .content-section h2 {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: #1a1a2e;
+        }
+
+        .content-section h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #374151;
+        }
+
+        .content-section p {
+            font-size: 15px;
+            color: #374151;
+            margin-bottom: 14px;
+        }
+
+        .content-callout {
+            background: #f0f4ff;
+            border-left: 3px solid #4361ee;
+            padding: 16px 20px;
+            border-radius: 0 10px 10px 0;
+            margin: 20px 0;
+        }
+
+        .content-callout p {
+            font-size: 14px;
+            color: #1e3a5f;
+            margin: 0;
+        }
+
+        .content-callout strong { color: #4361ee; }
+
+        .content-callout.warning {
+            background: #fffbeb;
+            border-left-color: #f59e0b;
+        }
+
+        .content-callout.warning p { color: #78350f; }
+        .content-callout.warning strong { color: #b45309; }
+
+        .content-image {
+            width: 100%;
+            height: 240px;
+            background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #9ca3af;
+            font-size: 14px;
+            margin: 24px 0;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .content-image-icon { font-size: 32px; }
+
+        .content-list {
+            padding-left: 20px;
+            margin: 12px 0 16px;
+        }
+
+        .content-list li {
+            font-size: 15px;
+            color: #374151;
+            margin-bottom: 8px;
+            line-height: 1.6;
+        }
+
+        .content-list li strong { color: #1a1a2e; }
+
+        .content-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 20px 0;
+            font-size: 14px;
+        }
+
+        .content-table th {
+            background: #f9fafb;
+            text-align: left;
+            padding: 10px 14px;
+            font-weight: 600;
+            color: #374151;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .content-table td {
+            padding: 10px 14px;
+            border-bottom: 1px solid #f3f4f6;
+            color: #4b5563;
+        }
+
+        .content-table tr:last-child td { border-bottom: none; }
+
+        /* Navigation Bar (bottom of content) */
+        .content-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 40px;
+            padding-top: 24px;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .nav-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 20px;
+            border-radius: 12px;
+            border: 1px solid #e5e7eb;
+            background: white;
+            font-size: 14px;
+            color: #4b5563;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.15s;
+            max-width: 280px;
+        }
+
+        .nav-btn:hover {
+            border-color: #4361ee;
+            color: #4361ee;
+        }
+
+        .nav-btn.primary {
+            background: #4361ee;
+            color: white;
+            border-color: #4361ee;
+        }
+
+        .nav-btn.primary:hover { background: #3a50d9; }
+
+        .nav-btn-label {
+            font-size: 11px;
+            color: #9ca3af;
+            font-weight: 500;
+        }
+
+        .nav-btn.primary .nav-btn-label { color: rgba(255,255,255,0.7); }
+
+        .nav-btn-title {
+            font-weight: 600;
+            font-size: 13px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .nav-btn-arrow {
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        /* ══════════════════════════════════════
+           ILA FLOATING BUTTON
+           ══════════════════════════════════════ */
+        .ila-fab {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #4361ee, #7c3aed);
+            color: white;
+            border: none;
+            box-shadow: 0 4px 16px rgba(67,97,238,0.4);
+            cursor: pointer;
+            font-size: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s, box-shadow 0.2s;
+            z-index: 30;
+        }
+
+        .ila-fab:hover {
+            transform: scale(1.08);
+            box-shadow: 0 6px 24px rgba(67,97,238,0.5);
+        }
+
+        .ila-fab-label {
+            position: absolute;
+            right: 68px;
+            background: #1a1a2e;
+            color: white;
+            font-size: 13px;
+            font-weight: 500;
+            padding: 6px 14px;
+            border-radius: 8px;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s;
+        }
+
+        .ila-fab:hover .ila-fab-label {
+            opacity: 1;
+        }
+
+        /* ══════════════════════════════════════
+           SIDEBAR TOGGLE (mobile)
+           ══════════════════════════════════════ */
+        .sidebar-toggle {
+            display: none;
+            position: fixed;
+            bottom: 24px;
+            left: 24px;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: #1a1a2e;
+            color: white;
+            border: none;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            cursor: pointer;
+            font-size: 18px;
+            align-items: center;
+            justify-content: center;
+            z-index: 30;
+        }
+
+        /* ══════════════════════════════════════
+           RESPONSIVE
+           ══════════════════════════════════════ */
+        @media (max-width: 900px) {
+            .course-sidebar {
+                position: fixed;
+                left: 0;
+                top: 56px;
+                bottom: 0;
+                z-index: 25;
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+                box-shadow: 4px 0 16px rgba(0,0,0,0.1);
+            }
+
+            .course-sidebar.open { transform: translateX(0); }
+
+            .sidebar-toggle { display: flex; }
+
+            .content-body { padding: 24px 20px; }
+
+            .ce-indicator { padding: 10px 20px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ── TOP NAVIGATION ── -->
+<nav class="top-nav">
+    <div class="top-nav-left">
+        <a href="dashboard-lernende.html" class="nav-back">
+            <span class="nav-back-icon">←</span>
+            Dashboard
+        </a>
+        <div class="nav-divider"></div>
+        <div>
+            <div class="nav-course-name">Projektmanagement mit Scrum</div>
+            <div class="nav-course-meta">Methodikkurs · Woche 3 von 6</div>
+        </div>
+    </div>
+    <div class="top-nav-right">
+        <div class="nav-progress">
+            <div class="nav-progress-bar"><div class="fill" style="width: 47%"></div></div>
+            <span class="nav-progress-label">47%</span>
+        </div>
+        <div class="nav-avatar">DR</div>
+    </div>
+</nav>
+
+<!-- ── APP LAYOUT ── -->
+<div class="app-layout">
+
+    <!-- ── SIDEBAR: Kursstruktur ── -->
+    <aside class="course-sidebar" id="courseSidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-title">Kursstruktur</div>
+            <input type="text" class="sidebar-search" placeholder="Kapitel suchen...">
+        </div>
+
+        <div class="sidebar-tree">
+
+            <!-- Modul 1 (abgeschlossen) -->
+            <div class="tree-module">
+                <div class="tree-module-header" onclick="toggleModule(this)">
+                    <span class="tree-chevron">▶</span>
+                    <span class="tree-module-icon done">✓</span>
+                    <span class="tree-module-name">Modul 1: Grundlagen</span>
+                </div>
+                <div class="tree-chapters">
+                    <div class="tree-chapter">
+                        <div class="tree-chapter-header" onclick="toggleChapter(this)">
+                            <span class="tree-chevron">▶</span>
+                            <span class="tree-status-dot done"></span>
+                            Kap. 1: Einführung in PM
+                        </div>
+                        <div class="tree-subchapters">
+                            <div class="tree-subchapter done">
+                                <span class="tree-sub-icon">✓</span>
+                                Was ist Projektmanagement?
+                            </div>
+                            <div class="tree-subchapter done">
+                                <span class="tree-sub-icon">✓</span>
+                                Historischer Überblick
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tree-chapter">
+                        <div class="tree-chapter-header">
+                            <span class="tree-chevron">▶</span>
+                            <span class="tree-status-dot done"></span>
+                            Kap. 2: Agile vs. klassisch
+                        </div>
+                    </div>
+                    <div class="tree-chapter">
+                        <div class="tree-chapter-header">
+                            <span class="tree-chevron">▶</span>
+                            <span class="tree-status-dot done"></span>
+                            Kap. 3: Geschichte von Scrum
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modul 2 (abgeschlossen) -->
+            <div class="tree-module">
+                <div class="tree-module-header" onclick="toggleModule(this)">
+                    <span class="tree-chevron">▶</span>
+                    <span class="tree-module-icon done">✓</span>
+                    <span class="tree-module-name">Modul 2: Scrum Framework</span>
+                </div>
+                <div class="tree-chapters">
+                    <div class="tree-chapter">
+                        <div class="tree-chapter-header">
+                            <span class="tree-chevron">▶</span>
+                            <span class="tree-status-dot done"></span>
+                            Kap. 1: Rollen in Scrum
+                        </div>
+                    </div>
+                    <div class="tree-chapter">
+                        <div class="tree-chapter-header">
+                            <span class="tree-chevron">▶</span>
+                            <span class="tree-status-dot done"></span>
+                            Kap. 2: Artefakte
+                        </div>
+                    </div>
+                    <div class="tree-chapter">
+                        <div class="tree-chapter-header">
+                            <span class="tree-chevron">▶</span>
+                            <span class="tree-status-dot done"></span>
+                            Kap. 3: Events & Zeremonien
+                        </div>
+                    </div>
+                    <div class="tree-chapter">
+                        <div class="tree-chapter-header">
+                            <span class="tree-chevron">▶</span>
+                            <span class="tree-status-dot done"></span>
+                            Kap. 4: Sprint-Planung
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modul 3 (abgeschlossen) -->
+            <div class="tree-module">
+                <div class="tree-module-header" onclick="toggleModule(this)">
+                    <span class="tree-chevron">▶</span>
+                    <span class="tree-module-icon done">✓</span>
+                    <span class="tree-module-name">Modul 3: Praxistransfer</span>
+                </div>
+                <div class="tree-chapters">
+                    <div class="tree-chapter">
+                        <div class="tree-chapter-header">
+                            <span class="tree-chevron">▶</span>
+                            <span class="tree-status-dot done"></span>
+                            Kap. 1: Fallbeispiele
+                        </div>
+                    </div>
+                    <div class="tree-chapter">
+                        <div class="tree-chapter-header">
+                            <span class="tree-chevron">▶</span>
+                            <span class="tree-status-dot done"></span>
+                            Kap. 2: Kommunikationsmodelle
+                        </div>
+                    </div>
+                    <div class="tree-chapter">
+                        <div class="tree-chapter-header">
+                            <span class="tree-chevron">▶</span>
+                            <span class="tree-status-dot done"></span>
+                            Kap. 3: Reflexion & Retrospektive
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modul 4 (aktuell) -->
+            <div class="tree-module">
+                <div class="tree-module-header active" onclick="toggleModule(this)">
+                    <span class="tree-chevron open">▶</span>
+                    <span class="tree-module-icon active">▶</span>
+                    <span class="tree-module-name">Modul 4: Abschlussprojekt</span>
+                </div>
+                <div class="tree-chapters open">
+                    <div class="tree-chapter">
+                        <div class="tree-chapter-header active" onclick="toggleChapter(this)">
+                            <span class="tree-chevron open">▶</span>
+                            <span class="tree-status-dot active"></span>
+                            Kap. 1: Projektbriefing
+                        </div>
+                        <div class="tree-subchapters open">
+                            <div class="tree-subchapter done">
+                                <span class="tree-sub-icon">✓</span>
+                                Aufgabenstellung
+                            </div>
+                            <div class="tree-subchapter active">
+                                <span class="tree-sub-icon">▶</span>
+                                Sprint Planning
+                            </div>
+                            <div class="tree-subchapter">
+                                <span class="tree-sub-icon">○</span>
+                                Product Backlog erstellen
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tree-chapter">
+                        <div class="tree-chapter-header">
+                            <span class="tree-chevron">▶</span>
+                            <span class="tree-status-dot todo"></span>
+                            Kap. 2: Sprint-Simulation
+                        </div>
+                    </div>
+                    <div class="tree-chapter">
+                        <div class="tree-chapter-header">
+                            <span class="tree-chevron">▶</span>
+                            <span class="tree-status-dot todo"></span>
+                            Kap. 3: Abschlusspräsentation
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modul 5 (gesperrt) -->
+            <div class="tree-module">
+                <div class="tree-module-header" onclick="toggleModule(this)">
+                    <span class="tree-chevron">▶</span>
+                    <span class="tree-module-icon locked">🔒</span>
+                    <span class="tree-module-name" style="color: #9ca3af;">Modul 5: Prüfungsvorbereitung</span>
+                </div>
+                <div class="tree-chapters">
+                    <div class="tree-chapter">
+                        <div class="tree-chapter-header" style="color: #9ca3af;">
+                            <span class="tree-chevron">▶</span>
+                            <span class="tree-status-dot locked"></span>
+                            Kap. 1: Wiederholung Kernthemen
+                        </div>
+                    </div>
+                    <div class="tree-chapter">
+                        <div class="tree-chapter-header" style="color: #9ca3af;">
+                            <span class="tree-chevron">▶</span>
+                            <span class="tree-status-dot locked"></span>
+                            Kap. 2: Probeklausur
+                        </div>
+                    </div>
+                    <div class="tree-chapter">
+                        <div class="tree-chapter-header" style="color: #9ca3af;">
+                            <span class="tree-chevron">▶</span>
+                            <span class="tree-status-dot locked"></span>
+                            Kap. 3: Tipps & Strategien
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Sidebar Footer -->
+        <div class="sidebar-footer">
+            <div class="sidebar-progress">
+                <span class="sidebar-progress-label">Gesamtfortschritt</span>
+                <span class="sidebar-progress-value">47%</span>
+            </div>
+            <div class="sidebar-progress-bar">
+                <div class="fill" style="width: 47%"></div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- ── CONTENT AREA ── -->
+    <main class="content-area">
+
+        <!-- Content Element Indicator -->
+        <div class="ce-indicator">
+            <div class="ce-breadcrumb">
+                <a href="#">Modul 4</a>
+                <span>›</span>
+                <a href="#">Kap. 1: Projektbriefing</a>
+                <span>›</span>
+                <span class="current">Sprint Planning</span>
+            </div>
+            <div class="ce-steps">
+                <div class="ce-step done"></div>
+                <div class="ce-step done"></div>
+                <div class="ce-step active"></div>
+                <div class="ce-step"></div>
+                <div class="ce-step"></div>
+                <span class="ce-step-label">CE 3 / 5</span>
+            </div>
+        </div>
+
+        <!-- Content Body -->
+        <div class="content-body">
+
+            <div class="content-type-badge text">📝 Text-Element</div>
+
+            <h1 class="content-h1">Sprint Planning</h1>
+            <p class="content-subtitle">Rollen, Verantwortlichkeiten und der Ablauf eines Sprint Plannings im Scrum-Framework.</p>
+
+            <div class="content-section">
+                <h2>Was ist Sprint Planning?</h2>
+                <p>Das Sprint Planning ist ein Event in Scrum, das den Sprint einleitet. Im Sprint Planning wird festgelegt, welche Arbeit im kommenden Sprint erledigt werden soll. Dieser Plan wird durch die gemeinsame Arbeit des gesamten Scrum Teams erstellt.</p>
+                <p>Das Sprint Planning beantwortet drei zentrale Fragen:</p>
+
+                <div class="content-callout">
+                    <p><strong>1. Warum</strong> ist dieser Sprint wertvoll? → Sprint-Ziel definieren</p>
+                    <p><strong>2. Was</strong> kann in diesem Sprint erledigt werden? → Items aus Product Backlog auswählen</p>
+                    <p><strong>3. Wie</strong> wird die ausgewählte Arbeit erledigt? → Aufgaben planen</p>
+                </div>
+            </div>
+
+            <div class="content-section">
+                <h2>Die Rollen im Sprint Planning</h2>
+                <p>Alle Mitglieder des Scrum Teams nehmen am Sprint Planning teil. Jede Rolle hat dabei spezifische Verantwortlichkeiten:</p>
+
+                <div class="content-image">
+                    <span class="content-image-icon">📊</span>
+                    Diagramm: Rollen und Verantwortlichkeiten im Sprint Planning
+                </div>
+
+                <table class="content-table">
+                    <thead>
+                        <tr>
+                            <th>Rolle</th>
+                            <th>Verantwortung im Sprint Planning</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Product Owner</strong></td>
+                            <td>Priorisiert das Product Backlog, schlägt Items vor, definiert das Sprint-Ziel</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Scrum Master</strong></td>
+                            <td>Moderiert das Event, achtet auf Timebox, beseitigt Hindernisse</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Developers</strong></td>
+                            <td>Wählen Items aus, planen die technische Umsetzung, schätzen Aufwand</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="content-callout warning">
+                    <p><strong>Wichtig:</strong> Der Product Owner priorisiert, aber die Developers entscheiden, wie viel Arbeit sie in den Sprint aufnehmen. Niemand darf dem Team diktieren, was es committet.</p>
+                </div>
+            </div>
+
+            <div class="content-section">
+                <h2>Timebox und Ablauf</h2>
+                <p>Das Sprint Planning ist auf maximal <strong>8 Stunden</strong> für einen einmonatigen Sprint begrenzt. Bei kürzeren Sprints ist das Event in der Regel kürzer.</p>
+
+                <h3>Typischer Ablauf (2-Wochen-Sprint):</h3>
+                <ol class="content-list">
+                    <li><strong>Sprint-Ziel besprechen</strong> (30 Min.) – Product Owner stellt die Vision vor</li>
+                    <li><strong>Backlog Items auswählen</strong> (60 Min.) – Team diskutiert und selektiert</li>
+                    <li><strong>Aufgaben planen</strong> (60 Min.) – Items in technische Tasks zerlegen</li>
+                    <li><strong>Kapazität prüfen</strong> (15 Min.) – Realismus-Check: Schaffen wir das?</li>
+                    <li><strong>Commitment</strong> (15 Min.) – Team bestätigt Sprint Backlog und Sprint-Ziel</li>
+                </ol>
+            </div>
+
+            <!-- Navigation -->
+            <div class="content-nav">
+                <a class="nav-btn" href="#">
+                    <span class="nav-btn-arrow">←</span>
+                    <div>
+                        <div class="nav-btn-label">Vorheriges Content-Element</div>
+                        <div class="nav-btn-title">Teamzusammenstellung</div>
+                    </div>
+                </a>
+                <a class="nav-btn primary" href="#">
+                    <div style="text-align: right;">
+                        <div class="nav-btn-label">Nächstes Content-Element</div>
+                        <div class="nav-btn-title">User Stories schreiben</div>
+                    </div>
+                    <span class="nav-btn-arrow">→</span>
+                </a>
+            </div>
+
+        </div>
+    </main>
+
+</div>
+
+<!-- ILA Floating Action Button -->
+<button class="ila-fab" onclick="window.open('intelligent-learning-assistant.html', '_blank')">
+    🤖
+    <span class="ila-fab-label">Lernassistent öffnen</span>
+</button>
+
+<!-- Sidebar Toggle (mobile) -->
+<button class="sidebar-toggle" id="sidebarToggle" onclick="toggleSidebar()">☰</button>
+
+<script>
+    function toggleModule(header) {
+        const chapters = header.nextElementSibling;
+        const chevron = header.querySelector('.tree-chevron');
+        if (chapters) {
+            chapters.classList.toggle('open');
+            chevron.classList.toggle('open');
+        }
+    }
+
+    function toggleChapter(header) {
+        const subs = header.nextElementSibling;
+        const chevron = header.querySelector('.tree-chevron');
+        if (subs) {
+            subs.classList.toggle('open');
+            chevron.classList.toggle('open');
+        }
+    }
+
+    function toggleSidebar() {
+        document.getElementById('courseSidebar').classList.toggle('open');
+    }
+</script>
+
+</body>
+</html>
