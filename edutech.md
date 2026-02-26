@@ -75,6 +75,8 @@ Erwachsenenfortbildung eingesetzt, um Weiterbildungen und Umschulungen als Selbs
 *** Kursstruktur (Modul, Kapitel, Unterkapitel)
 *** Kursinhalt (Content Elemente in Reihenfolge)
 *** Lernende navigieren frei durch Reihenfolge Content Elemente
+*** Alle Content Elemente eines Unterkapitels werden auf einer Seite angezeigt
+*** Ein Unterkapitel ist in die didaktischen Sequenzschritte unterteilt: Vorher, Während, Nachher, Schluss
 ** Gamification
 *** Punkte für abgeschlossene Quizze
 *** Badges für erreichte Meilensteine

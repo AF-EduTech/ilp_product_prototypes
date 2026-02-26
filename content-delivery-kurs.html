@@ -57,9 +57,7 @@
             color: white;
         }
 
-        .nav-back-icon {
-            font-size: 16px;
-        }
+        .nav-back-icon { font-size: 16px; }
 
         .nav-divider {
             width: 1px;
@@ -67,15 +65,8 @@
             background: rgba(255,255,255,0.15);
         }
 
-        .nav-course-name {
-            font-size: 15px;
-            font-weight: 600;
-        }
-
-        .nav-course-meta {
-            font-size: 12px;
-            opacity: 0.5;
-        }
+        .nav-course-name { font-size: 15px; font-weight: 600; }
+        .nav-course-meta { font-size: 12px; opacity: 0.5; }
 
         .top-nav-right {
             display: flex;
@@ -169,9 +160,7 @@
             transition: border-color 0.15s;
         }
 
-        .sidebar-search:focus {
-            border-color: #4361ee;
-        }
+        .sidebar-search:focus { border-color: #4361ee; }
 
         .sidebar-tree {
             flex: 1;
@@ -179,10 +168,7 @@
             padding: 8px 0;
         }
 
-        /* Module */
-        .tree-module {
-            margin-bottom: 2px;
-        }
+        .tree-module { margin-bottom: 2px; }
 
         .tree-module-header {
             display: flex;
@@ -197,13 +183,8 @@
             transition: background 0.1s;
         }
 
-        .tree-module-header:hover {
-            background: #f9fafb;
-        }
-
-        .tree-module-header.active {
-            color: #4361ee;
-        }
+        .tree-module-header:hover { background: #f9fafb; }
+        .tree-module-header.active { color: #4361ee; }
 
         .tree-chevron {
             font-size: 9px;
@@ -227,7 +208,7 @@
             flex-shrink: 0;
         }
 
-        .tree-module-icon.done { background: #d1fae5; color: #059669; }
+        .tree-module-icon.done   { background: #d1fae5; color: #059669; }
         .tree-module-icon.active { background: #dbeafe; color: #4361ee; }
         .tree-module-icon.locked { background: #f3f4f6; color: #9ca3af; }
 
@@ -238,16 +219,10 @@
             text-overflow: ellipsis;
         }
 
-        /* Chapters */
-        .tree-chapters {
-            display: none;
-        }
-
+        .tree-chapters { display: none; }
         .tree-chapters.open { display: block; }
 
-        .tree-chapter {
-            margin-bottom: 1px;
-        }
+        .tree-chapter { margin-bottom: 1px; }
 
         .tree-chapter-header {
             display: flex;
@@ -261,11 +236,7 @@
         }
 
         .tree-chapter-header:hover { background: #f9fafb; }
-
-        .tree-chapter-header.active {
-            color: #4361ee;
-            font-weight: 600;
-        }
+        .tree-chapter-header.active { color: #4361ee; font-weight: 600; }
 
         .tree-status-dot {
             width: 8px;
@@ -274,16 +245,12 @@
             flex-shrink: 0;
         }
 
-        .tree-status-dot.done { background: #059669; }
+        .tree-status-dot.done   { background: #059669; }
         .tree-status-dot.active { background: #4361ee; }
-        .tree-status-dot.todo { background: #d1d5db; }
+        .tree-status-dot.todo   { background: #d1d5db; }
         .tree-status-dot.locked { background: #e5e7eb; }
 
-        /* Subchapters */
-        .tree-subchapters {
-            display: none;
-        }
-
+        .tree-subchapters { display: none; }
         .tree-subchapters.open { display: block; }
 
         .tree-subchapter {
@@ -298,13 +265,7 @@
         }
 
         .tree-subchapter:hover { background: #f9fafb; }
-
-        .tree-subchapter.active {
-            background: #eef2ff;
-            color: #4361ee;
-            font-weight: 600;
-        }
-
+        .tree-subchapter.active { background: #eef2ff; color: #4361ee; font-weight: 600; }
         .tree-subchapter.done { color: #059669; }
 
         .tree-sub-icon {
@@ -314,7 +275,6 @@
             text-align: center;
         }
 
-        /* Sidebar footer */
         .sidebar-footer {
             padding: 12px 20px;
             border-top: 1px solid #e5e7eb;
@@ -328,17 +288,8 @@
             margin-bottom: 6px;
         }
 
-        .sidebar-progress-label {
-            font-size: 11px;
-            font-weight: 600;
-            color: #6b7280;
-        }
-
-        .sidebar-progress-value {
-            font-size: 11px;
-            font-weight: 700;
-            color: #4361ee;
-        }
+        .sidebar-progress-label { font-size: 11px; font-weight: 600; color: #6b7280; }
+        .sidebar-progress-value { font-size: 11px; font-weight: 700; color: #4361ee; }
 
         .sidebar-progress-bar {
             width: 100%;
@@ -355,7 +306,7 @@
         }
 
         /* ══════════════════════════════════════
-           MAIN CONTENT
+           CONTENT AREA
            ══════════════════════════════════════ */
         .content-area {
             flex: 1;
@@ -364,14 +315,18 @@
             flex-direction: column;
         }
 
-        /* Content Element Indicator */
+        /* ── Context bar (sticky) ── */
         .ce-indicator {
-            padding: 12px 48px;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            padding: 10px 48px;
             background: white;
             border-bottom: 1px solid #e5e7eb;
             display: flex;
             align-items: center;
             justify-content: space-between;
+            gap: 16px;
         }
 
         .ce-breadcrumb {
@@ -380,166 +335,281 @@
             gap: 6px;
             font-size: 12px;
             color: #6b7280;
+            flex-shrink: 0;
         }
 
-        .ce-breadcrumb span {
-            color: #9ca3af;
-        }
+        .ce-breadcrumb span { color: #9ca3af; }
 
         .ce-breadcrumb a {
             color: #6b7280;
             text-decoration: none;
         }
 
-        .ce-breadcrumb a:hover {
-            color: #4361ee;
-        }
+        .ce-breadcrumb a:hover { color: #4361ee; }
+        .ce-breadcrumb .current { color: #4361ee; font-weight: 600; }
 
-        .ce-breadcrumb .current {
-            color: #4361ee;
-            font-weight: 600;
-        }
-
-        .ce-steps {
+        /* Phase legend pills */
+        .phase-legend {
             display: flex;
             align-items: center;
             gap: 4px;
         }
 
-        .ce-step {
-            width: 28px;
-            height: 6px;
-            border-radius: 3px;
-            background: #e5e7eb;
+        .phase-pill {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 4px 12px;
+            border-radius: 99px;
+            border: 1px solid transparent;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.15s;
+            white-space: nowrap;
+            color: #9ca3af;
+            background: #f9fafb;
         }
 
-        .ce-step.done { background: #059669; }
-        .ce-step.active { background: #4361ee; }
+        .phase-pill .pill-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #d1d5db;
+            flex-shrink: 0;
+        }
 
-        .ce-step-label {
-            font-size: 11px;
+        /* Vorher – Teal */
+        .phase-pill.vorher.done,
+        .phase-pill.vorher.active {
+            color: #0d9488;
+            background: #f0fdfa;
+            border-color: #99f6e4;
+        }
+        .phase-pill.vorher.done .pill-dot,
+        .phase-pill.vorher.active .pill-dot { background: #0d9488; }
+
+        /* Während – Blue */
+        .phase-pill.waehrend.done,
+        .phase-pill.waehrend.active {
+            color: #4361ee;
+            background: #eef2ff;
+            border-color: #c7d2fe;
+        }
+        .phase-pill.waehrend.done .pill-dot,
+        .phase-pill.waehrend.active .pill-dot { background: #4361ee; }
+
+        /* Nachher – Amber */
+        .phase-pill.nachher.done,
+        .phase-pill.nachher.active {
+            color: #d97706;
+            background: #fffbeb;
+            border-color: #fde68a;
+        }
+        .phase-pill.nachher.done .pill-dot,
+        .phase-pill.nachher.active .pill-dot { background: #d97706; }
+
+        /* Schluss – Violet */
+        .phase-pill.schluss.done,
+        .phase-pill.schluss.active {
+            color: #7c3aed;
+            background: #faf5ff;
+            border-color: #ddd6fe;
+        }
+        .phase-pill.schluss.done .pill-dot,
+        .phase-pill.schluss.active .pill-dot { background: #7c3aed; }
+
+        .phase-pill.active { font-weight: 700; }
+
+        /* Checkmark for done */
+        .phase-pill.done .pill-dot::after {
+            content: '';
+        }
+
+        /* ── UK Title (above first phase) ── */
+        .uk-title-area {
+            background: white;
+            padding: 32px 48px 28px;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .uk-title {
+            font-size: 26px;
+            font-weight: 700;
+            color: #1a1a2e;
+            margin-bottom: 6px;
+        }
+
+        .uk-meta {
+            font-size: 14px;
             color: #6b7280;
-            margin-left: 8px;
+        }
+
+        /* ══════════════════════════════════════
+           PHASE SECTIONS – only color, no labels
+           ══════════════════════════════════════ */
+        .phase-section {
+            padding: 24px 48px 8px;
+        }
+
+        .phase-section:last-of-type {
+            padding-bottom: 0;
+        }
+
+        /* Phase background colors */
+        .phase-section.vorher   { background: #f0fdfa; }
+        .phase-section.waehrend { background: #eef2ff; }
+        .phase-section.nachher  { background: #fffbeb; }
+        .phase-section.schluss  { background: #faf5ff; }
+
+        /* ── Content Element Cards ── */
+        .ce-card {
+            background: white;
+            border: 1px solid rgba(0,0,0,0.07);
+            border-radius: 12px;
+            margin-bottom: 16px;
+            overflow: hidden;
+            max-width: 724px;
+        }
+
+        /* Left accent border per phase */
+        .phase-section.vorher   .ce-card { border-left: 3px solid #0d9488; }
+        .phase-section.waehrend .ce-card { border-left: 3px solid #4361ee; }
+        .phase-section.nachher  .ce-card { border-left: 3px solid #d97706; }
+        .phase-section.schluss  .ce-card { border-left: 3px solid #7c3aed; }
+
+        .ce-card-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 20px;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .ce-card-type {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            padding: 3px 9px;
+            border-radius: 5px;
+        }
+
+        .ce-card-type.text  { background: #eef2ff; color: #4361ee; }
+        .ce-card-type.quiz  { background: #fef3c7; color: #92400e; }
+        .ce-card-type.video { background: #fce7f3; color: #9d174d; }
+        .ce-card-type.image { background: #ecfdf5; color: #065f46; }
+
+        .ce-card-num {
+            font-size: 12px;
+            color: #9ca3af;
+            margin-left: auto;
             font-weight: 500;
         }
 
-        /* Content Body */
-        .content-body {
-            flex: 1;
-            padding: 40px 48px;
-            max-width: 820px;
+        .ce-card-body {
+            padding: 20px 24px;
         }
 
-        .content-type-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 11px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            padding: 4px 12px;
-            border-radius: 6px;
-            margin-bottom: 16px;
-        }
-
-        .content-type-badge.text { background: #eef2ff; color: #4361ee; }
-        .content-type-badge.quiz { background: #fef3c7; color: #92400e; }
-        .content-type-badge.video { background: #fce7f3; color: #9d174d; }
-        .content-type-badge.image { background: #ecfdf5; color: #065f46; }
-
-        .content-h1 {
-            font-size: 28px;
+        .ce-card-body h2 {
+            font-size: 19px;
             font-weight: 700;
             color: #1a1a2e;
-            margin-bottom: 8px;
-        }
-
-        .content-subtitle {
-            font-size: 15px;
-            color: #6b7280;
-            margin-bottom: 32px;
-        }
-
-        .content-section {
-            margin-bottom: 28px;
-        }
-
-        .content-section h2 {
-            font-size: 20px;
-            font-weight: 600;
-            margin-bottom: 12px;
-            color: #1a1a2e;
-        }
-
-        .content-section h3 {
-            font-size: 16px;
-            font-weight: 600;
             margin-bottom: 10px;
-            color: #374151;
         }
 
-        .content-section p {
+        .ce-card-body h3 {
+            font-size: 15px;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 8px;
+            margin-top: 16px;
+        }
+
+        .ce-card-body p {
             font-size: 15px;
             color: #374151;
-            margin-bottom: 14px;
+            margin-bottom: 12px;
+            line-height: 1.65;
         }
 
+        .ce-card-body p:last-child { margin-bottom: 0; }
+
+        /* Callout box – color adapts to phase via inheritance */
         .content-callout {
-            background: #f0f4ff;
-            border-left: 3px solid #4361ee;
-            padding: 16px 20px;
+            border-left: 3px solid;
+            padding: 13px 18px;
             border-radius: 0 10px 10px 0;
-            margin: 20px 0;
+            margin: 12px 0;
         }
 
         .content-callout p {
             font-size: 14px;
-            color: #1e3a5f;
             margin: 0;
+            margin-bottom: 5px;
+            line-height: 1.55;
         }
 
-        .content-callout strong { color: #4361ee; }
+        .content-callout p:last-child { margin-bottom: 0; }
 
-        .content-callout.warning {
-            background: #fffbeb;
-            border-left-color: #f59e0b;
-        }
+        .phase-section.vorher   .content-callout { background: #f0fdfa; border-left-color: #0d9488; }
+        .phase-section.vorher   .content-callout p { color: #134e4a; }
+        .phase-section.vorher   .content-callout strong { color: #0d9488; }
 
-        .content-callout.warning p { color: #78350f; }
-        .content-callout.warning strong { color: #b45309; }
+        .phase-section.waehrend .content-callout { background: #f0f4ff; border-left-color: #4361ee; }
+        .phase-section.waehrend .content-callout p { color: #1e3a5f; }
+        .phase-section.waehrend .content-callout strong { color: #4361ee; }
 
+        .phase-section.nachher  .content-callout { background: #fffbeb; border-left-color: #d97706; }
+        .phase-section.nachher  .content-callout p { color: #78350f; }
+        .phase-section.nachher  .content-callout strong { color: #b45309; }
+
+        .phase-section.schluss  .content-callout { background: #faf5ff; border-left-color: #7c3aed; }
+        .phase-section.schluss  .content-callout p { color: #3b0764; }
+        .phase-section.schluss  .content-callout strong { color: #7c3aed; }
+
+        .content-callout.warning { background: #fffbeb !important; border-left-color: #f59e0b !important; }
+        .content-callout.warning p { color: #78350f !important; }
+        .content-callout.warning strong { color: #b45309 !important; }
+
+        /* Image placeholder */
         .content-image {
             width: 100%;
-            height: 240px;
+            height: 200px;
             background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
-            border-radius: 12px;
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
             color: #9ca3af;
             font-size: 14px;
-            margin: 24px 0;
+            margin: 10px 0;
             flex-direction: column;
             gap: 8px;
         }
 
         .content-image-icon { font-size: 32px; }
 
+        /* Lists */
         .content-list {
             padding-left: 20px;
-            margin: 12px 0 16px;
+            margin: 8px 0 12px;
         }
 
         .content-list li {
             font-size: 15px;
             color: #374151;
-            margin-bottom: 8px;
+            margin-bottom: 7px;
             line-height: 1.6;
         }
 
         .content-list li strong { color: #1a1a2e; }
 
+        /* Table */
         .content-table {
             width: 100%;
             border-collapse: separate;
@@ -547,7 +617,7 @@
             border: 1px solid #e5e7eb;
             border-radius: 10px;
             overflow: hidden;
-            margin: 20px 0;
+            margin: 12px 0;
             font-size: 14px;
         }
 
@@ -568,14 +638,115 @@
 
         .content-table tr:last-child td { border-bottom: none; }
 
-        /* Navigation Bar (bottom of content) */
-        .content-nav {
+        /* Quiz */
+        .quiz-question {
+            font-size: 15px;
+            font-weight: 600;
+            color: #1a1a2e;
+            margin-bottom: 14px;
+        }
+
+        .quiz-option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 14px;
+            border: 1px solid #e5e7eb;
+            border-radius: 9px;
+            margin-bottom: 7px;
+            cursor: pointer;
+            font-size: 14px;
+            color: #374151;
+            transition: all 0.15s;
+            background: white;
+        }
+
+        .quiz-option:hover   { border-color: #4361ee; background: #f0f4ff; }
+        .quiz-option.correct { border-color: #059669; background: #ecfdf5; color: #065f46; }
+        .quiz-option.wrong   { border-color: #dc2626; background: #fef2f2; color: #991b1b; }
+
+        .quiz-radio {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            border: 2px solid #d1d5db;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .quiz-option.correct .quiz-radio { border-color: #059669; background: #059669; }
+        .quiz-option.correct .quiz-radio::after { content: '✓'; color: white; font-size: 10px; font-weight: 700; }
+        .quiz-option.wrong   .quiz-radio { border-color: #dc2626; background: #dc2626; }
+        .quiz-option.wrong   .quiz-radio::after { content: '✗'; color: white; font-size: 10px; font-weight: 700; }
+
+        .quiz-result {
+            padding: 11px 16px;
+            border-radius: 0 9px 9px 0;
+            border-left: 3px solid #059669;
+            background: #ecfdf5;
+            font-size: 13px;
+            color: #065f46;
+            margin-top: 10px;
+        }
+
+        .quiz-result strong { color: #059669; }
+
+        /* Reflexion textarea */
+        .reflexion-area {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid #e5e7eb;
+            border-radius: 9px;
+            font-size: 14px;
+            font-family: inherit;
+            resize: vertical;
+            min-height: 80px;
+            outline: none;
+            color: #374151;
+            transition: border-color 0.15s;
+            margin-top: 10px;
+            background: white;
+        }
+
+        .phase-section.vorher   .reflexion-area:focus { border-color: #0d9488; box-shadow: 0 0 0 3px rgba(13,148,136,0.1); }
+        .phase-section.waehrend .reflexion-area:focus { border-color: #4361ee; box-shadow: 0 0 0 3px rgba(67,97,238,0.1); }
+        .phase-section.nachher  .reflexion-area:focus { border-color: #d97706; box-shadow: 0 0 0 3px rgba(217,119,6,0.1); }
+        .phase-section.schluss  .reflexion-area:focus { border-color: #7c3aed; box-shadow: 0 0 0 3px rgba(124,58,237,0.1); }
+        .reflexion-area::placeholder { color: #9ca3af; }
+
+        /* Summary cards */
+        .summary-cards {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin: 10px 0;
+        }
+
+        .summary-card {
+            background: #faf5ff;
+            border: 1px solid #ede9fe;
+            border-radius: 10px;
+            padding: 13px 15px;
+        }
+
+        .summary-card-icon  { font-size: 18px; margin-bottom: 5px; }
+        .summary-card-title { font-size: 13px; font-weight: 700; color: #4c1d95; margin-bottom: 3px; }
+        .summary-card-text  { font-size: 12px; color: #5b21b6; line-height: 1.5; }
+
+        /* ── UK Navigation ── */
+        .uk-nav-area {
+            background: #faf5ff;
+            padding: 24px 48px 36px;
+            border-top: 1px solid #ede9fe;
+        }
+
+        .uk-nav {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-top: 40px;
-            padding-top: 24px;
-            border-top: 1px solid #e5e7eb;
+            max-width: 724px;
         }
 
         .nav-btn {
@@ -594,10 +765,7 @@
             max-width: 280px;
         }
 
-        .nav-btn:hover {
-            border-color: #4361ee;
-            color: #4361ee;
-        }
+        .nav-btn:hover { border-color: #4361ee; color: #4361ee; }
 
         .nav-btn.primary {
             background: #4361ee;
@@ -607,12 +775,7 @@
 
         .nav-btn.primary:hover { background: #3a50d9; }
 
-        .nav-btn-label {
-            font-size: 11px;
-            color: #9ca3af;
-            font-weight: 500;
-        }
-
+        .nav-btn-label { font-size: 11px; color: #9ca3af; font-weight: 500; }
         .nav-btn.primary .nav-btn-label { color: rgba(255,255,255,0.7); }
 
         .nav-btn-title {
@@ -623,10 +786,7 @@
             text-overflow: ellipsis;
         }
 
-        .nav-btn-arrow {
-            font-size: 18px;
-            flex-shrink: 0;
-        }
+        .nav-btn-arrow { font-size: 18px; flex-shrink: 0; }
 
         /* ══════════════════════════════════════
            ILA FLOATING BUTTON
@@ -671,9 +831,7 @@
             transition: opacity 0.2s;
         }
 
-        .ila-fab:hover .ila-fab-label {
-            opacity: 1;
-        }
+        .ila-fab:hover .ila-fab-label { opacity: 1; }
 
         /* ══════════════════════════════════════
            SIDEBAR TOGGLE (mobile)
@@ -703,9 +861,7 @@
         @media (max-width: 900px) {
             .course-sidebar {
                 position: fixed;
-                left: 0;
-                top: 56px;
-                bottom: 0;
+                left: 0; top: 56px; bottom: 0;
                 z-index: 25;
                 transform: translateX(-100%);
                 transition: transform 0.3s ease;
@@ -713,12 +869,13 @@
             }
 
             .course-sidebar.open { transform: translateX(0); }
-
             .sidebar-toggle { display: flex; }
 
-            .content-body { padding: 24px 20px; }
-
             .ce-indicator { padding: 10px 20px; }
+
+            .phase-section,
+            .uk-title-area,
+            .uk-nav-area { padding-left: 20px; padding-right: 20px; }
         }
     </style>
 </head>
@@ -734,7 +891,7 @@
         <div class="nav-divider"></div>
         <div>
             <div class="nav-course-name">Projektmanagement mit Scrum</div>
-            <div class="nav-course-meta">Methodikkurs · Woche 3 von 6</div>
+            <div class="nav-course-meta">Methodikkurs · Woche 4 von 6</div>
         </div>
     </div>
     <div class="top-nav-right">
@@ -758,7 +915,7 @@
 
         <div class="sidebar-tree">
 
-            <!-- Modul 1 (abgeschlossen) -->
+            <!-- Modul 1 -->
             <div class="tree-module">
                 <div class="tree-module-header" onclick="toggleModule(this)">
                     <span class="tree-chevron">▶</span>
@@ -767,20 +924,10 @@
                 </div>
                 <div class="tree-chapters">
                     <div class="tree-chapter">
-                        <div class="tree-chapter-header" onclick="toggleChapter(this)">
+                        <div class="tree-chapter-header">
                             <span class="tree-chevron">▶</span>
                             <span class="tree-status-dot done"></span>
                             Kap. 1: Einführung in PM
-                        </div>
-                        <div class="tree-subchapters">
-                            <div class="tree-subchapter done">
-                                <span class="tree-sub-icon">✓</span>
-                                Was ist Projektmanagement?
-                            </div>
-                            <div class="tree-subchapter done">
-                                <span class="tree-sub-icon">✓</span>
-                                Historischer Überblick
-                            </div>
                         </div>
                     </div>
                     <div class="tree-chapter">
@@ -790,17 +937,10 @@
                             Kap. 2: Agile vs. klassisch
                         </div>
                     </div>
-                    <div class="tree-chapter">
-                        <div class="tree-chapter-header">
-                            <span class="tree-chevron">▶</span>
-                            <span class="tree-status-dot done"></span>
-                            Kap. 3: Geschichte von Scrum
-                        </div>
-                    </div>
                 </div>
             </div>
 
-            <!-- Modul 2 (abgeschlossen) -->
+            <!-- Modul 2 -->
             <div class="tree-module">
                 <div class="tree-module-header" onclick="toggleModule(this)">
                     <span class="tree-chevron">▶</span>
@@ -819,27 +959,13 @@
                         <div class="tree-chapter-header">
                             <span class="tree-chevron">▶</span>
                             <span class="tree-status-dot done"></span>
-                            Kap. 2: Artefakte
-                        </div>
-                    </div>
-                    <div class="tree-chapter">
-                        <div class="tree-chapter-header">
-                            <span class="tree-chevron">▶</span>
-                            <span class="tree-status-dot done"></span>
-                            Kap. 3: Events & Zeremonien
-                        </div>
-                    </div>
-                    <div class="tree-chapter">
-                        <div class="tree-chapter-header">
-                            <span class="tree-chevron">▶</span>
-                            <span class="tree-status-dot done"></span>
-                            Kap. 4: Sprint-Planung
+                            Kap. 2: Artefakte &amp; Events
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Modul 3 (abgeschlossen) -->
+            <!-- Modul 3 -->
             <div class="tree-module">
                 <div class="tree-module-header" onclick="toggleModule(this)">
                     <span class="tree-chevron">▶</span>
@@ -851,21 +977,7 @@
                         <div class="tree-chapter-header">
                             <span class="tree-chevron">▶</span>
                             <span class="tree-status-dot done"></span>
-                            Kap. 1: Fallbeispiele
-                        </div>
-                    </div>
-                    <div class="tree-chapter">
-                        <div class="tree-chapter-header">
-                            <span class="tree-chevron">▶</span>
-                            <span class="tree-status-dot done"></span>
-                            Kap. 2: Kommunikationsmodelle
-                        </div>
-                    </div>
-                    <div class="tree-chapter">
-                        <div class="tree-chapter-header">
-                            <span class="tree-chevron">▶</span>
-                            <span class="tree-status-dot done"></span>
-                            Kap. 3: Reflexion & Retrospektive
+                            Kap. 1–5 abgeschlossen
                         </div>
                     </div>
                 </div>
@@ -896,7 +1008,7 @@
                             </div>
                             <div class="tree-subchapter">
                                 <span class="tree-sub-icon">○</span>
-                                Product Backlog erstellen
+                                User Stories schreiben
                             </div>
                         </div>
                     </div>
@@ -924,34 +1036,11 @@
                     <span class="tree-module-icon locked">🔒</span>
                     <span class="tree-module-name" style="color: #9ca3af;">Modul 5: Prüfungsvorbereitung</span>
                 </div>
-                <div class="tree-chapters">
-                    <div class="tree-chapter">
-                        <div class="tree-chapter-header" style="color: #9ca3af;">
-                            <span class="tree-chevron">▶</span>
-                            <span class="tree-status-dot locked"></span>
-                            Kap. 1: Wiederholung Kernthemen
-                        </div>
-                    </div>
-                    <div class="tree-chapter">
-                        <div class="tree-chapter-header" style="color: #9ca3af;">
-                            <span class="tree-chevron">▶</span>
-                            <span class="tree-status-dot locked"></span>
-                            Kap. 2: Probeklausur
-                        </div>
-                    </div>
-                    <div class="tree-chapter">
-                        <div class="tree-chapter-header" style="color: #9ca3af;">
-                            <span class="tree-chevron">▶</span>
-                            <span class="tree-status-dot locked"></span>
-                            Kap. 3: Tipps & Strategien
-                        </div>
-                    </div>
-                </div>
+                <div class="tree-chapters"></div>
             </div>
 
         </div>
 
-        <!-- Sidebar Footer -->
         <div class="sidebar-footer">
             <div class="sidebar-progress">
                 <span class="sidebar-progress-label">Gesamtfortschritt</span>
@@ -966,7 +1055,7 @@
     <!-- ── CONTENT AREA ── -->
     <main class="content-area">
 
-        <!-- Content Element Indicator -->
+        <!-- Context bar (sticky) -->
         <div class="ce-indicator">
             <div class="ce-breadcrumb">
                 <a href="#">Modul 4</a>
@@ -975,106 +1064,307 @@
                 <span>›</span>
                 <span class="current">Sprint Planning</span>
             </div>
-            <div class="ce-steps">
-                <div class="ce-step done"></div>
-                <div class="ce-step done"></div>
-                <div class="ce-step active"></div>
-                <div class="ce-step"></div>
-                <div class="ce-step"></div>
-                <span class="ce-step-label">CE 3 / 5</span>
+            <div class="phase-legend">
+                <a class="phase-pill vorher done"   href="#phase-vorher">
+                    <span class="pill-dot"></span>Vorher
+                </a>
+                <a class="phase-pill waehrend done" href="#phase-waehrend">
+                    <span class="pill-dot"></span>Während
+                </a>
+                <a class="phase-pill nachher active" href="#phase-nachher">
+                    <span class="pill-dot"></span>Nachher
+                </a>
+                <a class="phase-pill schluss"       href="#phase-schluss">
+                    <span class="pill-dot"></span>Schluss
+                </a>
             </div>
         </div>
 
-        <!-- Content Body -->
-        <div class="content-body">
+        <!-- UK Title -->
+        <div class="uk-title-area">
+            <h1 class="uk-title">Sprint Planning</h1>
+            <p class="uk-meta">Modul 4 · Kap. 1 · UK 1.2 · ca. 55 Min. · 10 Content-Elemente</p>
+        </div>
 
-            <div class="content-type-badge text">📝 Text-Element</div>
+        <!-- ════════════════════════
+             VORHER (teal)
+             ════════════════════════ -->
+        <div class="phase-section vorher" id="phase-vorher">
 
-            <h1 class="content-h1">Sprint Planning</h1>
-            <p class="content-subtitle">Rollen, Verantwortlichkeiten und der Ablauf eines Sprint Plannings im Scrum-Framework.</p>
-
-            <div class="content-section">
-                <h2>Was ist Sprint Planning?</h2>
-                <p>Das Sprint Planning ist ein Event in Scrum, das den Sprint einleitet. Im Sprint Planning wird festgelegt, welche Arbeit im kommenden Sprint erledigt werden soll. Dieser Plan wird durch die gemeinsame Arbeit des gesamten Scrum Teams erstellt.</p>
-                <p>Das Sprint Planning beantwortet drei zentrale Fragen:</p>
-
-                <div class="content-callout">
-                    <p><strong>1. Warum</strong> ist dieser Sprint wertvoll? → Sprint-Ziel definieren</p>
-                    <p><strong>2. Was</strong> kann in diesem Sprint erledigt werden? → Items aus Product Backlog auswählen</p>
-                    <p><strong>3. Wie</strong> wird die ausgewählte Arbeit erledigt? → Aufgaben planen</p>
+            <!-- CE 1: Lernziele -->
+            <div class="ce-card">
+                <div class="ce-card-header">
+                    <span class="ce-card-type text">📝 Text</span>
+                    <span class="ce-card-num">CE 1 / 10</span>
+                </div>
+                <div class="ce-card-body">
+                    <h2>Was dich erwartet</h2>
+                    <p>In diesem Unterkapitel lernst du, was ein Sprint Planning ist, wer daran teilnimmt und wie das Meeting strukturell abläuft.</p>
+                    <div class="content-callout">
+                        <p><strong>Lernziele:</strong> Nach diesem Unterkapitel kannst du …</p>
+                        <p>· den Ablauf eines Sprint Plannings beschreiben</p>
+                        <p>· die Verantwortlichkeiten der drei Scrum-Rollen benennen</p>
+                        <p>· einschätzen, welche Items ins Sprint Backlog aufgenommen werden sollten</p>
+                    </div>
                 </div>
             </div>
 
-            <div class="content-section">
-                <h2>Die Rollen im Sprint Planning</h2>
-                <p>Alle Mitglieder des Scrum Teams nehmen am Sprint Planning teil. Jede Rolle hat dabei spezifische Verantwortlichkeiten:</p>
-
-                <div class="content-image">
-                    <span class="content-image-icon">📊</span>
-                    Diagramm: Rollen und Verantwortlichkeiten im Sprint Planning
+            <!-- CE 2: Vorwissensfrage -->
+            <div class="ce-card">
+                <div class="ce-card-header">
+                    <span class="ce-card-type quiz">❓ Reflexion</span>
+                    <span class="ce-card-num">CE 2 / 10</span>
                 </div>
-
-                <table class="content-table">
-                    <thead>
-                        <tr>
-                            <th>Rolle</th>
-                            <th>Verantwortung im Sprint Planning</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td><strong>Product Owner</strong></td>
-                            <td>Priorisiert das Product Backlog, schlägt Items vor, definiert das Sprint-Ziel</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Scrum Master</strong></td>
-                            <td>Moderiert das Event, achtet auf Timebox, beseitigt Hindernisse</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Developers</strong></td>
-                            <td>Wählen Items aus, planen die technische Umsetzung, schätzen Aufwand</td>
-                        </tr>
-                    </tbody>
-                </table>
-
-                <div class="content-callout warning">
-                    <p><strong>Wichtig:</strong> Der Product Owner priorisiert, aber die Developers entscheiden, wie viel Arbeit sie in den Sprint aufnehmen. Niemand darf dem Team diktieren, was es committet.</p>
+                <div class="ce-card-body">
+                    <p class="quiz-question">Bevor wir starten: Was verbindest du bisher mit dem Begriff „Sprint Planning"? Notiere kurz deine Gedanken.</p>
+                    <textarea class="reflexion-area" placeholder="Schreib hier deine ersten Gedanken …"></textarea>
                 </div>
             </div>
 
-            <div class="content-section">
-                <h2>Timebox und Ablauf</h2>
-                <p>Das Sprint Planning ist auf maximal <strong>8 Stunden</strong> für einen einmonatigen Sprint begrenzt. Bei kürzeren Sprints ist das Event in der Regel kürzer.</p>
+        </div>
 
-                <h3>Typischer Ablauf (2-Wochen-Sprint):</h3>
-                <ol class="content-list">
-                    <li><strong>Sprint-Ziel besprechen</strong> (30 Min.) – Product Owner stellt die Vision vor</li>
-                    <li><strong>Backlog Items auswählen</strong> (60 Min.) – Team diskutiert und selektiert</li>
-                    <li><strong>Aufgaben planen</strong> (60 Min.) – Items in technische Tasks zerlegen</li>
-                    <li><strong>Kapazität prüfen</strong> (15 Min.) – Realismus-Check: Schaffen wir das?</li>
-                    <li><strong>Commitment</strong> (15 Min.) – Team bestätigt Sprint Backlog und Sprint-Ziel</li>
-                </ol>
+        <!-- ════════════════════════
+             WÄHREND (blue)
+             ════════════════════════ -->
+        <div class="phase-section waehrend" id="phase-waehrend">
+
+            <!-- CE 3: Was ist Sprint Planning? -->
+            <div class="ce-card">
+                <div class="ce-card-header">
+                    <span class="ce-card-type text">📝 Text</span>
+                    <span class="ce-card-num">CE 3 / 10</span>
+                </div>
+                <div class="ce-card-body">
+                    <h2>Was ist Sprint Planning?</h2>
+                    <p>Das Sprint Planning ist ein Event in Scrum, das den Sprint einleitet. Im Sprint Planning wird festgelegt, welche Arbeit im kommenden Sprint erledigt werden soll. Dieser Plan wird durch die gemeinsame Arbeit des gesamten Scrum Teams erstellt.</p>
+                    <p>Das Sprint Planning beantwortet drei zentrale Fragen:</p>
+                    <div class="content-callout">
+                        <p><strong>1. Warum</strong> ist dieser Sprint wertvoll? → Sprint-Ziel definieren</p>
+                        <p><strong>2. Was</strong> kann in diesem Sprint erledigt werden? → Items aus Product Backlog auswählen</p>
+                        <p><strong>3. Wie</strong> wird die ausgewählte Arbeit erledigt? → Aufgaben planen</p>
+                    </div>
+                </div>
             </div>
 
-            <!-- Navigation -->
-            <div class="content-nav">
+            <!-- CE 4: Rollendiagramm -->
+            <div class="ce-card">
+                <div class="ce-card-header">
+                    <span class="ce-card-type image">🖼 Bild</span>
+                    <span class="ce-card-num">CE 4 / 10</span>
+                </div>
+                <div class="ce-card-body">
+                    <p>Alle drei Scrum-Rollen nehmen am Sprint Planning teil und bringen unterschiedliche Perspektiven ein:</p>
+                    <div class="content-image">
+                        <span class="content-image-icon">📊</span>
+                        Diagramm: Rollen und Verantwortlichkeiten im Sprint Planning
+                    </div>
+                </div>
+            </div>
+
+            <!-- CE 5: Rollentabelle -->
+            <div class="ce-card">
+                <div class="ce-card-header">
+                    <span class="ce-card-type text">📝 Text</span>
+                    <span class="ce-card-num">CE 5 / 10</span>
+                </div>
+                <div class="ce-card-body">
+                    <h2>Verantwortlichkeiten nach Rolle</h2>
+                    <table class="content-table">
+                        <thead>
+                            <tr>
+                                <th>Rolle</th>
+                                <th>Verantwortung im Sprint Planning</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Product Owner</strong></td>
+                                <td>Priorisiert das Product Backlog, schlägt Items vor, definiert das Sprint-Ziel</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Scrum Master</strong></td>
+                                <td>Moderiert das Event, achtet auf Timebox, beseitigt Hindernisse</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Developers</strong></td>
+                                <td>Wählen Items aus, planen die technische Umsetzung, schätzen Aufwand</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="content-callout warning">
+                        <p><strong>Wichtig:</strong> Der Product Owner priorisiert, aber die Developers entscheiden, wie viel Arbeit sie in den Sprint aufnehmen. Niemand darf dem Team diktieren, was es committet.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CE 6: Timebox und Ablauf -->
+            <div class="ce-card">
+                <div class="ce-card-header">
+                    <span class="ce-card-type text">📝 Text</span>
+                    <span class="ce-card-num">CE 6 / 10</span>
+                </div>
+                <div class="ce-card-body">
+                    <h2>Timebox und Ablauf</h2>
+                    <p>Das Sprint Planning ist auf maximal <strong>8 Stunden</strong> für einen einmonatigen Sprint begrenzt. Bei kürzeren Sprints ist das Event in der Regel kürzer.</p>
+                    <h3>Typischer Ablauf (2-Wochen-Sprint)</h3>
+                    <ol class="content-list">
+                        <li><strong>Sprint-Ziel besprechen</strong> (30 Min.) – Product Owner stellt die Vision vor</li>
+                        <li><strong>Backlog Items auswählen</strong> (60 Min.) – Team diskutiert und selektiert</li>
+                        <li><strong>Aufgaben planen</strong> (60 Min.) – Items in technische Tasks zerlegen</li>
+                        <li><strong>Kapazität prüfen</strong> (15 Min.) – Realismus-Check: Schaffen wir das?</li>
+                        <li><strong>Commitment</strong> (15 Min.) – Team bestätigt Sprint Backlog und Sprint-Ziel</li>
+                    </ol>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ════════════════════════
+             NACHHER (amber)
+             ════════════════════════ -->
+        <div class="phase-section nachher" id="phase-nachher">
+
+            <!-- CE 7: Quiz 1 -->
+            <div class="ce-card">
+                <div class="ce-card-header">
+                    <span class="ce-card-type quiz">❓ Quiz</span>
+                    <span class="ce-card-num">CE 7 / 10</span>
+                </div>
+                <div class="ce-card-body">
+                    <p class="quiz-question">Wer ist beim Sprint Planning dafür verantwortlich, die Items aus dem Product Backlog auszuwählen?</p>
+                    <div class="quiz-option wrong">
+                        <div class="quiz-radio"></div>
+                        <span>Der Product Owner</span>
+                    </div>
+                    <div class="quiz-option">
+                        <div class="quiz-radio"></div>
+                        <span>Der Scrum Master</span>
+                    </div>
+                    <div class="quiz-option correct">
+                        <div class="quiz-radio"></div>
+                        <span>Die Developers</span>
+                    </div>
+                    <div class="quiz-option">
+                        <div class="quiz-radio"></div>
+                        <span>Das Management</span>
+                    </div>
+                    <div class="quiz-result">
+                        <strong>Richtig!</strong> Die Developers wählen selbst, welche Items sie als machbar einschätzen. Der Product Owner schlägt vor und priorisiert – die finale Auswahl liegt beim Team.
+                    </div>
+                </div>
+            </div>
+
+            <!-- CE 8: Fallbeispiel -->
+            <div class="ce-card">
+                <div class="ce-card-header">
+                    <span class="ce-card-type text">📝 Fallbeispiel</span>
+                    <span class="ce-card-num">CE 8 / 10</span>
+                </div>
+                <div class="ce-card-body">
+                    <h2>Fallbeispiel: Das überlastete Team</h2>
+                    <p>Das Scrum-Team von „FinApp GmbH" plant Sprint 7. Der Product Owner besteht darauf, dass 12 Story Points eingeplant werden – deutlich mehr als die bisherige Velocity von 8.</p>
+                    <div class="content-callout">
+                        <p><strong>Frage:</strong> Was sollte der Scrum Master in dieser Situation tun? Und wer hat das letzte Wort bei der Kapazitätsplanung?</p>
+                    </div>
+                    <textarea class="reflexion-area" placeholder="Deine Antwort zum Fallbeispiel …"></textarea>
+                </div>
+            </div>
+
+            <!-- CE 9: Quiz 2 -->
+            <div class="ce-card">
+                <div class="ce-card-header">
+                    <span class="ce-card-type quiz">❓ Quiz</span>
+                    <span class="ce-card-num">CE 9 / 10</span>
+                </div>
+                <div class="ce-card-body">
+                    <p class="quiz-question">Wie lange darf ein Sprint Planning für einen 2-Wochen-Sprint höchstens dauern?</p>
+                    <div class="quiz-option">
+                        <div class="quiz-radio"></div>
+                        <span>2 Stunden</span>
+                    </div>
+                    <div class="quiz-option correct">
+                        <div class="quiz-radio"></div>
+                        <span>4 Stunden</span>
+                    </div>
+                    <div class="quiz-option">
+                        <div class="quiz-radio"></div>
+                        <span>8 Stunden</span>
+                    </div>
+                    <div class="quiz-option">
+                        <div class="quiz-radio"></div>
+                        <span>Keine Begrenzung</span>
+                    </div>
+                    <div class="quiz-result">
+                        <strong>Richtig!</strong> Für einen 2-Wochen-Sprint gilt eine Timebox von 4 Stunden. Die 8-Stunden-Grenze gilt nur für den einmonatigen Sprint.
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ════════════════════════
+             SCHLUSS (violet)
+             ════════════════════════ -->
+        <div class="phase-section schluss" id="phase-schluss">
+
+            <!-- CE 10: Zusammenfassung -->
+            <div class="ce-card">
+                <div class="ce-card-header">
+                    <span class="ce-card-type text">📝 Zusammenfassung</span>
+                    <span class="ce-card-num">CE 10 / 10</span>
+                </div>
+                <div class="ce-card-body">
+                    <h2>Das Wichtigste auf einen Blick</h2>
+                    <div class="summary-cards">
+                        <div class="summary-card">
+                            <div class="summary-card-icon">🎯</div>
+                            <div class="summary-card-title">Sprint-Ziel</div>
+                            <div class="summary-card-text">Definiert den Wert des Sprints – formuliert vom PO, verabschiedet vom Team</div>
+                        </div>
+                        <div class="summary-card">
+                            <div class="summary-card-icon">👥</div>
+                            <div class="summary-card-title">Alle drei Rollen</div>
+                            <div class="summary-card-text">PO, SM und Developers – jeder bringt eine klar definierte Perspektive mit</div>
+                        </div>
+                        <div class="summary-card">
+                            <div class="summary-card-icon">⏱</div>
+                            <div class="summary-card-title">Timebox</div>
+                            <div class="summary-card-text">Max. 4 h für 2-Wochen-Sprint; Effizienz durch Vorbereitung und Backlog Grooming</div>
+                        </div>
+                        <div class="summary-card">
+                            <div class="summary-card-icon">🤝</div>
+                            <div class="summary-card-title">Team-Entscheidung</div>
+                            <div class="summary-card-text">Niemand kann dem Team von außen aufzwingen, wie viel es sich vornimmt</div>
+                        </div>
+                    </div>
+                    <div class="content-callout" style="margin-top: 14px;">
+                        <p><strong>Ausblick:</strong> Im nächsten Unterkapitel lernst du, wie User Stories formuliert werden – die Bausteine, aus denen das Sprint Backlog entsteht.</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- UK Navigation -->
+        <div class="uk-nav-area">
+            <div class="uk-nav">
                 <a class="nav-btn" href="#">
                     <span class="nav-btn-arrow">←</span>
                     <div>
-                        <div class="nav-btn-label">Vorheriges Content-Element</div>
-                        <div class="nav-btn-title">Teamzusammenstellung</div>
+                        <div class="nav-btn-label">Vorheriges Unterkapitel</div>
+                        <div class="nav-btn-title">Aufgabenstellung</div>
                     </div>
                 </a>
                 <a class="nav-btn primary" href="#">
                     <div style="text-align: right;">
-                        <div class="nav-btn-label">Nächstes Content-Element</div>
+                        <div class="nav-btn-label">Nächstes Unterkapitel</div>
                         <div class="nav-btn-title">User Stories schreiben</div>
                     </div>
                     <span class="nav-btn-arrow">→</span>
                 </a>
             </div>
-
         </div>
+
     </main>
 
 </div>
@@ -1110,6 +1400,42 @@
     function toggleSidebar() {
         document.getElementById('courseSidebar').classList.toggle('open');
     }
+
+    // Update active phase pill on scroll
+    const phases = [
+        { id: 'phase-vorher',   key: 'vorher'   },
+        { id: 'phase-waehrend', key: 'waehrend' },
+        { id: 'phase-nachher',  key: 'nachher'  },
+        { id: 'phase-schluss',  key: 'schluss'  },
+    ];
+
+    const contentArea = document.querySelector('.content-area');
+
+    contentArea.addEventListener('scroll', () => {
+        const top = contentArea.scrollTop + 80;
+        let current = phases[0].key;
+
+        phases.forEach(({ id, key }) => {
+            const el = document.getElementById(id);
+            if (el && el.offsetTop <= top) current = key;
+        });
+
+        document.querySelectorAll('.phase-pill').forEach(pill => {
+            pill.classList.remove('active');
+        });
+
+        const activePill = document.querySelector(`.phase-pill.${current}`);
+        if (activePill) activePill.classList.add('active');
+    });
+
+    // Smooth scroll for phase pills
+    document.querySelectorAll('.phase-pill[href^="#"]').forEach(link => {
+        link.addEventListener('click', e => {
+            e.preventDefault();
+            const target = document.getElementById(link.getAttribute('href').slice(1));
+            if (target) contentArea.scrollTo({ top: target.offsetTop - 45, behavior: 'smooth' });
+        });
+    });
 </script>
 
 </body>
