@@ -2,7 +2,21 @@
   "permissions": {
     "allow": [
       "Bash(\"/Users/consu/Claude Projects/Reza/replace_schedule.py\":*)",
-      "Bash(python3:*)"
+      "Bash(python3:*)",
+      "WebSearch",
+      "WebFetch(domain:www.fourzerothree.in)",
+      "WebFetch(domain:www.brandcolorcode.com)",
+      "WebFetch(domain:teach.udemy.com)",
+      "WebFetch(domain:www.talentlms.com)",
+      "WebFetch(domain:sellcoursesonline.com)",
+      "WebFetch(domain:componentlibrary.moodle.com)",
+      "WebFetch(domain:www.thebrandingjournal.com)",
+      "WebFetch(domain:mobbin.com)",
+      "WebFetch(domain:blog.coursera.org)",
+      "WebFetch(domain:ixd.prattsi.org)",
+      "WebFetch(domain:www.ispringsolutions.com)",
+      "WebFetch(domain:www.eleken.co)",
+      "WebFetch(domain:www.ispring.com)"
     ]
   }
 }

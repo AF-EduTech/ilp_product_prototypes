@@ -1,0 +1,48 @@
+Create a detailed schema that illustrates the complete data flow through the main SQL Server components, starting from external data sources and ending with the reporting output. Arrange the schema horizontally from left to right. The schema must include five clearly separated and visually distinct stations: (1) Data Sources, (2) SSIS (SQL Server Integration Services), (3) Database Engine/Data Warehouse, (4) SSAS (SQL Server Analysis Services), and (5) SSRS (SQL Server Reporting Services). Each station should be represented by a unique icon or area, such as a cylinder for databases, a gear for processing, or a monitor for reporting. Connect the stations with arrows that clearly indicate the direction of data flow, starting at the data sources and ending at the reporting output. The arrows must be clearly visible and consistently styled throughout the schema.
+
+Each station must have a large, numbered hotspot (from 1 to 5) placed at its center or most prominent part. The hotspots must be visually prominent, such as with a bold circle or colored indicator, and must be clicked in the order from left (1) to right (5) to follow the process step by step. The schema should also include small labels for each station, written in German, matching the hotspot titles.
+
+At the far left, illustrate a group of external data sources (such as icons for databases, files, or applications) to represent the starting point. Immediately to the right, show SSIS as the first processing step, perhaps with an icon symbolizing data transformation or movement. In the center, depict the Database Engine/Data Warehouse as the main storage and management hub, using a large database cylinder or similar icon. Next, position SSAS to the right of the Database Engine, using an icon that suggests analysis or data cubes. Finally, at the far right, represent SSRS with a monitor or report icon, showing the final reporting output.
+
+Ensure that the schema visually emphasizes the sequential flow of data and the distinct role of each component. The hotspots must be numbered and their order must be clearly indicated in the schema. When clicked, each hotspot reveals a short German description explaining the function and purpose of the respective component in the overall data flow. This schema enables an intuitive understanding of how data travels from its source, is processed and stored, analyzed, and ultimately presented as reports.
+
+Hotspots and their descriptions:
+1. Hotspot: 
+Title:
+Datenquellen
+Position:
+Far left side, showing a cluster of icons for external databases, files, and applications
+Text upon clicking:
+Hier stammen die Rohdaten her – aus unterschiedlichen externen Systemen, Datenbanken oder Dateien.
+
+2. Hotspot: 
+Title:
+SSIS (Integration Services)
+Position:
+Immediately right of Data Sources, with a gear or arrow icon indicating data extraction and transformation
+Text upon clicking:
+SSIS übernimmt die Aufgabe, Daten aus den verschiedenen Quellen zu extrahieren, zu transformieren und in das Data Warehouse zu laden.
+
+3. Hotspot: 
+Title:
+Datenbank-Engine / Data Warehouse
+Position:
+Center of the schema, represented by a large database cylinder or similar storage icon
+Text upon clicking:
+Hier werden die Daten dauerhaft gespeichert, verwaltet und für weitere Analysen bereitgestellt.
+
+4. Hotspot: 
+Title:
+SSAS (Analysis Services)
+Position:
+To the right of the Database Engine, shown with an analysis or data cube icon
+Text upon clicking:
+Mit SSAS werden die gespeicherten Daten analysiert, verdichtet und für Auswertungen vorbereitet.
+
+5. Hotspot: 
+Title:
+SSRS (Reporting Services)
+Position:
+Far right side, with a monitor or report icon showing the reporting output
+Text upon clicking:
+SSRS bereitet die Analyseergebnisse auf und stellt sie als Berichte im Browser zur Verfügung.

@@ -1,0 +1,118 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 520" width="900" height="520" font-family="'Segoe UI', Helvetica, Arial, sans-serif">
+  <defs>
+    <style>
+      .panel-label { font-size: 28px; font-weight: 700; letter-spacing: 2px; }
+      .hotspot-circle { cursor: pointer; }
+      .hotspot-circle circle { transition: r 0.15s; }
+      .hotspot-number { font-size: 13px; font-weight: 700; fill: white; pointer-events: none; }
+      .hotspot-tag { font-size: 11px; fill: #555; }
+      .tooltip-box { display: none; }
+      .tooltip-box.visible { display: block; }
+      .divider-line { stroke: #cbd5e1; stroke-width: 1.5; stroke-dasharray: 6 4; }
+    </style>
+  </defs>
+
+  <!-- Background -->
+  <rect width="900" height="520" fill="#f8fafc" rx="12"/>
+
+  <!-- OLTP half background -->
+  <rect x="0" y="0" width="449" height="520" fill="#eff6ff" rx="12"/>
+  <!-- OLAP half background -->
+  <rect x="451" y="0" width="449" height="520" fill="#f0fdf4" rx="12"/>
+
+  <!-- Center divider -->
+  <line x1="450" y1="20" x2="450" y2="500" class="divider-line"/>
+
+  <!-- ── OLTP Panel ── -->
+  <!-- Section: Top -->
+  <rect x="30" y="60" width="390" height="110" rx="8" fill="#dbeafe" stroke="#93c5fd" stroke-width="1"/>
+  <text x="225" y="95" text-anchor="middle" fill="#1e40af" class="panel-label">OLTP</text>
+  <text x="225" y="118" text-anchor="middle" fill="#3b82f6" font-size="12">Online Transaction Processing</text>
+  <line x1="50" y1="128" x2="400" y2="128" stroke="#93c5fd" stroke-width="1" stroke-dasharray="4 3"/>
+  <text x="225" y="148" text-anchor="middle" fill="#1e3a8a" font-size="11.5">Viele kurze Transaktionen · ACID-konform · zeilenorientiert</text>
+
+  <!-- Section: Middle -->
+  <rect x="30" y="200" width="390" height="110" rx="8" fill="#dbeafe" stroke="#93c5fd" stroke-width="1"/>
+  <text x="225" y="240" text-anchor="middle" fill="#1e40af" font-size="13" font-weight="600">Workload</text>
+  <text x="225" y="262" text-anchor="middle" fill="#374151" font-size="11.5">INSERT · UPDATE · DELETE</text>
+  <text x="225" y="280" text-anchor="middle" fill="#374151" font-size="11.5">Einzelne Datensätze · hohe Schreibrate</text>
+  <text x="225" y="298" text-anchor="middle" fill="#374151" font-size="11">Normalisiertes Schema · kurze Antwortzeiten</text>
+
+  <!-- Section: Bottom -->
+  <rect x="30" y="340" width="390" height="110" rx="8" fill="#dbeafe" stroke="#93c5fd" stroke-width="1"/>
+  <text x="225" y="378" text-anchor="middle" fill="#1e40af" font-size="13" font-weight="600">Beispiele</text>
+  <text x="225" y="400" text-anchor="middle" fill="#374151" font-size="11.5">Banktransaktionen</text>
+  <text x="225" y="418" text-anchor="middle" fill="#374151" font-size="11.5">Online-Shops &amp; Buchungssysteme</text>
+  <text x="225" y="436" text-anchor="middle" fill="#374151" font-size="11">Lagerverwaltung · ERP-Systeme</text>
+
+  <!-- ── OLAP Panel ── -->
+  <!-- Section: Top -->
+  <rect x="480" y="60" width="390" height="110" rx="8" fill="#dcfce7" stroke="#86efac" stroke-width="1"/>
+  <text x="675" y="95" text-anchor="middle" fill="#14532d" class="panel-label">OLAP</text>
+  <text x="675" y="118" text-anchor="middle" fill="#16a34a" font-size="12">Online Analytical Processing</text>
+  <line x1="500" y1="128" x2="850" y2="128" stroke="#86efac" stroke-width="1" stroke-dasharray="4 3"/>
+  <text x="675" y="148" text-anchor="middle" fill="#14532d" font-size="11.5">Komplexe Analysen · große Datenmengen · spaltenorientiert</text>
+
+  <!-- Section: Middle -->
+  <rect x="480" y="200" width="390" height="110" rx="8" fill="#dcfce7" stroke="#86efac" stroke-width="1"/>
+  <text x="675" y="240" text-anchor="middle" fill="#14532d" font-size="13" font-weight="600">Workload</text>
+  <text x="675" y="262" text-anchor="middle" fill="#374151" font-size="11.5">SELECT · Aggregation · JOIN</text>
+  <text x="675" y="280" text-anchor="middle" fill="#374151" font-size="11.5">Massendaten · hohe Leserate</text>
+  <text x="675" y="298" text-anchor="middle" fill="#374151" font-size="11">Denormalisiertes Schema · Trendanalysen</text>
+
+  <!-- Section: Bottom -->
+  <rect x="480" y="340" width="390" height="110" rx="8" fill="#dcfce7" stroke="#86efac" stroke-width="1"/>
+  <text x="675" y="378" text-anchor="middle" fill="#14532d" font-size="13" font-weight="600">Beispiele</text>
+  <text x="675" y="400" text-anchor="middle" fill="#374151" font-size="11.5">Data Warehouses</text>
+  <text x="675" y="418" text-anchor="middle" fill="#374151" font-size="11.5">Business Intelligence · Reporting</text>
+  <text x="675" y="436" text-anchor="middle" fill="#374151" font-size="11">Google BigQuery · Amazon Redshift</text>
+
+  <!-- ════════════════════════════════════ -->
+  <!-- HOTSPOTS                             -->
+  <!-- ════════════════════════════════════ -->
+
+  <!-- 1: Top-left — Ziel (OLTP) -->
+  <g class="hotspot-circle" tabindex="0" role="button" aria-label="Hotspot 1: Ziel (OLTP)">
+    <circle cx="60" cy="40" r="16" fill="#1d4ed8"/>
+    <text x="60" y="45" text-anchor="middle" class="hotspot-number">1</text>
+  </g>
+  <text x="82" y="36" class="hotspot-tag" font-weight="600">Ziel (OLTP)</text>
+
+  <!-- 2: Center-left — Typischer Workload (OLTP) -->
+  <g class="hotspot-circle" tabindex="0" role="button" aria-label="Hotspot 2: Typischer Workload (OLTP)">
+    <circle cx="60" cy="255" r="16" fill="#1d4ed8"/>
+    <text x="60" y="260" text-anchor="middle" class="hotspot-number">2</text>
+  </g>
+  <text x="82" y="251" class="hotspot-tag" font-weight="600">Typischer Workload (OLTP)</text>
+
+  <!-- 3: Bottom-left — Beispiel (OLTP) -->
+  <g class="hotspot-circle" tabindex="0" role="button" aria-label="Hotspot 3: Beispiel (OLTP)">
+    <circle cx="60" cy="476" r="16" fill="#1d4ed8"/>
+    <text x="60" y="481" text-anchor="middle" class="hotspot-number">3</text>
+  </g>
+  <text x="82" y="472" class="hotspot-tag" font-weight="600">Beispiel (OLTP)</text>
+
+  <!-- 4: Top-right — Ziel (OLAP) -->
+  <g class="hotspot-circle" tabindex="0" role="button" aria-label="Hotspot 4: Ziel (OLAP)">
+    <circle cx="840" cy="40" r="16" fill="#15803d"/>
+    <text x="840" y="45" text-anchor="middle" class="hotspot-number">4</text>
+  </g>
+  <text x="610" y="36" class="hotspot-tag" font-weight="600" text-anchor="start">Ziel (OLAP)</text>
+
+  <!-- 5: Center-right — Typischer Workload (OLAP) -->
+  <g class="hotspot-circle" tabindex="0" role="button" aria-label="Hotspot 5: Typischer Workload (OLAP)">
+    <circle cx="840" cy="255" r="16" fill="#15803d"/>
+    <text x="840" y="260" text-anchor="middle" class="hotspot-number">5</text>
+  </g>
+  <text x="610" y="251" class="hotspot-tag" font-weight="600" text-anchor="start">Typischer Workload (OLAP)</text>
+
+  <!-- 6: Bottom-right — Beispiel (OLAP) -->
+  <g class="hotspot-circle" tabindex="0" role="button" aria-label="Hotspot 6: Beispiel (OLAP)">
+    <circle cx="840" cy="476" r="16" fill="#15803d"/>
+    <text x="840" y="481" text-anchor="middle" class="hotspot-number">6</text>
+  </g>
+  <text x="610" y="472" class="hotspot-tag" font-weight="600" text-anchor="start">Beispiel (OLAP)</text>
+
+  <!-- Outer border -->
+  <rect x="1" y="1" width="898" height="518" rx="12" fill="none" stroke="#e2e8f0" stroke-width="1.5"/>
+</svg>

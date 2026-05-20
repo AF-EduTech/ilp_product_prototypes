@@ -1,0 +1,52 @@
+Image description:
+Create a detailed side-by-side comparison schema that visually contrasts OLTP and OLAP databases. The schema must be divided vertically into two equal halves. The left half is clearly labeled 'OLTP', and the right half is labeled 'OLAP'. Each half should be visually distinct, for example by using different background shades or borders. On both sides, three clearly visible and numbered hotspots must be placed. On the OLTP side, place the first hotspot at the very top, above the OLTP label, labeled 'Ziel (OLTP)'. The second hotspot is centered vertically in the OLTP half, labeled 'Typischer Workload (OLTP)'. The third hotspot is placed at the bottom of the OLTP half, below the OLTP label, labeled 'Beispiel (OLTP)'. On the OLAP side, mirror this arrangement: the fourth hotspot is at the very top, above the OLAP label, labeled 'Ziel (OLAP)'. The fifth hotspot is centered vertically in the OLAP half, labeled 'Typischer Workload (OLAP)'. The sixth hotspot is at the bottom of the OLAP half, below the OLAP label, labeled 'Beispiel (OLAP)'. All hotspots must be numbered from 1 to 6 and must be clicked in strict sequence, starting at the top left and ending at the bottom right. The schema should include clear vertical separation between the two halves, and the labels should be prominent. The background can be neutral, but the halves must be visually easy to distinguish. The overall layout should be rectangular, landscape-oriented, and wide enough to accommodate all labels and hotspots without crowding. The schema must not include any diagrams, charts, or statistics, but should focus on the conceptual comparison of OLTP and OLAP. Hotspot positions must be precise: top left above 'OLTP' label, center left in the middle of OLTP half, bottom left below 'OLTP' label; top right above 'OLAP' label, center right in the middle of OLAP half, bottom right below 'OLAP' label. Make sure the labels and hotspot numbers are clearly visible and correspond to the explanations provided.
+
+Hotspots and their descriptions:
+1. Hotspot: 
+Title:
+Ziel (OLTP)
+Position:
+Top left, above the OLTP label
+Text upon clicking:
+OLTP-Datenbanken sind darauf ausgelegt, viele kurze Transaktionen effizient und zuverlässig zu verarbeiten.
+
+2. Hotspot: 
+Title:
+Typischer Workload (OLTP)
+Position:
+Center left, in the middle of the OLTP half
+Text upon clicking:
+Typische Workloads sind Einfügen, Aktualisieren und Löschen einzelner Datensätze, zum Beispiel Buchungen oder Bestellungen.
+
+3. Hotspot: 
+Title:
+Beispiel (OLTP)
+Position:
+Bottom left, below the OLTP label
+Text upon clicking:
+Beispiel: Banktransaktionen, Online-Shops, Buchungssysteme.
+
+4. Hotspot: 
+Title:
+Ziel (OLAP)
+Position:
+Top right, above the OLAP label
+Text upon clicking:
+OLAP-Datenbanken sind für die schnelle Analyse großer Datenmengen und komplexe Abfragen konzipiert.
+
+5. Hotspot: 
+Title:
+Typischer Workload (OLAP)
+Position:
+Center right, in the middle of the OLAP half
+Text upon clicking:
+Typische Workloads sind umfangreiche Leseabfragen zur Auswertung und zum Reporting, wie zum Beispiel Trendanalysen.
+
+6. Hotspot: 
+Title:
+Beispiel (OLAP)
+Position:
+Bottom right, below the OLAP label
+Text upon clicking:
+Beispiel: Data Warehouses, Business-Intelligence-Systeme.
+

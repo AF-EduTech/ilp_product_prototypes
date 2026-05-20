@@ -1,0 +1,34 @@
+Create a detailed, horizontal flowchart-style schema that visualizes the dependencies and sequence of database backups required for a point-in-time recovery after a crash. The schema must consist of four main, clearly labeled rectangles arranged from left to right, each representing a specific backup type: 1. Full Backup, 2. Differential Backup, 3. Log Backup, and 4. Tail-Log Backup. Each rectangle must be large enough to accommodate a number and a label. Draw a right-pointing arrow from the Full Backup to the Differential Backup, another arrow from the Differential Backup to the Log Backup, and a final arrow from the Log Backup to the Tail-Log Backup, visually emphasizing that each backup is dependent on the previous one. The Tail-Log Backup rectangle should be visually distinct, for example by using a bold border or a different background color, to highlight its special role in the recovery process. Above or below the rectangles, include a horizontal timeline or line indicating the progression of time, with markers showing when each backup is taken. Place a crash icon or marker just before the Tail-Log Backup to indicate the database crash event. Number the rectangles clearly from 1 to 4, starting with Full Backup on the far left and ending with Tail-Log Backup on the far right. Each rectangle must have a hotspot with the corresponding number. Users must click the hotspots in the given order (from 1 to 4) to learn about each backup type and its role in the recovery process. The schema should make it clear that a restore operation requires first the Full Backup, then the latest Differential Backup (if available), followed by all Log Backups in sequence, and finally the Tail-Log Backup, which is essential to capture the last transactions before the restore. The schema must also visually show that each backup builds on the previous one, and that the Tail-Log Backup is a special emergency step performed after a crash but before starting the restore.
+
+Hotspots and their descriptions:
+1. Hotspot: 
+Title:
+Vollständige Sicherung
+Position:
+On the far left rectangle labeled 'Full Backup', with the number 1 inside the rectangle.
+Text upon clicking:
+Die vollständige Sicherung ist die Basis für alle nachfolgenden Sicherungen. Sie enthält alle Daten der Datenbank zum Zeitpunkt der Sicherung. Ohne diese Sicherung ist eine Wiederherstellung nicht möglich.
+
+2. Hotspot: 
+Title:
+Differentielle Sicherung
+Position:
+Immediately to the right of the Full Backup, on the rectangle labeled 'Differential Backup', with the number 2 inside the rectangle.
+Text upon clicking:
+Die differentielle Sicherung enthält alle Änderungen, die seit der letzten vollständigen Sicherung vorgenommen wurden. Sie baut direkt auf der letzten Vollsicherung auf und verkürzt die Wiederherstellungszeit, da nicht alle Log-Sicherungen einzeln eingespielt werden müssen.
+
+3. Hotspot: 
+Title:
+Transaktionsprotokoll-Sicherung
+Position:
+To the right of the Differential Backup, on the rectangle labeled 'Log Backup', with the number 3 inside the rectangle.
+Text upon clicking:
+Die Transaktionsprotokoll-Sicherung speichert alle Transaktionen, die seit der letzten Protokollsicherung durchgeführt wurden. Sie ist notwendig, um alle Änderungen bis zum Absturzzeitpunkt zu erfassen und die Datenbank auf einen beliebigen Zeitpunkt zwischen den Sicherungen zurückzusetzen.
+
+4. Hotspot: 
+Title:
+Tail-Log-Sicherung
+Position:
+On the far right rectangle, visually distinct (e.g. with a bold border or different color), labeled 'Tail-Log Backup', with the number 4 inside the rectangle and a crash icon just before it.
+Text upon clicking:
+Die Tail-Log-Sicherung wird unmittelbar nach dem Absturz und vor der Wiederherstellung durchgeführt. Sie enthält das letzte Fragment des Transaktionsprotokolls und stellt sicher, dass keine Transaktion verloren geht. Diese Sicherung ist nur im Notfall erforderlich und unterscheidet sich von regulären Log-Sicherungen, weil sie das Protokoll nicht abschneidet und ein neues Sicherungsziel benötigt.

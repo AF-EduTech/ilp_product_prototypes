@@ -1,0 +1,255 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 480" width="1100" height="480"
+     font-family="'Segoe UI', Helvetica, Arial, sans-serif">
+  <defs>
+    <!-- Arrow marker -->
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#64748b"/>
+    </marker>
+    <!-- Drop shadow -->
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="130%">
+      <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#00000022"/>
+    </filter>
+    <!-- Gradient fills -->
+    <linearGradient id="gradBlue" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#3b82f6"/>
+      <stop offset="100%" stop-color="#1d4ed8"/>
+    </linearGradient>
+    <linearGradient id="gradOrange" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f97316"/>
+      <stop offset="100%" stop-color="#c2410c"/>
+    </linearGradient>
+    <linearGradient id="gradSlate" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#475569"/>
+      <stop offset="100%" stop-color="#1e293b"/>
+    </linearGradient>
+    <linearGradient id="gradViolet" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#8b5cf6"/>
+      <stop offset="100%" stop-color="#5b21b6"/>
+    </linearGradient>
+    <linearGradient id="gradGreen" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#10b981"/>
+      <stop offset="100%" stop-color="#065f46"/>
+    </linearGradient>
+    <linearGradient id="bgGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f1f5f9"/>
+      <stop offset="100%" stop-color="#e2e8f0"/>
+    </linearGradient>
+  </defs>
+
+  <!-- ── Background ── -->
+  <rect width="1100" height="480" rx="16" fill="url(#bgGrad)" stroke="#cbd5e1" stroke-width="1.5"/>
+
+  <!-- Title bar -->
+  <rect x="0" y="0" width="1100" height="52" rx="16" fill="#1e293b"/>
+  <rect x="0" y="36" width="1100" height="16" fill="#1e293b"/>
+  <text x="550" y="33" text-anchor="middle" fill="white" font-size="16" font-weight="700" letter-spacing="1">
+    SQL Server – Datenflusskette
+  </text>
+
+  <!-- ══════════════════════════════════════════════ -->
+  <!--  STATION 1 – DATENQUELLEN  (x=42)             -->
+  <!-- ══════════════════════════════════════════════ -->
+  <g filter="url(#shadow)">
+    <rect x="28" y="88" width="162" height="320" rx="14" fill="white" stroke="#93c5fd" stroke-width="2"/>
+  </g>
+  <!-- Header -->
+  <rect x="28" y="88" width="162" height="44" rx="14" fill="url(#gradBlue)"/>
+  <rect x="28" y="110" width="162" height="22" fill="url(#gradBlue)"/>
+  <text x="109" y="115" text-anchor="middle" fill="white" font-size="12" font-weight="700">① Datenquellen</text>
+
+  <!-- DB icon 1 -->
+  <ellipse cx="109" cy="175" rx="34" ry="11" fill="#bfdbfe" stroke="#3b82f6" stroke-width="1.5"/>
+  <rect x="75" y="175" width="68" height="32" fill="#dbeafe" stroke="#3b82f6" stroke-width="1.5"/>
+  <ellipse cx="109" cy="207" rx="34" ry="11" fill="#bfdbfe" stroke="#3b82f6" stroke-width="1.5"/>
+  <text x="109" y="197" text-anchor="middle" fill="#1e40af" font-size="9" font-weight="600">Datenbank</text>
+
+  <!-- File icon -->
+  <rect x="68" y="230" width="26" height="32" rx="3" fill="#fef9c3" stroke="#eab308" stroke-width="1.5"/>
+  <polyline points="86,230 94,230 94,238 86,238" fill="#fde047" stroke="#eab308" stroke-width="1"/>
+  <line x1="72" y1="244" x2="90" y2="244" stroke="#ca8a04" stroke-width="1"/>
+  <line x1="72" y1="249" x2="90" y2="249" stroke="#ca8a04" stroke-width="1"/>
+  <line x1="72" y1="254" x2="90" y2="254" stroke="#ca8a04" stroke-width="1"/>
+  <text x="82" y="272" text-anchor="middle" fill="#92400e" font-size="9">CSV / XLS</text>
+
+  <!-- App icon -->
+  <rect x="112" y="230" width="30" height="32" rx="4" fill="#d1fae5" stroke="#10b981" stroke-width="1.5"/>
+  <rect x="116" y="234" width="22" height="14" rx="2" fill="#6ee7b7"/>
+  <rect x="121" y="252" width="12" height="5" rx="1" fill="#10b981"/>
+  <text x="127" y="272" text-anchor="middle" fill="#065f46" font-size="9">App</text>
+
+  <!-- Station label bottom -->
+  <text x="109" y="355" text-anchor="middle" fill="#64748b" font-size="10">Externe Systeme,</text>
+  <text x="109" y="368" text-anchor="middle" fill="#64748b" font-size="10">Dateien, Datenbanken</text>
+
+  <!-- HOTSPOT 1 -->
+  <circle cx="109" cy="395" r="20" fill="url(#gradBlue)" stroke="white" stroke-width="3" filter="url(#shadow)"/>
+  <text x="109" y="401" text-anchor="middle" fill="white" font-size="15" font-weight="800">1</text>
+
+  <!-- ══════════════════════════════════════════════ -->
+  <!--  ARROW 1 → 2                                  -->
+  <!-- ══════════════════════════════════════════════ -->
+  <line x1="192" y1="248" x2="228" y2="248" stroke="#64748b" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <text x="210" y="240" text-anchor="middle" fill="#94a3b8" font-size="9">ETL</text>
+
+  <!-- ══════════════════════════════════════════════ -->
+  <!--  STATION 2 – SSIS  (x=230)                    -->
+  <!-- ══════════════════════════════════════════════ -->
+  <g filter="url(#shadow)">
+    <rect x="230" y="88" width="162" height="320" rx="14" fill="white" stroke="#fed7aa" stroke-width="2"/>
+  </g>
+  <rect x="230" y="88" width="162" height="44" rx="14" fill="url(#gradOrange)"/>
+  <rect x="230" y="110" width="162" height="22" fill="url(#gradOrange)"/>
+  <text x="311" y="115" text-anchor="middle" fill="white" font-size="12" font-weight="700">② SSIS</text>
+
+  <!-- Gear icon (hand-drawn circles as gear) -->
+  <circle cx="311" cy="200" r="38" fill="#ffedd5" stroke="#f97316" stroke-width="2"/>
+  <circle cx="311" cy="200" r="20" fill="#fed7aa" stroke="#f97316" stroke-width="2"/>
+  <!-- Gear teeth -->
+  <rect x="305" y="158" width="12" height="14" rx="3" fill="#f97316"/>
+  <rect x="305" y="228" width="12" height="14" rx="3" fill="#f97316"/>
+  <rect x="269" y="194" width="14" height="12" rx="3" fill="#f97316"/>
+  <rect x="339" y="194" width="14" height="12" rx="3" fill="#f97316"/>
+  <rect x="278" y="167" width="12" height="14" rx="3" fill="#f97316" transform="rotate(45 284 174)"/>
+  <rect x="326" y="167" width="12" height="14" rx="3" fill="#f97316" transform="rotate(-45 332 174)"/>
+  <rect x="278" y="219" width="12" height="14" rx="3" fill="#f97316" transform="rotate(-45 284 226)"/>
+  <rect x="326" y="219" width="12" height="14" rx="3" fill="#f97316" transform="rotate(45 332 226)"/>
+  <!-- Center arrows (extract-transform-load) -->
+  <text x="311" y="197" text-anchor="middle" fill="#7c2d12" font-size="9" font-weight="700">ETL</text>
+  <text x="311" y="208" text-anchor="middle" fill="#7c2d12" font-size="7">Pipeline</text>
+
+  <text x="311" y="290" text-anchor="middle" fill="#64748b" font-size="10">Extraktion,</text>
+  <text x="311" y="303" text-anchor="middle" fill="#64748b" font-size="10">Transformation,</text>
+  <text x="311" y="316" text-anchor="middle" fill="#64748b" font-size="10">Laden</text>
+
+  <!-- HOTSPOT 2 -->
+  <circle cx="311" cy="395" r="20" fill="url(#gradOrange)" stroke="white" stroke-width="3" filter="url(#shadow)"/>
+  <text x="311" y="401" text-anchor="middle" fill="white" font-size="15" font-weight="800">2</text>
+
+  <!-- ══════════════════════════════════════════════ -->
+  <!--  ARROW 2 → 3                                  -->
+  <!-- ══════════════════════════════════════════════ -->
+  <line x1="394" y1="248" x2="430" y2="248" stroke="#64748b" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <text x="412" y="240" text-anchor="middle" fill="#94a3b8" font-size="9">Laden</text>
+
+  <!-- ══════════════════════════════════════════════ -->
+  <!--  STATION 3 – DATABASE ENGINE / DWH  (x=432)   -->
+  <!-- ══════════════════════════════════════════════ -->
+  <g filter="url(#shadow)">
+    <rect x="432" y="72" width="186" height="352" rx="14" fill="white" stroke="#94a3b8" stroke-width="2.5"/>
+  </g>
+  <rect x="432" y="72" width="186" height="50" rx="14" fill="url(#gradSlate)"/>
+  <rect x="432" y="98" width="186" height="24" fill="url(#gradSlate)"/>
+  <text x="525" y="99" text-anchor="middle" fill="white" font-size="11" font-weight="700">③ Datenbank-Engine</text>
+  <text x="525" y="114" text-anchor="middle" fill="#94a3b8" font-size="9">/ Data Warehouse</text>
+
+  <!-- Large cylinder -->
+  <ellipse cx="525" cy="172" rx="52" ry="16" fill="#cbd5e1" stroke="#475569" stroke-width="2"/>
+  <rect x="473" y="172" width="104" height="100" fill="#e2e8f0" stroke="#475569" stroke-width="2"/>
+  <ellipse cx="525" cy="272" rx="52" ry="16" fill="#94a3b8" stroke="#475569" stroke-width="2"/>
+  <!-- Cylinder inner lines -->
+  <ellipse cx="525" cy="210" rx="52" ry="10" fill="none" stroke="#94a3b8" stroke-width="1" stroke-dasharray="5 3"/>
+  <ellipse cx="525" cy="245" rx="52" ry="10" fill="none" stroke="#94a3b8" stroke-width="1" stroke-dasharray="5 3"/>
+  <text x="525" y="220" text-anchor="middle" fill="#1e293b" font-size="10" font-weight="600">SQL Server</text>
+  <text x="525" y="234" text-anchor="middle" fill="#475569" font-size="9">Database Engine</text>
+  <text x="525" y="248" text-anchor="middle" fill="#475569" font-size="9">Data Warehouse</text>
+
+  <text x="525" y="310" text-anchor="middle" fill="#64748b" font-size="10">Zentrale Datenspeicherung</text>
+  <text x="525" y="323" text-anchor="middle" fill="#64748b" font-size="10">und -verwaltung</text>
+
+  <!-- HOTSPOT 3 -->
+  <circle cx="525" cy="405" r="22" fill="url(#gradSlate)" stroke="white" stroke-width="3" filter="url(#shadow)"/>
+  <text x="525" y="411" text-anchor="middle" fill="white" font-size="16" font-weight="800">3</text>
+
+  <!-- ══════════════════════════════════════════════ -->
+  <!--  ARROW 3 → 4                                  -->
+  <!-- ══════════════════════════════════════════════ -->
+  <line x1="620" y1="248" x2="656" y2="248" stroke="#64748b" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <text x="638" y="240" text-anchor="middle" fill="#94a3b8" font-size="9">Analyse</text>
+
+  <!-- ══════════════════════════════════════════════ -->
+  <!--  STATION 4 – SSAS  (x=658)                    -->
+  <!-- ══════════════════════════════════════════════ -->
+  <g filter="url(#shadow)">
+    <rect x="658" y="88" width="162" height="320" rx="14" fill="white" stroke="#ddd6fe" stroke-width="2"/>
+  </g>
+  <rect x="658" y="88" width="162" height="44" rx="14" fill="url(#gradViolet)"/>
+  <rect x="658" y="110" width="162" height="22" fill="url(#gradViolet)"/>
+  <text x="739" y="115" text-anchor="middle" fill="white" font-size="12" font-weight="700">④ SSAS</text>
+
+  <!-- Data cube icon -->
+  <!-- Front face -->
+  <polygon points="739,155 789,170 789,220 739,235" fill="#ede9fe" stroke="#7c3aed" stroke-width="1.5"/>
+  <!-- Right face -->
+  <polygon points="789,170 819,158 819,208 789,220" fill="#ddd6fe" stroke="#7c3aed" stroke-width="1.5"/>
+  <!-- Top face -->
+  <polygon points="739,155 769,143 819,158 789,170" fill="#c4b5fd" stroke="#7c3aed" stroke-width="1.5"/>
+  <!-- Grid lines on front -->
+  <line x1="739" y1="175" x2="789" y2="190" stroke="#7c3aed" stroke-width="0.8" stroke-dasharray="3 2"/>
+  <line x1="739" y1="195" x2="789" y2="210" stroke="#7c3aed" stroke-width="0.8" stroke-dasharray="3 2"/>
+  <line x1="752" y1="155" x2="752" y2="235" stroke="#7c3aed" stroke-width="0.8" stroke-dasharray="3 2"/>
+  <line x1="768" y1="160" x2="768" y2="235" stroke="#7c3aed" stroke-width="0.8" stroke-dasharray="3 2"/>
+
+  <text x="739" y="268" text-anchor="middle" fill="#64748b" font-size="10">Analyse &amp; Verdichtung</text>
+  <text x="739" y="281" text-anchor="middle" fill="#64748b" font-size="10">multidimensionaler</text>
+  <text x="739" y="294" text-anchor="middle" fill="#64748b" font-size="10">Datenwürfel (Cubes)</text>
+
+  <!-- HOTSPOT 4 -->
+  <circle cx="739" cy="395" r="20" fill="url(#gradViolet)" stroke="white" stroke-width="3" filter="url(#shadow)"/>
+  <text x="739" y="401" text-anchor="middle" fill="white" font-size="15" font-weight="800">4</text>
+
+  <!-- ══════════════════════════════════════════════ -->
+  <!--  ARROW 4 → 5                                  -->
+  <!-- ══════════════════════════════════════════════ -->
+  <line x1="822" y1="248" x2="858" y2="248" stroke="#64748b" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <text x="840" y="240" text-anchor="middle" fill="#94a3b8" font-size="9">Berichte</text>
+
+  <!-- ══════════════════════════════════════════════ -->
+  <!--  STATION 5 – SSRS  (x=860)                    -->
+  <!-- ══════════════════════════════════════════════ -->
+  <g filter="url(#shadow)">
+    <rect x="860" y="88" width="210" height="320" rx="14" fill="white" stroke="#a7f3d0" stroke-width="2"/>
+  </g>
+  <rect x="860" y="88" width="210" height="44" rx="14" fill="url(#gradGreen)"/>
+  <rect x="860" y="110" width="210" height="22" fill="url(#gradGreen)"/>
+  <text x="965" y="115" text-anchor="middle" fill="white" font-size="12" font-weight="700">⑤ SSRS</text>
+
+  <!-- Monitor icon -->
+  <!-- Screen body -->
+  <rect x="902" y="148" width="126" height="88" rx="6" fill="#1e293b" stroke="#10b981" stroke-width="2"/>
+  <!-- Screen content (report lines) -->
+  <rect x="910" y="156" width="110" height="72" rx="3" fill="#f0fdf4"/>
+  <rect x="916" y="162" width="70" height="6" rx="2" fill="#10b981"/>
+  <rect x="916" y="173" width="98" height="4" rx="2" fill="#d1fae5"/>
+  <rect x="916" y="181" width="90" height="4" rx="2" fill="#d1fae5"/>
+  <rect x="916" y="189" width="95" height="4" rx="2" fill="#d1fae5"/>
+  <!-- Bar chart inside screen -->
+  <rect x="916" y="202" width="12" height="18" rx="1" fill="#34d399"/>
+  <rect x="932" y="208" width="12" height="12" rx="1" fill="#6ee7b7"/>
+  <rect x="948" y="199" width="12" height="21" rx="1" fill="#059669"/>
+  <rect x="964" y="205" width="12" height="15" rx="1" fill="#34d399"/>
+  <rect x="980" y="196" width="12" height="24" rx="1" fill="#065f46"/>
+  <!-- Monitor stand -->
+  <rect x="954" y="236" width="22" height="12" rx="2" fill="#475569"/>
+  <rect x="940" y="248" width="50" height="6" rx="3" fill="#334155"/>
+
+  <text x="965" y="285" text-anchor="middle" fill="#64748b" font-size="10">Berichterstellung</text>
+  <text x="965" y="298" text-anchor="middle" fill="#64748b" font-size="10">und Visualisierung</text>
+  <text x="965" y="311" text-anchor="middle" fill="#64748b" font-size="10">im Browser</text>
+
+  <!-- HOTSPOT 5 -->
+  <circle cx="965" cy="395" r="20" fill="url(#gradGreen)" stroke="white" stroke-width="3" filter="url(#shadow)"/>
+  <text x="965" y="401" text-anchor="middle" fill="white" font-size="15" font-weight="800">5</text>
+
+  <!-- ══════════════════════════════════════════════ -->
+  <!--  FLOW LABEL STRIP (bottom)                    -->
+  <!-- ══════════════════════════════════════════════ -->
+  <rect x="28" y="432" width="1044" height="30" rx="8" fill="#1e293b" opacity="0.06"/>
+  <text x="109" y="451" text-anchor="middle" fill="#475569" font-size="10" font-weight="600">Rohdaten</text>
+  <text x="311" y="451" text-anchor="middle" fill="#475569" font-size="10" font-weight="600">ETL-Pipeline</text>
+  <text x="525" y="451" text-anchor="middle" fill="#475569" font-size="10" font-weight="600">Speicherung &amp; Verwaltung</text>
+  <text x="739" y="451" text-anchor="middle" fill="#475569" font-size="10" font-weight="600">Analyse</text>
+  <text x="965" y="451" text-anchor="middle" fill="#475569" font-size="10" font-weight="600">Reporting</text>
+
+  <!-- Outer border -->
+  <rect x="1" y="1" width="1098" height="478" rx="16" fill="none" stroke="#cbd5e1" stroke-width="1.5"/>
+</svg>

@@ -1,0 +1,164 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 520" width="900" height="520"
+     font-family="'Segoe UI', Helvetica, Arial, sans-serif">
+
+  <!--
+    RASTER
+    ─────────────────────────────────────────────
+    Gesamt: 900 × 520
+    Titelleiste: y=0 h=48
+    Inhalt: y=48 h=472
+
+    Linke Hälfte (OLTP):  x=0   w=449
+    Rechte Hälfte (OLAP): x=451 w=449
+    Trennlinie: x=450
+
+    Zeilen (3 Abschnitte pro Seite):
+      Sektion A (Ziel):     y=68  h=130  cy=133
+      Sektion B (Workload): y=218 h=140  cy=288
+      Sektion C (Beispiel): y=378 h=120  cy=438
+
+    Hotspot-Nummer: linke Seite cx=52, rechte Seite cx=848
+    Hotspot-Kreis r=18
+    ─────────────────────────────────────────────
+  -->
+
+  <!-- ── Hintergrund ── -->
+  <rect width="900" height="520" fill="#f8f9fa" rx="10" stroke="#dee2e6" stroke-width="1.5"/>
+
+  <!-- ── Titelleiste ── -->
+  <rect x="0" y="0" width="900" height="48" rx="10" fill="#343a40"/>
+  <rect x="0" y="34" width="900" height="14" fill="#343a40"/>
+  <text x="450" y="30" text-anchor="middle" fill="white" font-size="15" font-weight="700" letter-spacing="0.5">
+    OLTP vs. OLAP – Vergleich
+  </text>
+
+  <!-- ── Linke Hälfte (OLTP) ── -->
+  <rect x="0" y="48" width="449" height="472" fill="#e8f4fd"/>
+
+  <!-- OLTP Hauptlabel -->
+  <text x="224" y="76" text-anchor="middle" fill="#1a6fa8" font-size="22" font-weight="800" letter-spacing="2">OLTP</text>
+  <text x="224" y="92" text-anchor="middle" fill="#4a90c4" font-size="11">Online Transaction Processing</text>
+  <line x1="40" y1="100" x2="408" y2="100" stroke="#a8d4f0" stroke-width="1"/>
+
+  <!-- ── SEKTION A: Ziel (OLTP) ── y=108 h=110 -->
+  <rect x="24" y="108" width="400" height="110" rx="8" fill="white" stroke="#a8d4f0" stroke-width="1.5"/>
+  <text x="224" y="129" text-anchor="middle" fill="#1a6fa8" font-size="11" font-weight="700">Ziel</text>
+  <line x1="40" y1="135" x2="408" y2="135" stroke="#daeef9" stroke-width="1"/>
+  <!-- Icon: Blitzpfeil (Schnelligkeit/Effizienz) -->
+  <polygon points="196,145 208,145 202,162 214,162 188,185 196,168 184,168" fill="#2196f3" opacity="0.8"/>
+  <!-- Beschreibungstext -->
+  <text x="232" y="155" fill="#374151" font-size="11">Viele kurze Transaktionen</text>
+  <text x="232" y="170" fill="#374151" font-size="11">effizient verarbeiten</text>
+  <text x="232" y="185" fill="#374151" font-size="11">ACID-Konformität · hohe Verfügbarkeit</text>
+  <!-- Hotspot 1 -->
+  <circle cx="52" cy="163" r="18" fill="#1a6fa8" stroke="white" stroke-width="2.5"/>
+  <text x="52" y="169" text-anchor="middle" fill="white" font-size="14" font-weight="800">1</text>
+  <text x="80" y="222" fill="#1a6fa8" font-size="9" font-weight="600">Ziel (OLTP)</text>
+
+  <!-- ── SEKTION B: Workload (OLTP) ── y=232 h=120 -->
+  <rect x="24" y="232" width="400" height="120" rx="8" fill="white" stroke="#a8d4f0" stroke-width="1.5"/>
+  <text x="224" y="251" text-anchor="middle" fill="#1a6fa8" font-size="11" font-weight="700">Typischer Workload</text>
+  <line x1="40" y1="257" x2="408" y2="257" stroke="#daeef9" stroke-width="1"/>
+  <!-- Workload-Chips -->
+  <rect x="52"  y="265" width="76" height="22" rx="11" fill="#bbdefb" stroke="#64b5f6" stroke-width="1"/>
+  <text x="90"  y="280" text-anchor="middle" fill="#0d47a1" font-size="10" font-weight="600">INSERT</text>
+  <rect x="136" y="265" width="76" height="22" rx="11" fill="#bbdefb" stroke="#64b5f6" stroke-width="1"/>
+  <text x="174" y="280" text-anchor="middle" fill="#0d47a1" font-size="10" font-weight="600">UPDATE</text>
+  <rect x="220" y="265" width="76" height="22" rx="11" fill="#bbdefb" stroke="#64b5f6" stroke-width="1"/>
+  <text x="258" y="280" text-anchor="middle" fill="#0d47a1" font-size="10" font-weight="600">DELETE</text>
+  <rect x="304" y="265" width="76" height="22" rx="11" fill="#bbdefb" stroke="#64b5f6" stroke-width="1"/>
+  <text x="342" y="280" text-anchor="middle" fill="#0d47a1" font-size="10" font-weight="600">SELECT</text>
+  <!-- Merkmale -->
+  <text x="224" y="306" text-anchor="middle" fill="#374151" font-size="11">Einzelne Datensätze · kurze Laufzeit</text>
+  <text x="224" y="321" text-anchor="middle" fill="#374151" font-size="11">Buchungen, Bestellungen, Änderungen</text>
+  <text x="224" y="336" text-anchor="middle" fill="#374151" font-size="11">normalisiertes Schema</text>
+  <!-- Hotspot 2 -->
+  <circle cx="52" cy="292" r="18" fill="#1a6fa8" stroke="white" stroke-width="2.5"/>
+  <text x="52" y="298" text-anchor="middle" fill="white" font-size="14" font-weight="800">2</text>
+
+  <!-- ── SEKTION C: Beispiel (OLTP) ── y=368 h=110 -->
+  <rect x="24" y="368" width="400" height="110" rx="8" fill="white" stroke="#a8d4f0" stroke-width="1.5"/>
+  <text x="224" y="387" text-anchor="middle" fill="#1a6fa8" font-size="11" font-weight="700">Beispiele</text>
+  <line x1="40" y1="393" x2="408" y2="393" stroke="#daeef9" stroke-width="1"/>
+  <!-- Beispiel-Badges -->
+  <rect x="40"  y="401" width="116" height="26" rx="6" fill="#e3f2fd" stroke="#90caf9" stroke-width="1"/>
+  <text x="98"  y="418" text-anchor="middle" fill="#1565c0" font-size="10" font-weight="600">Banktransaktionen</text>
+  <rect x="164" y="401" width="96"  height="26" rx="6" fill="#e3f2fd" stroke="#90caf9" stroke-width="1"/>
+  <text x="212" y="418" text-anchor="middle" fill="#1565c0" font-size="10" font-weight="600">Online-Shop</text>
+  <rect x="268" y="401" width="116" height="26" rx="6" fill="#e3f2fd" stroke="#90caf9" stroke-width="1"/>
+  <text x="326" y="418" text-anchor="middle" fill="#1565c0" font-size="10" font-weight="600">Buchungssysteme</text>
+  <!-- Zusatz -->
+  <text x="224" y="447" text-anchor="middle" fill="#374151" font-size="11">ERP · Lagerverwaltung · POS-Systeme</text>
+  <text x="224" y="463" text-anchor="middle" fill="#374151" font-size="11">Ticketing · Reservierungssysteme</text>
+  <!-- Hotspot 3 -->
+  <circle cx="52" cy="423" r="18" fill="#1a6fa8" stroke="white" stroke-width="2.5"/>
+  <text x="52" y="429" text-anchor="middle" fill="white" font-size="14" font-weight="800">3</text>
+
+  <!-- ── Rechte Hälfte (OLAP) ── -->
+  <rect x="451" y="48" width="449" height="472" fill="#edf7ee"/>
+
+  <!-- OLAP Hauptlabel -->
+  <text x="676" y="76" text-anchor="middle" fill="#1a7a3a" font-size="22" font-weight="800" letter-spacing="2">OLAP</text>
+  <text x="676" y="92" text-anchor="middle" fill="#4aa85e" font-size="11">Online Analytical Processing</text>
+  <line x1="467" y1="100" x2="860" y2="100" stroke="#9dd4aa" stroke-width="1"/>
+
+  <!-- ── SEKTION A: Ziel (OLAP) ── y=108 h=110 -->
+  <rect x="476" y="108" width="400" height="110" rx="8" fill="white" stroke="#9dd4aa" stroke-width="1.5"/>
+  <text x="676" y="129" text-anchor="middle" fill="#1a7a3a" font-size="11" font-weight="700">Ziel</text>
+  <line x1="492" y1="135" x2="860" y2="135" stroke="#d4edda" stroke-width="1"/>
+  <!-- Icon: Lupe (Analyse) -->
+  <circle cx="650" cy="163" r="14" fill="none" stroke="#2e7d32" stroke-width="3"/>
+  <line x1="660" y1="173" x2="668" y2="182" stroke="#2e7d32" stroke-width="3" stroke-linecap="round"/>
+  <!-- Beschreibungstext -->
+  <text x="690" y="151" fill="#374151" font-size="11">Schnelle Analyse großer</text>
+  <text x="690" y="166" fill="#374151" font-size="11">Datenmengen</text>
+  <text x="690" y="181" fill="#374151" font-size="11">Komplexe Abfragen · Reporting</text>
+  <!-- Hotspot 4 -->
+  <circle cx="848" cy="163" r="18" fill="#1a7a3a" stroke="white" stroke-width="2.5"/>
+  <text x="848" y="169" text-anchor="middle" fill="white" font-size="14" font-weight="800">4</text>
+
+  <!-- ── SEKTION B: Workload (OLAP) ── y=232 h=120 -->
+  <rect x="476" y="232" width="400" height="120" rx="8" fill="white" stroke="#9dd4aa" stroke-width="1.5"/>
+  <text x="676" y="251" text-anchor="middle" fill="#1a7a3a" font-size="11" font-weight="700">Typischer Workload</text>
+  <line x1="492" y1="257" x2="860" y2="257" stroke="#d4edda" stroke-width="1"/>
+  <!-- Workload-Chips -->
+  <rect x="484" y="265" width="100" height="22" rx="11" fill="#c8e6c9" stroke="#66bb6a" stroke-width="1"/>
+  <text x="534"  y="280" text-anchor="middle" fill="#1b5e20" font-size="10" font-weight="600">SELECT (groß)</text>
+  <rect x="592" y="265" width="96"  height="22" rx="11" fill="#c8e6c9" stroke="#66bb6a" stroke-width="1"/>
+  <text x="640"  y="280" text-anchor="middle" fill="#1b5e20" font-size="10" font-weight="600">Aggregation</text>
+  <rect x="696" y="265" width="76"  height="22" rx="11" fill="#c8e6c9" stroke="#66bb6a" stroke-width="1"/>
+  <text x="734"  y="280" text-anchor="middle" fill="#1b5e20" font-size="10" font-weight="600">JOIN</text>
+  <rect x="780" y="265" width="80"  height="22" rx="11" fill="#c8e6c9" stroke="#66bb6a" stroke-width="1"/>
+  <text x="820"  y="280" text-anchor="middle" fill="#1b5e20" font-size="10" font-weight="600">GROUP BY</text>
+  <!-- Merkmale -->
+  <text x="676" y="306" text-anchor="middle" fill="#374151" font-size="11">Massendaten · lange Laufzeit · Lesezugriff</text>
+  <text x="676" y="321" text-anchor="middle" fill="#374151" font-size="11">Trendanalysen, KPIs, Auswertungen</text>
+  <text x="676" y="336" text-anchor="middle" fill="#374151" font-size="11">denormalisiertes / Sternschema</text>
+  <!-- Hotspot 5 -->
+  <circle cx="848" cy="292" r="18" fill="#1a7a3a" stroke="white" stroke-width="2.5"/>
+  <text x="848" y="298" text-anchor="middle" fill="white" font-size="14" font-weight="800">5</text>
+
+  <!-- ── SEKTION C: Beispiel (OLAP) ── y=368 h=110 -->
+  <rect x="476" y="368" width="400" height="110" rx="8" fill="white" stroke="#9dd4aa" stroke-width="1.5"/>
+  <text x="676" y="387" text-anchor="middle" fill="#1a7a3a" font-size="11" font-weight="700">Beispiele</text>
+  <line x1="492" y1="393" x2="860" y2="393" stroke="#d4edda" stroke-width="1"/>
+  <!-- Beispiel-Badges -->
+  <rect x="484" y="401" width="116" height="26" rx="6" fill="#e8f5e9" stroke="#a5d6a7" stroke-width="1"/>
+  <text x="542"  y="418" text-anchor="middle" fill="#1b5e20" font-size="10" font-weight="600">Data Warehouse</text>
+  <rect x="608" y="401" width="116" height="26" rx="6" fill="#e8f5e9" stroke="#a5d6a7" stroke-width="1"/>
+  <text x="666"  y="418" text-anchor="middle" fill="#1b5e20" font-size="10" font-weight="600">Business Intelligence</text>
+  <rect x="732" y="401" width="116" height="26" rx="6" fill="#e8f5e9" stroke="#a5d6a7" stroke-width="1"/>
+  <text x="790"  y="418" text-anchor="middle" fill="#1b5e20" font-size="10" font-weight="600">Reporting-Systeme</text>
+  <!-- Zusatz -->
+  <text x="676" y="447" text-anchor="middle" fill="#374151" font-size="11">Google BigQuery · Amazon Redshift</text>
+  <text x="676" y="463" text-anchor="middle" fill="#374151" font-size="11">Microsoft Analysis Services · Snowflake</text>
+  <!-- Hotspot 6 -->
+  <circle cx="848" cy="423" r="18" fill="#1a7a3a" stroke="white" stroke-width="2.5"/>
+  <text x="848" y="429" text-anchor="middle" fill="white" font-size="14" font-weight="800">6</text>
+
+  <!-- ── Trennlinie Mitte ── -->
+  <line x1="450" y1="48" x2="450" y2="520" stroke="#adb5bd" stroke-width="2"/>
+
+  <!-- ── Äußerer Rahmen ── -->
+  <rect x="1" y="1" width="898" height="518" rx="10" fill="none" stroke="#adb5bd" stroke-width="1.5"/>
+</svg>
