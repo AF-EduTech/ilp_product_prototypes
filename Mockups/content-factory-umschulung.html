@@ -1,0 +1,1013 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Content Factory – Umschulung FISI</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f0f2f5;
+            color: #1a1a2e;
+            padding: 32px;
+        }
+
+        /* ── Umschulungs-Kontext-Header ── */
+        .umschulung-header {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 14px 14px 0 0;
+            padding: 16px 20px;
+            border-bottom: none;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .umschulung-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: #eef2ff;
+            color: #4361ee;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .umschulung-meta {
+            flex: 1;
+        }
+
+        .umschulung-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: #1a1a2e;
+        }
+
+        .umschulung-subtitle {
+            font-size: 12px;
+            color: #6b7280;
+            margin-top: 2px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .umschulung-subtitle span + span::before {
+            content: '·';
+            margin-right: 10px;
+        }
+
+        .divider-line {
+            width: 100%;
+            height: 1px;
+            background: #e5e7eb;
+        }
+
+        /* ── Table Container ── */
+        .table-container {
+            background: white;
+            border-radius: 0 0 14px 14px;
+            border: 1px solid #e5e7eb;
+            border-top: none;
+            overflow: hidden;
+        }
+
+        .table-toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .table-toolbar-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .table-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: #1a1a2e;
+        }
+
+        .table-count {
+            font-size: 12px;
+            font-weight: 600;
+            color: #6b7280;
+            background: #f3f4f6;
+            padding: 2px 8px;
+            border-radius: 99px;
+        }
+
+        .table-toolbar-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toolbar-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 14px;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+            background: white;
+            font-size: 13px;
+            font-weight: 500;
+            color: #4b5563;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .toolbar-btn:hover { border-color: #4361ee; color: #4361ee; }
+
+        .toolbar-btn.primary {
+            background: #4361ee;
+            color: white;
+            border-color: #4361ee;
+        }
+
+        .toolbar-btn.primary:hover { background: #3a50d9; }
+
+        /* ── Table ── */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        .data-table thead {
+            background: #f9fafb;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .data-table th {
+            padding: 10px 16px;
+            text-align: left;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #6b7280;
+            white-space: nowrap;
+            user-select: none;
+        }
+
+        .data-table th.drag-col {
+            width: 36px;
+            padding-right: 0;
+        }
+
+        .data-table td {
+            padding: 13px 16px;
+            border-bottom: 1px solid #f3f4f6;
+            vertical-align: middle;
+        }
+
+        .data-table tbody tr:last-child td { border-bottom: none; }
+
+        .data-table tbody tr:hover td { background: #fafafa; }
+
+        /* ── Drag Handle ── */
+        .drag-handle {
+            color: #d1d5db;
+            cursor: grab;
+            font-size: 16px;
+            padding: 4px 8px 4px 0;
+            user-select: none;
+            line-height: 1;
+            display: block;
+        }
+
+        .drag-handle:hover { color: #9ca3af; }
+
+        tr.dragging td { background: #f0f4ff !important; opacity: 0.85; }
+        tr.drag-over td { border-top: 2px solid #4361ee; }
+
+        /* ── LF Nummer ── */
+        .lf-nr {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            border-radius: 6px;
+            background: #eef2ff;
+            color: #4361ee;
+            font-size: 11px;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        /* ── Lernfeld Titel ── */
+        .lf-cell {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .lf-text {}
+
+        .lf-titel {
+            font-weight: 600;
+            color: #1a1a2e;
+            font-size: 13px;
+            margin-bottom: 2px;
+        }
+
+        .lf-meta {
+            font-size: 11px;
+            color: #9ca3af;
+        }
+
+        /* ── Status Phase ── */
+        .phase-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 3px 10px;
+            border-radius: 5px;
+            white-space: nowrap;
+        }
+
+        .phase-badge.grob    { background: #eef2ff; color: #4361ee; }
+        .phase-badge.fein    { background: #fdf4ff; color: #7c3aed; }
+        .phase-badge.story   { background: #ecfdf5; color: #059669; }
+
+        /* ── Laufstatus ── */
+        .run-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .run-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .run-status.lauft .run-dot {
+            background: #4361ee;
+            animation: pulse 1.6s ease-in-out infinite;
+        }
+
+        .run-status.lauft { color: #4361ee; }
+
+        .run-status.fertig .run-dot { background: #059669; }
+        .run-status.fertig { color: #059669; }
+
+        .run-status.fehler .run-dot { background: #dc2626; }
+        .run-status.fehler { color: #dc2626; }
+
+        .run-status.wartend .run-dot { background: #9ca3af; }
+        .run-status.wartend { color: #6b7280; }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        /* ── Fortschritt ── */
+        .progress-wrap {
+            min-width: 160px;
+        }
+
+        .progress-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+
+        .progress-numbers {
+            font-size: 12px;
+            font-weight: 600;
+            color: #374151;
+        }
+
+        .progress-numbers .total { color: #9ca3af; font-weight: 400; }
+
+        .progress-unit {
+            font-size: 11px;
+            color: #9ca3af;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 5px;
+            background: #f3f4f6;
+            border-radius: 99px;
+            overflow: hidden;
+        }
+
+        .progress-bar .fill {
+            height: 100%;
+            border-radius: 99px;
+            transition: width 0.3s ease;
+        }
+
+        .fill.grob  { background: #4361ee; }
+        .fill.fein  { background: #7c3aed; }
+        .fill.story { background: #059669; }
+        .fill.fertig { background: #059669; }
+        .fill.fehler { background: #dc2626; }
+        .fill.leer  { background: #e5e7eb; }
+
+        /* ── Bearbeiter ── */
+        .bearbeiter {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .bearbeiter-avatar {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: 700;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .bearbeiter-name {
+            font-size: 12px;
+            color: #374151;
+            white-space: nowrap;
+        }
+
+        /* ── Datum ── */
+        .datum {
+            font-size: 12px;
+            color: #6b7280;
+            white-space: nowrap;
+        }
+
+        .datum .time {
+            font-size: 11px;
+            color: #9ca3af;
+            display: block;
+            margin-top: 1px;
+        }
+
+        /* ── Fehler-Hinweis ── */
+        .error-hint {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 11px;
+            color: #dc2626;
+            margin-top: 4px;
+        }
+
+        /* ── Row highlight für Fehler ── */
+        tr.has-error td { background: #fff8f8; }
+        tr.has-error:hover td { background: #fff0f0; }
+
+        /* ── Footer ── */
+        .table-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 20px;
+            border-top: 1px solid #e5e7eb;
+            background: #f9fafb;
+        }
+
+        .pagination-info {
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        /* ── Drag hint ── */
+        .drag-hint {
+            font-size: 11px;
+            color: #9ca3af;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Umschulungs-Kontext-Header -->
+<div class="umschulung-header">
+    <div class="umschulung-icon">🎓</div>
+    <div class="umschulung-meta">
+        <div class="umschulung-title">Fachinformatiker für Systemintegration (FISI)</div>
+        <div class="umschulung-subtitle">
+            <span>Umschulung 2024–2026</span>
+            <span>2 Jahre · 17 Lernfelder</span>
+            <span>3 Lernbegleiter</span>
+        </div>
+    </div>
+</div>
+<div class="divider-line"></div>
+
+<div class="table-container">
+
+    <!-- Toolbar -->
+    <div class="table-toolbar">
+        <div class="table-toolbar-left">
+            <span class="table-title">Lernfelder</span>
+            <span class="table-count">17 Lernfelder</span>
+        </div>
+        <div class="table-toolbar-right">
+            <button class="toolbar-btn primary">+ Neues Lernfeld</button>
+        </div>
+    </div>
+
+    <!-- Table -->
+    <table class="data-table" id="lf-table">
+        <thead>
+            <tr>
+                <th class="drag-col"></th>
+                <th style="width: 28%">Lernfeld</th>
+                <th style="width: 14%">Phase</th>
+                <th style="width: 8%">Status</th>
+                <th style="width: 20%">Fortschritt</th>
+                <th style="width: 14%">Bearbeiter</th>
+                <th style="width: 13%">Letztes Update</th>
+            </tr>
+        </thead>
+        <tbody id="lf-tbody">
+
+            <!-- LF 1 -->
+            <tr draggable="true">
+                <td class="drag-col"><span class="drag-handle" title="Reihenfolge ändern">⠿</span></td>
+                <td>
+                    <div class="lf-cell">
+                        <span class="lf-nr">1</span>
+                        <div class="lf-text">
+                            <div class="lf-titel">Das Unternehmen und sein Umfeld</div>
+                            <div class="lf-meta">Modul 1–3 · geplant 4 Wochen</div>
+                        </div>
+                    </div>
+                </td>
+                <td><span class="phase-badge story">Storyboards</span></td>
+                <td>
+                    <div class="run-status fertig">
+                        <span class="run-dot"></span>Fertig
+                    </div>
+                </td>
+                <td>
+                    <div class="progress-wrap">
+                        <div class="progress-top">
+                            <span class="progress-numbers">580 <span class="total">/ 580</span></span>
+                            <span class="progress-unit">Storyboards</span>
+                        </div>
+                        <div class="progress-bar"><div class="fill fertig" style="width: 100%"></div></div>
+                    </div>
+                </td>
+                <td>
+                    <div class="bearbeiter">
+                        <div class="bearbeiter-avatar" style="background: #4361ee;">AK</div>
+                        <span class="bearbeiter-name">Anna Krüger</span>
+                    </div>
+                </td>
+                <td><div class="datum">10.02.2026<span class="time">11:20 Uhr</span></div></td>
+            </tr>
+
+            <!-- LF 2 -->
+            <tr draggable="true">
+                <td class="drag-col"><span class="drag-handle" title="Reihenfolge ändern">⠿</span></td>
+                <td>
+                    <div class="lf-cell">
+                        <span class="lf-nr">2</span>
+                        <div class="lf-text">
+                            <div class="lf-titel">Arbeitsplätze nach Kundenwunsch ausstatten</div>
+                            <div class="lf-meta">Modul 1–4 · geplant 5 Wochen</div>
+                        </div>
+                    </div>
+                </td>
+                <td><span class="phase-badge story">Storyboards</span></td>
+                <td>
+                    <div class="run-status fertig">
+                        <span class="run-dot"></span>Fertig
+                    </div>
+                </td>
+                <td>
+                    <div class="progress-wrap">
+                        <div class="progress-top">
+                            <span class="progress-numbers">740 <span class="total">/ 740</span></span>
+                            <span class="progress-unit">Storyboards</span>
+                        </div>
+                        <div class="progress-bar"><div class="fill fertig" style="width: 100%"></div></div>
+                    </div>
+                </td>
+                <td>
+                    <div class="bearbeiter">
+                        <div class="bearbeiter-avatar" style="background: #059669;">TW</div>
+                        <span class="bearbeiter-name">Thomas Weber</span>
+                    </div>
+                </td>
+                <td><div class="datum">28.02.2026<span class="time">14:05 Uhr</span></div></td>
+            </tr>
+
+            <!-- LF 3 -->
+            <tr draggable="true">
+                <td class="drag-col"><span class="drag-handle" title="Reihenfolge ändern">⠿</span></td>
+                <td>
+                    <div class="lf-cell">
+                        <span class="lf-nr">3</span>
+                        <div class="lf-text">
+                            <div class="lf-titel">Clients in Netzwerke einbinden</div>
+                            <div class="lf-meta">Modul 1–5 · geplant 6 Wochen</div>
+                        </div>
+                    </div>
+                </td>
+                <td><span class="phase-badge story">Storyboards</span></td>
+                <td>
+                    <div class="run-status lauft">
+                        <span class="run-dot"></span>Läuft
+                    </div>
+                </td>
+                <td>
+                    <div class="progress-wrap">
+                        <div class="progress-top">
+                            <span class="progress-numbers">620 <span class="total">/ 980</span></span>
+                            <span class="progress-unit">Storyboards</span>
+                        </div>
+                        <div class="progress-bar"><div class="fill story" style="width: 63%"></div></div>
+                    </div>
+                </td>
+                <td>
+                    <div class="bearbeiter">
+                        <div class="bearbeiter-avatar" style="background: #7c3aed;">SB</div>
+                        <span class="bearbeiter-name">Sara Becker</span>
+                    </div>
+                </td>
+                <td><div class="datum">21.03.2026<span class="time">09:48 Uhr</span></div></td>
+            </tr>
+
+            <!-- LF 4 -->
+            <tr draggable="true">
+                <td class="drag-col"><span class="drag-handle" title="Reihenfolge ändern">⠿</span></td>
+                <td>
+                    <div class="lf-cell">
+                        <span class="lf-nr">4</span>
+                        <div class="lf-text">
+                            <div class="lf-titel">Schutzbedarfsanalyse im eigenen Arbeitsbereich</div>
+                            <div class="lf-meta">Modul 1–3 · geplant 4 Wochen</div>
+                        </div>
+                    </div>
+                </td>
+                <td><span class="phase-badge fein">Feinkonzept</span></td>
+                <td>
+                    <div class="run-status lauft">
+                        <span class="run-dot"></span>Läuft
+                    </div>
+                </td>
+                <td>
+                    <div class="progress-wrap">
+                        <div class="progress-top">
+                            <span class="progress-numbers">210 <span class="total">/ 560</span></span>
+                            <span class="progress-unit">Content-Elemente</span>
+                        </div>
+                        <div class="progress-bar"><div class="fill fein" style="width: 38%"></div></div>
+                    </div>
+                </td>
+                <td>
+                    <div class="bearbeiter">
+                        <div class="bearbeiter-avatar" style="background: #4361ee;">AK</div>
+                        <span class="bearbeiter-name">Anna Krüger</span>
+                    </div>
+                </td>
+                <td><div class="datum">20.03.2026<span class="time">16:30 Uhr</span></div></td>
+            </tr>
+
+            <!-- LF 5 – Fehler -->
+            <tr class="has-error" draggable="true">
+                <td class="drag-col"><span class="drag-handle" title="Reihenfolge ändern">⠿</span></td>
+                <td>
+                    <div class="lf-cell">
+                        <span class="lf-nr">5</span>
+                        <div class="lf-text">
+                            <div class="lf-titel">Software zur Verwaltung von Netzwerken einsetzen</div>
+                            <div class="lf-meta">Modul 1–4 · geplant 5 Wochen</div>
+                        </div>
+                    </div>
+                </td>
+                <td><span class="phase-badge grob">Grobkonzept</span></td>
+                <td>
+                    <div class="run-status fehler">
+                        <span class="run-dot"></span>Fehler
+                    </div>
+                </td>
+                <td>
+                    <div class="progress-wrap">
+                        <div class="progress-top">
+                            <span class="progress-numbers">180 <span class="total">/ 1.400</span></span>
+                            <span class="progress-unit">Lerninhalte</span>
+                        </div>
+                        <div class="progress-bar"><div class="fill fehler" style="width: 13%"></div></div>
+                    </div>
+                    <div class="error-hint">⚠ Generierung unterbrochen – Quelldokument unlesbar</div>
+                </td>
+                <td>
+                    <div class="bearbeiter">
+                        <div class="bearbeiter-avatar" style="background: #f59e0b;">MH</div>
+                        <span class="bearbeiter-name">Markus Huber</span>
+                    </div>
+                </td>
+                <td><div class="datum">19.03.2026<span class="time">13:15 Uhr</span></div></td>
+            </tr>
+
+            <!-- LF 6 -->
+            <tr draggable="true">
+                <td class="drag-col"><span class="drag-handle" title="Reihenfolge ändern">⠿</span></td>
+                <td>
+                    <div class="lf-cell">
+                        <span class="lf-nr">6</span>
+                        <div class="lf-text">
+                            <div class="lf-titel">Systemintegration für vernetzte Systeme planen</div>
+                            <div class="lf-meta">Modul 1–5 · geplant 6 Wochen</div>
+                        </div>
+                    </div>
+                </td>
+                <td><span class="phase-badge grob">Grobkonzept</span></td>
+                <td>
+                    <div class="run-status wartend">
+                        <span class="run-dot"></span>Wartend
+                    </div>
+                </td>
+                <td>
+                    <div class="progress-wrap">
+                        <div class="progress-top">
+                            <span class="progress-numbers">0 <span class="total">/ 1.600</span></span>
+                            <span class="progress-unit">Lerninhalte</span>
+                        </div>
+                        <div class="progress-bar"><div class="fill leer" style="width: 0%"></div></div>
+                    </div>
+                </td>
+                <td>
+                    <div class="bearbeiter">
+                        <div class="bearbeiter-avatar" style="background: #059669;">TW</div>
+                        <span class="bearbeiter-name">Thomas Weber</span>
+                    </div>
+                </td>
+                <td><div class="datum">15.03.2026<span class="time">08:00 Uhr</span></div></td>
+            </tr>
+
+            <!-- LF 7 -->
+            <tr draggable="true">
+                <td class="drag-col"><span class="drag-handle" title="Reihenfolge ändern">⠿</span></td>
+                <td>
+                    <div class="lf-cell">
+                        <span class="lf-nr">7</span>
+                        <div class="lf-text">
+                            <div class="lf-titel">Cyber-physische Systeme ergänzen</div>
+                            <div class="lf-meta">Modul 1–4 · geplant 4 Wochen</div>
+                        </div>
+                    </div>
+                </td>
+                <td><span class="phase-badge grob">Grobkonzept</span></td>
+                <td>
+                    <div class="run-status wartend">
+                        <span class="run-dot"></span>Wartend
+                    </div>
+                </td>
+                <td>
+                    <div class="progress-wrap">
+                        <div class="progress-top">
+                            <span class="progress-numbers">0 <span class="total">/ 1.200</span></span>
+                            <span class="progress-unit">Lerninhalte</span>
+                        </div>
+                        <div class="progress-bar"><div class="fill leer" style="width: 0%"></div></div>
+                    </div>
+                </td>
+                <td>
+                    <div class="bearbeiter">
+                        <div class="bearbeiter-avatar" style="background: #7c3aed;">SB</div>
+                        <span class="bearbeiter-name">Sara Becker</span>
+                    </div>
+                </td>
+                <td><div class="datum">15.03.2026<span class="time">08:00 Uhr</span></div></td>
+            </tr>
+
+            <!-- LF 8 -->
+            <tr draggable="true">
+                <td class="drag-col"><span class="drag-handle" title="Reihenfolge ändern">⠿</span></td>
+                <td>
+                    <div class="lf-cell">
+                        <span class="lf-nr">8</span>
+                        <div class="lf-text">
+                            <div class="lf-titel">Daten systemübergreifend bereitstellen</div>
+                            <div class="lf-meta">Modul 1–4 · geplant 5 Wochen</div>
+                        </div>
+                    </div>
+                </td>
+                <td><span class="phase-badge grob">Grobkonzept</span></td>
+                <td>
+                    <div class="run-status wartend">
+                        <span class="run-dot"></span>Wartend
+                    </div>
+                </td>
+                <td>
+                    <div class="progress-wrap">
+                        <div class="progress-top">
+                            <span class="progress-numbers">0 <span class="total">/ 1.400</span></span>
+                            <span class="progress-unit">Lerninhalte</span>
+                        </div>
+                        <div class="progress-bar"><div class="fill leer" style="width: 0%"></div></div>
+                    </div>
+                </td>
+                <td>
+                    <div class="bearbeiter">
+                        <div class="bearbeiter-avatar" style="background: #f59e0b;">MH</div>
+                        <span class="bearbeiter-name">Markus Huber</span>
+                    </div>
+                </td>
+                <td><div class="datum">15.03.2026<span class="time">08:00 Uhr</span></div></td>
+            </tr>
+
+            <!-- LF 9–17: collapsed/placeholder rows -->
+            <tr draggable="true">
+                <td class="drag-col"><span class="drag-handle">⠿</span></td>
+                <td>
+                    <div class="lf-cell">
+                        <span class="lf-nr">9</span>
+                        <div class="lf-text">
+                            <div class="lf-titel">Netzwerke und Dienste bereitstellen</div>
+                            <div class="lf-meta">Modul 1–5 · geplant 6 Wochen</div>
+                        </div>
+                    </div>
+                </td>
+                <td><span class="phase-badge grob">Grobkonzept</span></td>
+                <td><div class="run-status wartend"><span class="run-dot"></span>Wartend</div></td>
+                <td>
+                    <div class="progress-wrap">
+                        <div class="progress-top"><span class="progress-numbers">0 <span class="total">/ 1.600</span></span><span class="progress-unit">Lerninhalte</span></div>
+                        <div class="progress-bar"><div class="fill leer" style="width: 0%"></div></div>
+                    </div>
+                </td>
+                <td><div class="bearbeiter"><div class="bearbeiter-avatar" style="background: #4361ee;">AK</div><span class="bearbeiter-name">Anna Krüger</span></div></td>
+                <td><div class="datum">–<span class="time">noch nicht gestartet</span></div></td>
+            </tr>
+
+            <tr draggable="true">
+                <td class="drag-col"><span class="drag-handle">⠿</span></td>
+                <td>
+                    <div class="lf-cell">
+                        <span class="lf-nr">10</span>
+                        <div class="lf-text">
+                            <div class="lf-titel">Serverdienste konfigurieren und administrieren</div>
+                            <div class="lf-meta">Modul 1–5 · geplant 6 Wochen</div>
+                        </div>
+                    </div>
+                </td>
+                <td><span class="phase-badge grob">Grobkonzept</span></td>
+                <td><div class="run-status wartend"><span class="run-dot"></span>Wartend</div></td>
+                <td>
+                    <div class="progress-wrap">
+                        <div class="progress-top"><span class="progress-numbers">0 <span class="total">/ 1.600</span></span><span class="progress-unit">Lerninhalte</span></div>
+                        <div class="progress-bar"><div class="fill leer" style="width: 0%"></div></div>
+                    </div>
+                </td>
+                <td><div class="bearbeiter"><div class="bearbeiter-avatar" style="background: #059669;">TW</div><span class="bearbeiter-name">Thomas Weber</span></div></td>
+                <td><div class="datum">–<span class="time">noch nicht gestartet</span></div></td>
+            </tr>
+
+            <tr draggable="true">
+                <td class="drag-col"><span class="drag-handle">⠿</span></td>
+                <td>
+                    <div class="lf-cell">
+                        <span class="lf-nr">11</span>
+                        <div class="lf-text">
+                            <div class="lf-titel">Betrieb und Sicherheit von Netzwerken gewährleisten</div>
+                            <div class="lf-meta">Modul 1–4 · geplant 5 Wochen</div>
+                        </div>
+                    </div>
+                </td>
+                <td><span class="phase-badge grob">Grobkonzept</span></td>
+                <td><div class="run-status wartend"><span class="run-dot"></span>Wartend</div></td>
+                <td>
+                    <div class="progress-wrap">
+                        <div class="progress-top"><span class="progress-numbers">0 <span class="total">/ 1.400</span></span><span class="progress-unit">Lerninhalte</span></div>
+                        <div class="progress-bar"><div class="fill leer" style="width: 0%"></div></div>
+                    </div>
+                </td>
+                <td><div class="bearbeiter"><div class="bearbeiter-avatar" style="background: #7c3aed;">SB</div><span class="bearbeiter-name">Sara Becker</span></div></td>
+                <td><div class="datum">–<span class="time">noch nicht gestartet</span></div></td>
+            </tr>
+
+            <tr draggable="true">
+                <td class="drag-col"><span class="drag-handle">⠿</span></td>
+                <td>
+                    <div class="lf-cell">
+                        <span class="lf-nr">12</span>
+                        <div class="lf-text">
+                            <div class="lf-titel">Kundenspezifische Systemintegration durchführen</div>
+                            <div class="lf-meta">Modul 1–5 · geplant 6 Wochen</div>
+                        </div>
+                    </div>
+                </td>
+                <td><span class="phase-badge grob">Grobkonzept</span></td>
+                <td><div class="run-status wartend"><span class="run-dot"></span>Wartend</div></td>
+                <td>
+                    <div class="progress-wrap">
+                        <div class="progress-top"><span class="progress-numbers">0 <span class="total">/ 1.600</span></span><span class="progress-unit">Lerninhalte</span></div>
+                        <div class="progress-bar"><div class="fill leer" style="width: 0%"></div></div>
+                    </div>
+                </td>
+                <td><div class="bearbeiter"><div class="bearbeiter-avatar" style="background: #f59e0b;">MH</div><span class="bearbeiter-name">Markus Huber</span></div></td>
+                <td><div class="datum">–<span class="time">noch nicht gestartet</span></div></td>
+            </tr>
+
+            <tr draggable="true">
+                <td class="drag-col"><span class="drag-handle">⠿</span></td>
+                <td>
+                    <div class="lf-cell">
+                        <span class="lf-nr">13</span>
+                        <div class="lf-text">
+                            <div class="lf-titel">IT-Sicherheit und Datenschutz umsetzen</div>
+                            <div class="lf-meta">Modul 1–4 · geplant 5 Wochen</div>
+                        </div>
+                    </div>
+                </td>
+                <td><span class="phase-badge grob">Grobkonzept</span></td>
+                <td><div class="run-status wartend"><span class="run-dot"></span>Wartend</div></td>
+                <td>
+                    <div class="progress-wrap">
+                        <div class="progress-top"><span class="progress-numbers">0 <span class="total">/ 1.400</span></span><span class="progress-unit">Lerninhalte</span></div>
+                        <div class="progress-bar"><div class="fill leer" style="width: 0%"></div></div>
+                    </div>
+                </td>
+                <td><div class="bearbeiter"><div class="bearbeiter-avatar" style="background: #4361ee;">AK</div><span class="bearbeiter-name">Anna Krüger</span></div></td>
+                <td><div class="datum">–<span class="time">noch nicht gestartet</span></div></td>
+            </tr>
+
+            <tr draggable="true">
+                <td class="drag-col"><span class="drag-handle">⠿</span></td>
+                <td>
+                    <div class="lf-cell">
+                        <span class="lf-nr">14</span>
+                        <div class="lf-text">
+                            <div class="lf-titel">Digitale Vernetzung und IoT-Lösungen</div>
+                            <div class="lf-meta">Modul 1–4 · geplant 5 Wochen</div>
+                        </div>
+                    </div>
+                </td>
+                <td><span class="phase-badge grob">Grobkonzept</span></td>
+                <td><div class="run-status wartend"><span class="run-dot"></span>Wartend</div></td>
+                <td>
+                    <div class="progress-wrap">
+                        <div class="progress-top"><span class="progress-numbers">0 <span class="total">/ 1.400</span></span><span class="progress-unit">Lerninhalte</span></div>
+                        <div class="progress-bar"><div class="fill leer" style="width: 0%"></div></div>
+                    </div>
+                </td>
+                <td><div class="bearbeiter"><div class="bearbeiter-avatar" style="background: #059669;">TW</div><span class="bearbeiter-name">Thomas Weber</span></div></td>
+                <td><div class="datum">–<span class="time">noch nicht gestartet</span></div></td>
+            </tr>
+
+            <tr draggable="true">
+                <td class="drag-col"><span class="drag-handle">⠿</span></td>
+                <td>
+                    <div class="lf-cell">
+                        <span class="lf-nr">15</span>
+                        <div class="lf-text">
+                            <div class="lf-titel">Administrieren von IT-Infrastrukturen</div>
+                            <div class="lf-meta">Modul 1–5 · geplant 6 Wochen</div>
+                        </div>
+                    </div>
+                </td>
+                <td><span class="phase-badge grob">Grobkonzept</span></td>
+                <td><div class="run-status wartend"><span class="run-dot"></span>Wartend</div></td>
+                <td>
+                    <div class="progress-wrap">
+                        <div class="progress-top"><span class="progress-numbers">0 <span class="total">/ 1.600</span></span><span class="progress-unit">Lerninhalte</span></div>
+                        <div class="progress-bar"><div class="fill leer" style="width: 0%"></div></div>
+                    </div>
+                </td>
+                <td><div class="bearbeiter"><div class="bearbeiter-avatar" style="background: #7c3aed;">SB</div><span class="bearbeiter-name">Sara Becker</span></div></td>
+                <td><div class="datum">–<span class="time">noch nicht gestartet</span></div></td>
+            </tr>
+
+            <tr draggable="true">
+                <td class="drag-col"><span class="drag-handle">⠿</span></td>
+                <td>
+                    <div class="lf-cell">
+                        <span class="lf-nr">16</span>
+                        <div class="lf-text">
+                            <div class="lf-titel">Serviceanfragen bearbeiten und Lösungen dokumentieren</div>
+                            <div class="lf-meta">Modul 1–3 · geplant 4 Wochen</div>
+                        </div>
+                    </div>
+                </td>
+                <td><span class="phase-badge grob">Grobkonzept</span></td>
+                <td><div class="run-status wartend"><span class="run-dot"></span>Wartend</div></td>
+                <td>
+                    <div class="progress-wrap">
+                        <div class="progress-top"><span class="progress-numbers">0 <span class="total">/ 1.100</span></span><span class="progress-unit">Lerninhalte</span></div>
+                        <div class="progress-bar"><div class="fill leer" style="width: 0%"></div></div>
+                    </div>
+                </td>
+                <td><div class="bearbeiter"><div class="bearbeiter-avatar" style="background: #f59e0b;">MH</div><span class="bearbeiter-name">Markus Huber</span></div></td>
+                <td><div class="datum">–<span class="time">noch nicht gestartet</span></div></td>
+            </tr>
+
+            <tr draggable="true">
+                <td class="drag-col"><span class="drag-handle">⠿</span></td>
+                <td>
+                    <div class="lf-cell">
+                        <span class="lf-nr">17</span>
+                        <div class="lf-text">
+                            <div class="lf-titel">Abschlussprojekt: IT-Lösung für ein Unternehmen</div>
+                            <div class="lf-meta">Modul 1–4 · geplant 6 Wochen</div>
+                        </div>
+                    </div>
+                </td>
+                <td><span class="phase-badge grob">Grobkonzept</span></td>
+                <td><div class="run-status wartend"><span class="run-dot"></span>Wartend</div></td>
+                <td>
+                    <div class="progress-wrap">
+                        <div class="progress-top"><span class="progress-numbers">0 <span class="total">/ 1.400</span></span><span class="progress-unit">Lerninhalte</span></div>
+                        <div class="progress-bar"><div class="fill leer" style="width: 0%"></div></div>
+                    </div>
+                </td>
+                <td><div class="bearbeiter"><div class="bearbeiter-avatar" style="background: #4361ee;">AK</div><span class="bearbeiter-name">Anna Krüger</span></div></td>
+                <td><div class="datum">–<span class="time">noch nicht gestartet</span></div></td>
+            </tr>
+
+        </tbody>
+    </table>
+
+    <!-- Footer -->
+    <div class="table-footer">
+        <span class="pagination-info">17 Lernfelder</span>
+        <span class="drag-hint">⠿ Reihenfolge per Drag &amp; Drop ändern</span>
+    </div>
+
+</div>
+
+<script>
+    // Simple drag-to-reorder for table rows
+    const tbody = document.getElementById('lf-tbody');
+    let dragged = null;
+
+    tbody.addEventListener('dragstart', e => {
+        dragged = e.target.closest('tr');
+        setTimeout(() => dragged.classList.add('dragging'), 0);
+    });
+
+    tbody.addEventListener('dragend', e => {
+        dragged.classList.remove('dragging');
+        document.querySelectorAll('tr.drag-over').forEach(r => r.classList.remove('drag-over'));
+        dragged = null;
+        renumberRows();
+    });
+
+    tbody.addEventListener('dragover', e => {
+        e.preventDefault();
+        const target = e.target.closest('tr');
+        if (target && target !== dragged) {
+            document.querySelectorAll('tr.drag-over').forEach(r => r.classList.remove('drag-over'));
+            target.classList.add('drag-over');
+        }
+    });
+
+    tbody.addEventListener('drop', e => {
+        e.preventDefault();
+        const target = e.target.closest('tr');
+        if (target && target !== dragged) {
+            const rows = [...tbody.querySelectorAll('tr')];
+            const draggedIdx = rows.indexOf(dragged);
+            const targetIdx = rows.indexOf(target);
+            if (draggedIdx < targetIdx) {
+                target.after(dragged);
+            } else {
+                target.before(dragged);
+            }
+        }
+    });
+
+    function renumberRows() {
+        tbody.querySelectorAll('tr').forEach((row, i) => {
+            const nr = row.querySelector('.lf-nr');
+            if (nr) nr.textContent = i + 1;
+        });
+    }
+</script>
+
+</body>
+</html>

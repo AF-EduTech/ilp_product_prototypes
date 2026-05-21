@@ -1,0 +1,1235 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lerndaten – Lernender Detailansicht</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: #f0f2f5;
+  color: #1a1a2e;
+  line-height: 1.5;
+}
+
+/* ── Header ── */
+.header {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  color: white;
+  padding: 18px 32px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.header-left { display:flex; align-items:center; gap:14px; }
+.back-btn {
+  background: rgba(255,255,255,0.12);
+  border: none;
+  color: white;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  cursor: pointer;
+  display:flex; align-items:center; gap:6px;
+}
+.header-left h1 { font-size:18px; font-weight:600; }
+.header-left span { font-size:12px; opacity:0.6; margin-left:4px; }
+.header-right { display:flex; align-items:center; gap:14px; }
+.avatar {
+  width:38px; height:38px; border-radius:50%;
+  background:#6366f1; display:flex; align-items:center;
+  justify-content:center; font-weight:700; font-size:15px;
+}
+.badge-pill {
+  font-size:11px; padding:3px 10px; border-radius:20px;
+  font-weight:600;
+}
+.badge-pill.warn  { background:#fef3c7; color:#92400e; }
+.badge-pill.ok    { background:#d1fae5; color:#065f46; }
+.badge-pill.risk  { background:#fee2e2; color:#991b1b; }
+
+/* ── Tabs ── */
+.tabs-bar {
+  background: white;
+  border-bottom: 1px solid #e5e7eb;
+  display: flex;
+  padding: 0 32px;
+  gap: 4px;
+}
+.tab-btn {
+  padding: 14px 18px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #6b7280;
+  border: none;
+  background: none;
+  border-bottom: 3px solid transparent;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s;
+  margin-bottom: -1px;
+}
+.tab-btn:hover { color: #4361ee; }
+.tab-btn.active { color: #4361ee; border-bottom-color: #4361ee; font-weight:600; }
+
+/* ── Layout ── */
+.page { max-width:1320px; margin:0 auto; padding:24px; }
+
+/* ── KPI Strip ── */
+.kpi-strip {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-bottom: 22px;
+}
+.kpi-card {
+  background: white;
+  border-radius: 14px;
+  padding: 18px 20px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  display: flex; align-items:center; gap:14px;
+}
+.kpi-icon {
+  width:44px; height:44px; border-radius:12px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:20px; flex-shrink:0;
+}
+.kpi-icon.blue   { background:#eff6ff; }
+.kpi-icon.green  { background:#ecfdf5; }
+.kpi-icon.amber  { background:#fffbeb; }
+.kpi-icon.purple { background:#faf5ff; }
+.kpi-icon.red    { background:#fef2f2; }
+.kpi-value { font-size:24px; font-weight:700; line-height:1.1; }
+.kpi-value.blue   { color:#4361ee; }
+.kpi-value.green  { color:#059669; }
+.kpi-value.amber  { color:#d97706; }
+.kpi-value.purple { color:#7c3aed; }
+.kpi-value.red    { color:#dc2626; }
+.kpi-label { font-size:11px; color:#6b7280; font-weight:500; margin-top:2px; }
+
+/* ── Section Panels ── */
+.panel-section { display:none; }
+.panel-section.active { display:block; }
+
+/* ── Cards ── */
+.card {
+  background: white;
+  border-radius: 16px;
+  padding: 22px 24px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  margin-bottom: 18px;
+}
+.card-header {
+  display:flex; justify-content:space-between; align-items:center;
+  margin-bottom: 18px;
+}
+.card-title {
+  font-size:12px; font-weight:600; text-transform:uppercase;
+  letter-spacing:0.5px; color:#6b7280;
+}
+.card-note { font-size:12px; color:#9ca3af; }
+
+/* ── Two-col grid ── */
+.two-col { display:grid; grid-template-columns:1fr 1fr; gap:18px; }
+.three-col { display:grid; grid-template-columns:1fr 1fr 1fr; gap:18px; }
+
+/* ── Chart bars (CSS-only) ── */
+.bar-chart { display:flex; align-items:flex-end; gap:6px; height:120px; padding-top:8px; }
+.bar-wrap { flex:1; display:flex; flex-direction:column; align-items:center; gap:4px; }
+.bar {
+  width:100%; border-radius:6px 6px 0 0;
+  transition: opacity 0.2s;
+  cursor:pointer;
+  position:relative;
+}
+.bar:hover { opacity:0.8; }
+.bar-label { font-size:10px; color:#9ca3af; text-align:center; }
+.bar-val { font-size:10px; font-weight:600; color:#374151; }
+
+/* ── Timeline (activity heatmap style) ── */
+.heatmap { display:flex; flex-wrap:wrap; gap:3px; }
+.hm-cell {
+  width:14px; height:14px; border-radius:3px;
+  background:#e5e7eb; cursor:pointer;
+  position:relative;
+  transition: transform 0.1s;
+}
+.hm-cell:hover { transform: scale(1.3); }
+.hm-cell.l1 { background:#bfdbfe; }
+.hm-cell.l2 { background:#60a5fa; }
+.hm-cell.l3 { background:#2563eb; }
+.hm-cell.l4 { background:#1d4ed8; }
+.hm-cell.off { background:#fee2e2; }
+.hm-legend { display:flex; align-items:center; gap:6px; margin-top:10px; font-size:11px; color:#6b7280; }
+.hm-swatch { width:12px; height:12px; border-radius:2px; }
+
+/* ── Progress bar inline ── */
+.prog-row { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
+.prog-label { font-size:13px; color:#374151; min-width:160px; }
+.prog-bar-wrap { flex:1; background:#f3f4f6; border-radius:20px; height:8px; overflow:hidden; }
+.prog-bar-fill { height:100%; border-radius:20px; }
+.prog-pct { font-size:12px; font-weight:600; min-width:36px; text-align:right; color:#374151; }
+.prog-time { font-size:11px; color:#9ca3af; min-width:60px; text-align:right; }
+
+/* ── Table ── */
+.data-table { width:100%; border-collapse:separate; border-spacing:0; font-size:13px; }
+.data-table th {
+  font-size:11px; font-weight:600; text-transform:uppercase;
+  letter-spacing:0.4px; color:#9ca3af; padding:8px 12px;
+  text-align:left; border-bottom:1px solid #f3f4f6;
+}
+.data-table td {
+  padding:10px 12px; border-bottom:1px solid #f9fafb;
+  vertical-align:middle;
+}
+.data-table tr:last-child td { border-bottom:none; }
+.data-table tr:hover td { background:#f9fafb; }
+.data-table tr { cursor:pointer; }
+
+/* ── Tags / chips ── */
+.chip {
+  display:inline-block; padding:2px 9px; border-radius:20px;
+  font-size:11px; font-weight:600;
+}
+.chip.green  { background:#d1fae5; color:#065f46; }
+.chip.amber  { background:#fef3c7; color:#92400e; }
+.chip.red    { background:#fee2e2; color:#991b1b; }
+.chip.gray   { background:#f3f4f6; color:#6b7280; }
+.chip.blue   { background:#dbeafe; color:#1d4ed8; }
+.chip.purple { background:#ede9fe; color:#6d28d9; }
+
+/* ── Pace gauge ── */
+.gauge-wrap { display:flex; align-items:center; gap:20px; }
+.gauge-svg { flex-shrink:0; }
+.gauge-info { flex:1; }
+.gauge-big { font-size:32px; font-weight:700; }
+.gauge-sub { font-size:12px; color:#6b7280; margin-top:2px; }
+.gauge-legend { display:flex; gap:16px; margin-top:12px; flex-wrap:wrap; }
+.gl-item { display:flex; align-items:center; gap:6px; font-size:12px; color:#6b7280; }
+.gl-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
+
+/* ── Score mini cards ── */
+.score-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
+.score-mini {
+  background:#f9fafb; border-radius:12px; padding:14px 16px;
+  text-align:center; border:1px solid #f3f4f6;
+  cursor:pointer; transition: box-shadow 0.15s;
+}
+.score-mini:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+.score-mini .val { font-size:26px; font-weight:700; }
+.score-mini .lbl { font-size:11px; color:#6b7280; margin-top:2px; }
+.score-mini .sub { font-size:10px; color:#9ca3af; margin-top:1px; }
+
+/* ── Problem indicators ── */
+.indicator-list { display:flex; flex-direction:column; gap:10px; }
+.indicator-row {
+  display:flex; align-items:center; gap:14px;
+  padding:12px 16px; border-radius:12px;
+  border:1px solid #f3f4f6; background:#fafafa;
+  cursor:pointer; transition: box-shadow 0.15s;
+}
+.indicator-row:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.07); background:white; }
+.ind-icon { font-size:22px; flex-shrink:0; }
+.ind-body { flex:1; }
+.ind-title { font-size:13px; font-weight:600; color:#374151; }
+.ind-desc { font-size:12px; color:#9ca3af; margin-top:1px; }
+.ind-right { text-align:right; }
+.ind-val { font-size:13px; font-weight:600; }
+.ind-trend { font-size:11px; color:#9ca3af; }
+
+/* ── Drill-down panel ── */
+.drill-panel {
+  display:none;
+  background:white; border-radius:16px;
+  box-shadow:0 4px 24px rgba(0,0,0,0.12);
+  padding:24px;
+  margin-top:16px;
+  border-left:4px solid #4361ee;
+}
+.drill-panel.open { display:block; }
+.drill-close {
+  float:right; background:none; border:none;
+  font-size:18px; cursor:pointer; color:#9ca3af;
+}
+.drill-title { font-size:14px; font-weight:600; margin-bottom:16px; }
+
+/* ── Session timeline ── */
+.session-timeline { display:flex; flex-direction:column; gap:8px; }
+.session-row {
+  display:flex; align-items:center; gap:12px;
+  padding:8px 12px; border-radius:10px; background:#f9fafb;
+  font-size:12px;
+}
+.session-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+.session-dot.active { background:#059669; }
+.session-dot.short  { background:#d97706; }
+.session-dot.idle   { background:#dc2626; }
+.session-date { color:#6b7280; min-width:110px; }
+.session-dur  { font-weight:600; min-width:50px; }
+.session-events { flex:1; color:#9ca3af; }
+.session-vis { color:#6b7280; min-width:60px; text-align:right; }
+
+/* ── Sparkline (CSS bar mini) ── */
+.sparkline { display:flex; align-items:flex-end; gap:2px; height:32px; }
+.sp-bar { width:6px; border-radius:2px 2px 0 0; background:#bfdbfe; }
+
+/* ── Scroll depth visual ── */
+.scroll-vis { position:relative; height:140px; background:#f9fafb; border-radius:8px; overflow:hidden; }
+.scroll-fill { position:absolute; bottom:0; left:0; right:0; border-radius:8px; }
+.scroll-mark { position:absolute; left:0; right:0; height:1px; background:rgba(0,0,0,0.1); }
+.scroll-mark-label { position:absolute; right:8px; font-size:10px; color:#9ca3af; transform:translateY(-50%); }
+
+/* ── Breadcrumb ── */
+.breadcrumb { display:flex; align-items:center; gap:6px; font-size:12px; color:#9ca3af; margin-bottom:18px; }
+.breadcrumb span { cursor:pointer; }
+.breadcrumb span:hover { color:#4361ee; }
+.breadcrumb .sep { color:#d1d5db; }
+.breadcrumb .current { color:#374151; font-weight:500; }
+
+/* ── Tooltip ── */
+.tooltip-target { position:relative; }
+.tt {
+  display:none; position:absolute; bottom:calc(100% + 8px); left:50%;
+  transform:translateX(-50%);
+  background:#1a1a2e; color:white; font-size:11px;
+  padding:5px 9px; border-radius:6px; white-space:nowrap; z-index:100;
+  pointer-events:none;
+}
+.tooltip-target:hover .tt { display:block; }
+</style>
+</head>
+<body>
+
+<!-- ── Header ── -->
+<div class="header">
+  <div class="header-left">
+    <button class="back-btn">← Alle Lernenden</button>
+    <div>
+      <h1>Mehmet Yilmaz <span>· Fachinformatiker AE, Kohorte 2024-B</span></h1>
+    </div>
+  </div>
+  <div class="header-right">
+    <span class="badge-pill warn">⚠ Langsam-Lerner</span>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <div class="avatar">MY</div>
+      <div>
+        <div style="font-size:13px;font-weight:500;">Mehmet Yilmaz</div>
+        <div style="font-size:11px;opacity:0.6;">Lernfeld 4 · Woche 3/8</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Tabs ── -->
+<div class="tabs-bar">
+  <button class="tab-btn active" onclick="switchTab('aktivitaet',this)">📅 Aktivität</button>
+  <button class="tab-btn" onclick="switchTab('fortschritt',this)">📊 Lernfortschritt</button>
+  <button class="tab-btn" onclick="switchTab('geschwindigkeit',this)">⏱ Lerngeschwindigkeit</button>
+  <button class="tab-btn" onclick="switchTab('erfolg',this)">🎯 Lernerfolg</button>
+  <button class="tab-btn" onclick="switchTab('indikatoren',this)">🚨 Problemindikatoren</button>
+</div>
+
+<div class="page">
+
+  <!-- ── KPI Strip (always visible) ── -->
+  <div class="kpi-strip">
+    <div class="kpi-card">
+      <div class="kpi-icon blue">📅</div>
+      <div style="flex:1;">
+        <div style="display:flex;align-items:baseline;gap:6px;">
+          <div class="kpi-value blue">5</div>
+          <div style="font-size:14px;color:#9ca3af;font-weight:500;">/ 10 Tage</div>
+        </div>
+        <div class="kpi-label">Aktive Kurstage (Kurs läuft seit 10 Tagen)</div>
+        <div style="margin-top:7px;background:#dbeafe;border-radius:20px;height:6px;overflow:hidden;">
+          <div style="background:#4361ee;height:100%;width:50%;border-radius:20px;"></div>
+        </div>
+        <div style="font-size:10px;color:#9ca3af;margin-top:3px;">5 Fehltage · 50% Anwesenheit</div>
+      </div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-icon green">📈</div>
+      <div>
+        <div class="kpi-value green">34%</div>
+        <div class="kpi-label">Kursfortschritt gesamt</div>
+      </div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-icon purple">🎯</div>
+      <div>
+        <div class="kpi-value purple">67%</div>
+        <div class="kpi-label">Ø Quiz-Score</div>
+      </div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-icon red">🚨</div>
+      <div>
+        <div class="kpi-value red">3</div>
+        <div class="kpi-label">Aktive Problemindikatoren</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════ -->
+  <!-- TAB 1: AKTIVITÄT -->
+  <!-- ══════════════════════════════════════════ -->
+  <div id="tab-aktivitaet" class="panel-section active">
+
+    <div style="display:grid;grid-template-columns:1fr;gap:18px;margin-bottom:18px;">
+
+      <!-- Aktivitätsheatmap -->
+      <div class="card" style="grid-column:1/-1;">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Aktivitäts-Heatmap · 28.04. – 16.05.2026 (3 Wochen)</div>
+            <div style="font-size:11px;color:#9ca3af;margin-top:3px;">Zeile = Kalenderwoche · Spalte = Wochentag · Hover für Tagesdetail</div>
+          </div>
+          <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+            <div style="display:flex;align-items:center;gap:4px;font-size:11px;color:#6b7280;"><div style="width:12px;height:12px;border-radius:3px;background:#f0f2f5;border:1px solid #d1d5db;"></div> Wochenende</div>
+            <div style="display:flex;align-items:center;gap:4px;font-size:11px;color:#6b7280;"><div style="width:12px;height:12px;border-radius:3px;background:#dc2626;"></div> Fehltag</div>
+            <div style="display:flex;align-items:center;gap:4px;font-size:11px;color:#6b7280;"><div style="width:12px;height:12px;border-radius:3px;background:#fbbf24;"></div> Gering (&lt;1h)</div>
+            <div style="display:flex;align-items:center;gap:4px;font-size:11px;color:#6b7280;"><div style="width:12px;height:12px;border-radius:3px;background:#60a5fa;"></div> Mittel (1–2h)</div>
+            <div style="display:flex;align-items:center;gap:4px;font-size:11px;color:#6b7280;"><div style="width:12px;height:12px;border-radius:3px;background:#2563eb;"></div> Hoch (2–3h)</div>
+            <div style="display:flex;align-items:center;gap:4px;font-size:11px;color:#6b7280;"><div style="width:12px;height:12px;border-radius:3px;background:#1d4ed8;"></div> Sehr hoch (&gt;3h)</div>
+            <div style="display:flex;align-items:center;gap:4px;font-size:11px;color:#6b7280;"><div style="width:12px;height:12px;border-radius:3px;background:#e5e7eb;border:1.5px dashed #9ca3af;"></div> Geplant</div>
+          </div>
+        </div>
+        <div id="heatmap-grid"></div>
+      </div>
+
+    </div><!-- /heatmap row -->
+
+    <!-- Zusammenfassung Aktivität nach Modul -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Zusammenfassung Aktivität</div>
+        <div style="display:flex;gap:14px;font-size:11px;color:#6b7280;align-items:center;flex-wrap:wrap;">
+          <div style="display:flex;align-items:center;gap:5px;"><div style="width:10px;height:10px;border-radius:2px;background:#60a5fa;"></div>Scroll-Tiefe</div>
+          <div style="display:flex;align-items:center;gap:5px;"><div style="width:10px;height:10px;border-radius:2px;background:#10b981;"></div>Fertigstellung</div>
+          <div style="display:flex;align-items:center;gap:5px;"><div style="width:10px;height:10px;border-radius:2px;background:#a78bfa;"></div>Ø Quiz-Erfolg</div>
+          <div style="display:flex;align-items:center;gap:5px;"><div style="width:10px;height:10px;border-radius:2px;background:#fb923c;"></div>Ø Zeit / Unterkapitel</div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:0 40px;" id="scroll-bars"></div>
+    </div>
+
+  </div><!-- /tab-aktivitaet -->
+
+
+  <!-- ══════════════════════════════════════════ -->
+  <!-- TAB 2: LERNFORTSCHRITT -->
+  <!-- ══════════════════════════════════════════ -->
+  <div id="tab-fortschritt" class="panel-section">
+
+    <!-- Modul-Fortschritt -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Fortschritt nach Modul</div>
+        <div class="card-note">Klick auf Modul für Kapitel-Drill-down</div>
+      </div>
+      <div id="modul-progress"></div>
+    </div>
+
+    <!-- Kapitel Drill-down -->
+    <div id="drill-modul" class="drill-panel">
+      <button class="drill-close" onclick="closeDrill('drill-modul')">✕</button>
+      <div class="drill-title" id="drill-modul-title">Modul 1 · Grundlagen Netzwerke</div>
+      <div style="margin-bottom:12px;">
+        <div style="display:flex;gap:12px;flex-wrap:wrap;font-size:12px;color:#6b7280;margin-bottom:12px;">
+          <span>✅ Abgeschlossen: <strong>3 / 5 Kapitel</strong></span>
+          <span>⏱ Zeit gesamt: <strong>4h 22m</strong></span>
+          <span>📅 Gestartet: <strong>14.04.2026</strong></span>
+        </div>
+      </div>
+      <table class="data-table">
+        <tr><th>Kapitel</th><th>Status</th><th>Unterkapitel</th><th>Abschl.</th><th>Zeit</th></tr>
+        <tr onclick="openDrill('drill-kapitel')">
+          <td>1.1 · OSI-Referenzmodell</td>
+          <td><span class="chip green">Abgeschlossen</span></td>
+          <td>4 / 4</td><td>17.04.</td><td>1h 12m</td>
+        </tr>
+        <tr onclick="openDrill('drill-kapitel')">
+          <td>1.2 · TCP/IP Stack</td>
+          <td><span class="chip green">Abgeschlossen</span></td>
+          <td>3 / 3</td><td>21.04.</td><td>0h 55m</td>
+        </tr>
+        <tr onclick="openDrill('drill-kapitel')">
+          <td>1.3 · Subnetting</td>
+          <td><span class="chip amber">In Bearbeitung</span></td>
+          <td>2 / 4</td><td>—</td><td>1h 31m</td>
+        </tr>
+        <tr onclick="openDrill('drill-kapitel')">
+          <td>1.4 · Routing</td>
+          <td><span class="chip gray">Nicht gestartet</span></td>
+          <td>0 / 3</td><td>—</td><td>—</td>
+        </tr>
+        <tr onclick="openDrill('drill-kapitel')">
+          <td>1.5 · Switching & VLANs</td>
+          <td><span class="chip gray">Nicht gestartet</span></td>
+          <td>0 / 5</td><td>—</td><td>—</td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- Unterkapitel Drill-down -->
+    <div id="drill-kapitel" class="drill-panel">
+      <button class="drill-close" onclick="closeDrill('drill-kapitel')">✕</button>
+      <div class="drill-title">Kapitel 1.3 · Subnetting — Unterkapitel</div>
+      <table class="data-table">
+        <tr><th>Unterkapitel</th><th>Status</th><th>Besuche</th><th>Zeit</th><th>Quiz-Score</th></tr>
+        <tr>
+          <td>1.3.1 · Was ist ein Subnetz?</td>
+          <td><span class="chip green">Abgeschlossen</span></td>
+          <td>1×</td><td>28 min</td><td><span class="chip green">90%</span></td>
+        </tr>
+        <tr>
+          <td>1.3.2 · CIDR-Notation</td>
+          <td><span class="chip green">Abgeschlossen</span></td>
+          <td>2×</td><td>42 min</td><td><span class="chip amber">58%</span></td>
+        </tr>
+        <tr>
+          <td>1.3.3 · Subnetzmaske berechnen</td>
+          <td><span class="chip amber">In Bearbeitung</span></td>
+          <td>1×</td><td>21 min</td><td>—</td>
+        </tr>
+        <tr>
+          <td>1.3.4 · Praxisübung Subnetting</td>
+          <td><span class="chip gray">Gesperrt</span></td>
+          <td>—</td><td>—</td><td>—</td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- Wiederaufnahmen -->
+    <div class="card" style="margin-top:0">
+      <div class="card-header">
+        <div class="card-title">Wiederaufnahmen nach Pause</div>
+      </div>
+      <table class="data-table">
+        <tr><th>Datum</th><th>Pause seit</th><th>Einstieg in</th><th>Wiederaufnahme-Ort</th></tr>
+        <tr><td>05.05.2026</td><td>2 Tage</td><td>Mo, 09:02</td><td>Modul 2 · Kap 2.1 Unterkapitel 3</td></tr>
+        <tr><td>28.04.2026</td><td>3 Tage</td><td>Mo, 08:47</td><td>Modul 1 · Kap 1.3 Unterkapitel 2</td></tr>
+        <tr><td>14.04.2026</td><td>1 Tag</td><td>Mo, 10:15</td><td>Modul 1 · Kap 1.1 Unterkapitel 1</td></tr>
+      </table>
+    </div>
+
+  </div><!-- /tab-fortschritt -->
+
+
+  <!-- ══════════════════════════════════════════ -->
+  <!-- TAB 3: LERNGESCHWINDIGKEIT -->
+  <!-- ══════════════════════════════════════════ -->
+  <div id="tab-geschwindigkeit" class="panel-section">
+
+    <div class="two-col">
+      <!-- Pace Gauge -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Pace-Ratio gesamt</div>
+        </div>
+        <div class="gauge-wrap">
+          <svg class="gauge-svg" width="160" height="160" viewBox="0 0 160 160">
+            <circle cx="80" cy="80" r="64" fill="none" stroke="#f3f4f6" stroke-width="14"/>
+            <!-- green zone 0.7-1.0 -->
+            <circle cx="80" cy="80" r="64" fill="none" stroke="#d1fae5" stroke-width="14"
+              stroke-dasharray="80 322" stroke-dashoffset="80" stroke-linecap="round"/>
+            <!-- actual fill: 1.6x = amber, mapped to ~65% of arc -->
+            <circle cx="80" cy="80" r="64" fill="none" stroke="#f59e0b" stroke-width="14"
+              stroke-dasharray="168 234" stroke-dashoffset="80" stroke-linecap="round"/>
+            <text x="80" y="74" text-anchor="middle" font-size="28" font-weight="700" fill="#d97706">1.6×</text>
+            <text x="80" y="94" text-anchor="middle" font-size="11" fill="#9ca3af">Pace-Ratio</text>
+          </svg>
+          <div class="gauge-info">
+            <div style="font-size:13px;color:#6b7280;margin-bottom:10px;">Ist-Zeit / Soll-Zeit über alle abgeschlossenen Unterkapitel</div>
+            <div class="gauge-legend">
+              <div class="gl-item"><div class="gl-dot" style="background:#059669;"></div> < 0.7 = Schnell</div>
+              <div class="gl-item"><div class="gl-dot" style="background:#10b981;"></div> 0.7–1.0 = Normal</div>
+              <div class="gl-item"><div class="gl-dot" style="background:#f59e0b;"></div> 1.0–1.5 = Etwas langsam</div>
+              <div class="gl-item"><div class="gl-dot" style="background:#ef4444;"></div> > 1.5 = Langsam</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pace-Verlauf -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Pace-Ratio Verlauf · pro Unterkapitel</div>
+          <div class="card-note">Letzte 20 abgeschlossen</div>
+        </div>
+        <div class="bar-chart" id="pace-chart"></div>
+        <div style="margin-top:8px;font-size:11px;color:#9ca3af;text-align:center;">← Ältere Unterkapitel &nbsp;&nbsp;&nbsp; Neuere Unterkapitel →</div>
+      </div>
+    </div>
+
+    <!-- Zeit pro Unterkapitel -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Zeit pro Unterkapitel vs. Soll-Zeit</div>
+        <div class="card-note">Klick für Details</div>
+      </div>
+      <table class="data-table">
+        <tr><th>Unterkapitel</th><th>Ist-Zeit</th><th>Soll-Zeit</th><th>Ratio</th><th>Vergleich</th></tr>
+        <tr onclick="openDrill('drill-zeit')">
+          <td>2.3 · Subnetting</td><td>51 min</td><td>30 min</td>
+          <td><span class="chip red">1.70×</span></td>
+          <td><div style="width:80px;"><div style="background:#f3f4f6;border-radius:4px;height:6px;overflow:hidden;"><div style="background:#ef4444;height:100%;width:100%;border-radius:4px;"></div></div></div></td>
+        </tr>
+        <tr onclick="openDrill('drill-zeit')">
+          <td>1.3 · CIDR-Notation</td><td>42 min</td><td>30 min</td>
+          <td><span class="chip amber">1.40×</span></td>
+          <td><div style="width:80px;"><div style="background:#f3f4f6;border-radius:4px;height:6px;overflow:hidden;"><div style="background:#f59e0b;height:100%;width:94%;border-radius:4px;"></div></div></div></td>
+        </tr>
+        <tr onclick="openDrill('drill-zeit')">
+          <td>1.1 · OSI-Referenzmodell</td><td>28 min</td><td>30 min</td>
+          <td><span class="chip green">0.93×</span></td>
+          <td><div style="width:80px;"><div style="background:#f3f4f6;border-radius:4px;height:6px;overflow:hidden;"><div style="background:#10b981;height:100%;width:62%;border-radius:4px;"></div></div></div></td>
+        </tr>
+        <tr onclick="openDrill('drill-zeit')">
+          <td>1.2 · TCP/IP Stack</td><td>35 min</td><td>30 min</td>
+          <td><span class="chip amber">1.17×</span></td>
+          <td><div style="width:80px;"><div style="background:#f3f4f6;border-radius:4px;height:6px;overflow:hidden;"><div style="background:#f59e0b;height:100%;width:78%;border-radius:4px;"></div></div></div></td>
+        </tr>
+        <tr onclick="openDrill('drill-zeit')">
+          <td>2.1 · Grundlagen TCP/IP</td><td>22 min</td><td>30 min</td>
+          <td><span class="chip green">0.73×</span></td>
+          <td><div style="width:80px;"><div style="background:#f3f4f6;border-radius:4px;height:6px;overflow:hidden;"><div style="background:#059669;height:100%;width:49%;border-radius:4px;"></div></div></div></td>
+        </tr>
+      </table>
+
+      <div id="drill-zeit" class="drill-panel">
+        <button class="drill-close" onclick="closeDrill('drill-zeit')">✕</button>
+        <div class="drill-title">Detail: 2.3 · Subnetting · 51 min (Soll: 30 min)</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;font-size:12px;margin-bottom:14px;">
+          <div style="background:#f9fafb;border-radius:8px;padding:10px;"><div style="color:#9ca3af;">Aktive Zeit</div><strong>48 min</strong></div>
+          <div style="background:#f9fafb;border-radius:8px;padding:10px;"><div style="color:#9ca3af;">Idle-Zeit</div><strong>3 min</strong></div>
+          <div style="background:#f9fafb;border-radius:8px;padding:10px;"><div style="color:#9ca3af;">Scroll ø</div><strong>70%</strong></div>
+        </div>
+        <div style="font-size:12px;color:#6b7280;">Mögliche Ursache: Der Lernende hat das Unterkapitel 2× verlassen und neu gestartet. Scroll-Tiefe deutet auf unvollständige Lektüre hin.</div>
+      </div>
+    </div>
+
+    <!-- Inaktivitäts-Gaps -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Inaktivitäts-Gaps (Werktage ohne Login)</div>
+      </div>
+      <table class="data-table">
+        <tr><th>Zeitraum</th><th>Dauer</th><th>Bewertung</th><th>Kursphase</th></tr>
+        <tr><td>29.04. – 30.04.2026</td><td>2 Tage</td><td><span class="chip amber">Moderat</span></td><td>Modul 2 · Beginn</td></tr>
+        <tr><td>22.04. – 24.04.2026</td><td>3 Tage</td><td><span class="chip red">Kritisch</span></td><td>Modul 1 · Mitte</td></tr>
+        <tr><td>15.04.2026</td><td>1 Tag</td><td><span class="chip gray">Normal</span></td><td>Modul 1 · Beginn</td></tr>
+      </table>
+    </div>
+
+  </div><!-- /tab-geschwindigkeit -->
+
+
+  <!-- ══════════════════════════════════════════ -->
+  <!-- TAB 4: LERNERFOLG -->
+  <!-- ══════════════════════════════════════════ -->
+  <div id="tab-erfolg" class="panel-section">
+
+    <!-- Score-Übersicht -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Quiz-Score Übersicht</div>
+      </div>
+      <div class="score-grid">
+        <div class="score-mini" onclick="openDrill('drill-mc')">
+          <div class="val" style="color:#4361ee;">71%</div>
+          <div class="lbl">Multiple Choice</div>
+          <div class="sub">24 Versuche</div>
+        </div>
+        <div class="score-mini" onclick="openDrill('drill-wf')">
+          <div class="val" style="color:#059669;">84%</div>
+          <div class="lbl">Wahr / Falsch</div>
+          <div class="sub">18 Versuche</div>
+        </div>
+        <div class="score-mini" onclick="openDrill('drill-mc')">
+          <div class="val" style="color:#d97706;">59%</div>
+          <div class="lbl">Lückentext</div>
+          <div class="sub">11 Versuche</div>
+        </div>
+        <div class="score-mini" onclick="openDrill('drill-mc')">
+          <div class="val" style="color:#7c3aed;">68%</div>
+          <div class="lbl">Zuordnung</div>
+          <div class="sub">8 Versuche</div>
+        </div>
+        <div class="score-mini" onclick="openDrill('drill-mc')">
+          <div class="val" style="color:#6b7280;">—</div>
+          <div class="lbl">Freitext</div>
+          <div class="sub">3 eingereicht</div>
+        </div>
+        <div class="score-mini" onclick="openDrill('drill-mc')">
+          <div class="val" style="color:#dc2626;">52%</div>
+          <div class="lbl">Code Debug</div>
+          <div class="sub">6 Versuche</div>
+        </div>
+        <div class="score-mini" onclick="openDrill('drill-mc')">
+          <div class="val" style="color:#d97706;">61%</div>
+          <div class="lbl">Code Assert</div>
+          <div class="sub">4 Versuche</div>
+        </div>
+        <div class="score-mini" onclick="openDrill('drill-mc')">
+          <div class="val" style="color:#9ca3af;">—</div>
+          <div class="lbl">Code Explain</div>
+          <div class="sub">2 eingereicht</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Score Drill-down MC -->
+    <div id="drill-mc" class="drill-panel">
+      <button class="drill-close" onclick="closeDrill('drill-mc')">✕</button>
+      <div class="drill-title">Multiple Choice — alle Versuche</div>
+      <table class="data-table">
+        <tr><th>Quiz</th><th>Unterkapitel</th><th>Datum</th><th>Versuch</th><th>Score</th><th>Zeit</th></tr>
+        <tr><td>OSI-Schichten</td><td>1.1</td><td>17.04.</td><td>1. Versuch</td><td><span class="chip green">100%</span></td><td>1:24</td></tr>
+        <tr><td>Subnetzmaske</td><td>1.3</td><td>21.04.</td><td>1. Versuch</td><td><span class="chip red">40%</span></td><td>2:11</td></tr>
+        <tr><td>Subnetzmaske</td><td>1.3</td><td>21.04.</td><td>2. Versuch</td><td><span class="chip amber">60%</span></td><td>1:52</td></tr>
+        <tr><td>TCP-Header</td><td>2.1</td><td>05.05.</td><td>1. Versuch</td><td><span class="chip green">80%</span></td><td>1:38</td></tr>
+        <tr><td>Routing-Tabelle</td><td>2.3</td><td>06.05.</td><td>1. Versuch</td><td><span class="chip amber">60%</span></td><td>3:05</td></tr>
+      </table>
+    </div>
+
+    <!-- Score Drill-down WF -->
+    <div id="drill-wf" class="drill-panel">
+      <button class="drill-close" onclick="closeDrill('drill-wf')">✕</button>
+      <div class="drill-title">Wahr / Falsch — alle Versuche</div>
+      <table class="data-table">
+        <tr><th>Frage</th><th>Unterkapitel</th><th>Antwort</th><th>Korrekt</th></tr>
+        <tr><td>IPv4 hat 128-Bit-Adressen</td><td>1.1</td><td>Falsch</td><td><span class="chip green">✓</span></td></tr>
+        <tr><td>TCP ist verbindungslos</td><td>2.1</td><td>Wahr</td><td><span class="chip red">✗</span></td></tr>
+        <tr><td>UDP garantiert Reihenfolge</td><td>2.1</td><td>Falsch</td><td><span class="chip green">✓</span></td></tr>
+      </table>
+    </div>
+
+    <!-- Score Verlauf -->
+    <div class="two-col">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Quiz-Score Verlauf · letzte 30 Tage</div>
+        </div>
+        <div class="bar-chart" id="score-chart"></div>
+        <div style="display:flex;justify-content:space-between;font-size:10px;color:#9ca3af;margin-top:6px;">
+          <span>07. Apr</span><span>14. Apr</span><span>21. Apr</span><span>28. Apr</span><span>05. Mai</span>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Wiederholungsversuche</div>
+          <div class="card-note">Quizze mit > 1 Versuch</div>
+        </div>
+        <table class="data-table">
+          <tr><th>Quiz</th><th>Versuche</th><th>Letzter Score</th></tr>
+          <tr><td>Subnetzmaske MC</td><td>3×</td><td><span class="chip amber">60%</span></td></tr>
+          <tr><td>CIDR-Lückentext</td><td>2×</td><td><span class="chip amber">70%</span></td></tr>
+          <tr><td>Code Debug: Schleife</td><td>2×</td><td><span class="chip red">50%</span></td></tr>
+        </table>
+      </div>
+    </div>
+
+    <!-- Arbeitsblätter & Lernkarten -->
+    <div class="two-col">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Arbeitsblätter</div>
+        </div>
+        <table class="data-table">
+          <tr><th>Arbeitsblatt</th><th>Status</th><th>Zusatzaufg.</th><th>Datum</th></tr>
+          <tr><td>OSI-Modell anwenden</td><td><span class="chip green">Abgegeben</span></td><td><span class="chip blue">Ja</span></td><td>18.04.</td></tr>
+          <tr><td>Subnetting-Übung</td><td><span class="chip amber">In Bearb.</span></td><td>—</td><td>—</td></tr>
+          <tr><td>TCP-Analyse</td><td><span class="chip gray">Nicht gestart.</span></td><td>—</td><td>—</td></tr>
+        </table>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Lernkarten-Durchläufe</div>
+        </div>
+        <table class="data-table">
+          <tr><th>Deck</th><th>Karten</th><th>Pass</th><th>Fail</th><th>Datum</th></tr>
+          <tr><td>OSI-Begriffe</td><td>12</td><td><span class="chip green">10</span></td><td><span class="chip red">2</span></td><td>17.04.</td></tr>
+          <tr><td>Netzwerk-Protokolle</td><td>8</td><td><span class="chip green">5</span></td><td><span class="chip amber">3</span></td><td>05.05.</td></tr>
+        </table>
+      </div>
+    </div>
+
+  </div><!-- /tab-erfolg -->
+
+
+  <!-- ══════════════════════════════════════════ -->
+  <!-- TAB 5: PROBLEMINDIKATOREN -->
+  <!-- ══════════════════════════════════════════ -->
+  <div id="tab-indikatoren" class="panel-section">
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Aktive Problemindikatoren</div>
+        <div class="card-note">3 von 5 ausgelöst</div>
+      </div>
+      <div class="indicator-list">
+
+        <div class="indicator-row" style="border-color:#fee2e2;background:#fff5f5;" onclick="openDrill('drill-ind1')">
+          <div class="ind-icon">🐢</div>
+          <div class="ind-body">
+            <div class="ind-title">Langsam-Lerner</div>
+            <div class="ind-desc">Pace-Ratio > 1.4 seit mehr als 3 aufeinanderfolgenden Tagen</div>
+          </div>
+          <div class="ind-right">
+            <div class="ind-val" style="color:#dc2626;">Seit 5 Tagen</div>
+            <div class="ind-trend">Pace-Ratio: 1.6×</div>
+          </div>
+          <span class="chip red">Aktiv</span>
+        </div>
+
+        <div class="indicator-row" style="border-color:#fef3c7;background:#fffdf0;" onclick="openDrill('drill-ind2')">
+          <div class="ind-icon">❓</div>
+          <div class="ind-body">
+            <div class="ind-title">Quiz-Schwierigkeiten</div>
+            <div class="ind-desc">Score < 60% in Unterkapitel 1.3 · CIDR-Notation</div>
+          </div>
+          <div class="ind-right">
+            <div class="ind-val" style="color:#d97706;">58% Score</div>
+            <div class="ind-trend">2 Wiederholungen</div>
+          </div>
+          <span class="chip amber">Aktiv</span>
+        </div>
+
+        <div class="indicator-row" style="border-color:#fef3c7;background:#fffdf0;" onclick="openDrill('drill-ind3')">
+          <div class="ind-icon">🔁</div>
+          <div class="ind-body">
+            <div class="ind-title">Steckengeblieben</div>
+            <div class="ind-desc">Unterkapitel 2.3 · Subnetting wird seit 51 min bearbeitet (Soll: 30 min)</div>
+          </div>
+          <div class="ind-right">
+            <div class="ind-val" style="color:#d97706;">1.7× Soll-Zeit</div>
+            <div class="ind-trend">Begonnen: heute 09:05</div>
+          </div>
+          <span class="chip amber">Aktiv</span>
+        </div>
+
+        <div class="indicator-row" onclick="openDrill('drill-ind4')">
+          <div class="ind-icon">💤</div>
+          <div class="ind-body">
+            <div class="ind-title">Inaktivität</div>
+            <div class="ind-desc">Kein Login an mehr als X aufeinanderfolgenden Werktagen</div>
+          </div>
+          <div class="ind-right">
+            <div class="ind-val" style="color:#6b7280;">Nicht ausgelöst</div>
+            <div class="ind-trend">Letzter Login: heute</div>
+          </div>
+          <span class="chip gray">Inaktiv</span>
+        </div>
+
+        <div class="indicator-row" onclick="openDrill('drill-ind4')">
+          <div class="ind-icon">⚠️</div>
+          <div class="ind-body">
+            <div class="ind-title">Dropout-Risiko</div>
+            <div class="ind-desc">Kombination aus Inaktivität + niedrigem Score über mehrere Tage</div>
+          </div>
+          <div class="ind-right">
+            <div class="ind-val" style="color:#6b7280;">Nicht ausgelöst</div>
+            <div class="ind-trend">Score-Trend: stabil</div>
+          </div>
+          <span class="chip gray">Inaktiv</span>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Drill-downs Indikatoren -->
+    <div id="drill-ind1" class="drill-panel" style="border-left-color:#ef4444;">
+      <button class="drill-close" onclick="closeDrill('drill-ind1')">✕</button>
+      <div class="drill-title">🐢 Langsam-Lerner — Verlauf der Pace-Ratio</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;font-size:12px;margin-bottom:16px;">
+        <div style="background:#f9fafb;border-radius:8px;padding:10px;">
+          <div style="color:#9ca3af;">Pace-Ratio heute</div><strong style="color:#dc2626;">1.6×</strong>
+        </div>
+        <div style="background:#f9fafb;border-radius:8px;padding:10px;">
+          <div style="color:#9ca3af;">Ausgelöst seit</div><strong>02.05.2026</strong>
+        </div>
+        <div style="background:#f9fafb;border-radius:8px;padding:10px;">
+          <div style="color:#9ca3af;">Empfehlung</div><strong>Lernbegleiter kontaktieren</strong>
+        </div>
+      </div>
+      <table class="data-table">
+        <tr><th>Tag</th><th>Pace-Ratio</th><th>Bewertung</th><th>Aktive Zeit</th></tr>
+        <tr><td>06.05.</td><td>1.72×</td><td><span class="chip red">Langsam</span></td><td>1h 42m</td></tr>
+        <tr><td>05.05.</td><td>1.58×</td><td><span class="chip red">Langsam</span></td><td>2h 14m</td></tr>
+        <tr><td>02.05.</td><td>1.43×</td><td><span class="chip amber">Etwas langsam</span></td><td>0h 18m</td></tr>
+        <tr><td>01.05.</td><td>1.61×</td><td><span class="chip red">Langsam</span></td><td>1h 55m</td></tr>
+        <tr><td>29.04.</td><td>1.12×</td><td><span class="chip amber">Etwas langsam</span></td><td>3h 02m</td></tr>
+      </table>
+    </div>
+
+    <div id="drill-ind2" class="drill-panel" style="border-left-color:#f59e0b;">
+      <button class="drill-close" onclick="closeDrill('drill-ind2')">✕</button>
+      <div class="drill-title">❓ Quiz-Schwierigkeiten — Unterkapitel 1.3 CIDR-Notation</div>
+      <div style="font-size:12px;color:#6b7280;margin-bottom:14px;">Lernender hat dieses Quiz 3× versucht, zuletzt mit 58%. Schwäche bei Umrechnung von CIDR in Dezimal.</div>
+      <table class="data-table">
+        <tr><th>Versuch</th><th>Score</th><th>Falsch beantwortet</th><th>Zeit</th></tr>
+        <tr><td>1. Versuch (21.04.)</td><td><span class="chip red">33%</span></td><td>Fragen 2, 3, 4</td><td>3:12</td></tr>
+        <tr><td>2. Versuch (21.04.)</td><td><span class="chip amber">50%</span></td><td>Fragen 3, 4</td><td>2:44</td></tr>
+        <tr><td>3. Versuch (22.04.)</td><td><span class="chip amber">58%</span></td><td>Fragen 3, 5</td><td>2:01</td></tr>
+      </table>
+    </div>
+
+    <div id="drill-ind3" class="drill-panel" style="border-left-color:#f59e0b;">
+      <button class="drill-close" onclick="closeDrill('drill-ind3')">✕</button>
+      <div class="drill-title">🔁 Steckengeblieben — Unterkapitel 2.3 Subnetting</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;font-size:12px;margin-bottom:14px;">
+        <div style="background:#f9fafb;border-radius:8px;padding:10px;">
+          <div style="color:#9ca3af;">Ist-Zeit bisher</div><strong>51 min</strong>
+        </div>
+        <div style="background:#f9fafb;border-radius:8px;padding:10px;">
+          <div style="color:#9ca3af;">Soll-Zeit</div><strong>30 min</strong>
+        </div>
+        <div style="background:#f9fafb;border-radius:8px;padding:10px;">
+          <div style="color:#9ca3af;">Tab-Wechsel</div><strong>3× verlassen</strong>
+        </div>
+      </div>
+      <div style="font-size:12px;color:#6b7280;">Der Lernende hat das Unterkapitel mehrfach unterbrochen. Quiz noch nicht gestartet.</div>
+    </div>
+
+    <div id="drill-ind4" class="drill-panel" style="border-left-color:#9ca3af;">
+      <button class="drill-close" onclick="closeDrill('drill-ind4')">✕</button>
+      <div class="drill-title">💤 Inaktivität / Dropout-Risiko</div>
+      <div style="font-size:13px;color:#6b7280;">Dieser Indikator ist aktuell nicht ausgelöst. Schwellwert: 3 aufeinanderfolgende Werktage ohne Login.</div>
+    </div>
+
+    <!-- Indikator-Historie -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Indikator-Verlauf (letzte 30 Tage)</div>
+      </div>
+      <table class="data-table">
+        <tr><th>Datum</th><th>Indikator</th><th>Status</th><th>Dauer</th><th>Aktion</th></tr>
+        <tr><td>02.05.2026</td><td>🐢 Langsam-Lerner</td><td><span class="chip red">Aktiv</span></td><td>5 Tage</td><td><span class="chip gray">Keine</span></td></tr>
+        <tr><td>21.04.2026</td><td>❓ Quiz-Schwierigkeiten</td><td><span class="chip amber">Offen</span></td><td>—</td><td><span class="chip gray">Keine</span></td></tr>
+        <tr><td>22.04.–24.04.</td><td>💤 Inaktivität</td><td><span class="chip green">Aufgelöst</span></td><td>3 Tage</td><td><span class="chip blue">LB benachrichtigt</span></td></tr>
+      </table>
+    </div>
+
+  </div><!-- /tab-indikatoren -->
+
+</div><!-- /page -->
+
+<script>
+// ── Tab switching ──
+function switchTab(id, btn) {
+  document.querySelectorAll('.panel-section').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  btn.classList.add('active');
+  // close all drills when switching
+  document.querySelectorAll('.drill-panel').forEach(d => d.classList.remove('open'));
+}
+
+// ── Drill-down toggle ──
+function openDrill(id) {
+  const panel = document.getElementById(id);
+  const isOpen = panel.classList.contains('open');
+  // close siblings in same card
+  const parentCard = panel.closest('.card, .panel-section');
+  if (parentCard) parentCard.querySelectorAll('.drill-panel').forEach(d => d.classList.remove('open'));
+  if (!isOpen) {
+    panel.classList.add('open');
+    panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+}
+function closeDrill(id) {
+  document.getElementById(id).classList.remove('open');
+}
+
+// ── Modul progress rows ──
+const moduls = [
+  { name: 'Modul 1 · Grundlagen Netzwerke', pct: 60, time: '4h 22m', soll:'~8h', color:'#10b981' },
+  { name: 'Modul 2 · TCP/IP & Routing',     pct: 20, time: '1h 48m', soll:'~8h', color:'#f59e0b' },
+  { name: 'Modul 3 · Sicherheit',           pct: 0,  time: '—',      soll:'~8h', color:'#e5e7eb' },
+  { name: 'Modul 4 · Virtualisierung',      pct: 0,  time: '—',      soll:'~8h', color:'#e5e7eb' },
+];
+const mp = document.getElementById('modul-progress');
+moduls.forEach(m => {
+  const pctColor = m.pct >= 80 ? '#059669' : m.pct >= 40 ? '#10b981' : m.pct > 0 ? '#f59e0b' : '#9ca3af';
+  mp.innerHTML += `
+    <div class="prog-row" onclick="openDrill('drill-modul')" style="cursor:pointer;">
+      <div class="prog-label">${m.name}</div>
+      <div class="prog-bar-wrap">
+        <div class="prog-bar-fill" style="width:${m.pct}%;background:${m.color};"></div>
+      </div>
+      <div class="prog-pct" style="color:${pctColor};">${m.pct}%</div>
+      <div class="prog-time">${m.time} / ${m.soll}</div>
+    </div>`;
+});
+
+// ── Heatmap: Kurs 28.04.–16.05.2026, 3 Wochen (15 Werktage + Wochenenden) ──
+// Layout: Zeile = KW, Spalte = Mo Di Mi Do Fr Sa So (7 Spalten)
+// status: 'weekend' | 'missing' | 'future' | 1 | 2 | 3 | 4
+// 1 = < 1h, 2 = 1–2h, 3 = 2–3h, 4 = > 3h
+
+const HM_WEEKS = [
+  {
+    kw: 'KW 18', range: '28.04. – 04.05.',
+    days: [
+      { tag:'Mo', date:'28.04.', status:3,         time:'1h 28m', quizze:2 },
+      { tag:'Di', date:'29.04.', status:4,         time:'3h 02m', quizze:6 },
+      { tag:'Mi', date:'30.04.', status:'missing', time:'—',      quizze:0 },
+      { tag:'Do', date:'01.05.', status:3,         time:'1h 55m', quizze:4 },
+      { tag:'Fr', date:'02.05.', status:1,         time:'0h 18m', quizze:0 },
+      { tag:'Sa', date:'03.05.', status:'weekend', time:'—',      quizze:0 },
+      { tag:'So', date:'04.05.', status:'weekend', time:'—',      quizze:0 },
+    ]
+  },
+  {
+    kw: 'KW 19', range: '05.05. – 11.05.',
+    days: [
+      { tag:'Mo', date:'05.05.', status:4,         time:'2h 14m', quizze:5 },
+      { tag:'Di', date:'06.05.', status:3,         time:'1h 42m', quizze:3 },
+      { tag:'Mi', date:'07.05.', status:'missing', time:'—',      quizze:0 },
+      { tag:'Do', date:'08.05.', status:2,         time:'1h 10m', quizze:2 },
+      { tag:'Fr', date:'09.05.', status:'missing', time:'—',      quizze:0 },
+      { tag:'Sa', date:'10.05.', status:'weekend', time:'—',      quizze:0 },
+      { tag:'So', date:'11.05.', status:'weekend', time:'—',      quizze:0 },
+    ]
+  },
+  {
+    kw: 'KW 20', range: '12.05. – 16.05.',
+    days: [
+      { tag:'Mo', date:'12.05.', status:'future',  time:'—',      quizze:0 },
+      { tag:'Di', date:'13.05.', status:'future',  time:'—',      quizze:0 },
+      { tag:'Mi', date:'14.05.', status:'future',  time:'—',      quizze:0 },
+      { tag:'Do', date:'15.05.', status:'future',  time:'—',      quizze:0 },
+      { tag:'Fr', date:'16.05.', status:'future',  time:'—',      quizze:0 },
+      { tag:'Sa', date:'17.05.', status:'weekend', time:'—',      quizze:0 },
+      { tag:'So', date:'18.05.', status:'weekend', time:'—',      quizze:0 },
+    ]
+  },
+];
+
+function hmColor(s) {
+  if (s === 'weekend') return { bg:'#f0f2f5', border:'1px solid #e5e7eb', textCol:'#d1d5db' };
+  if (s === 'missing') return { bg:'#dc2626', border:'none',               textCol:'white'   };
+  if (s === 'future')  return { bg:'#f3f4f6', border:'1.5px dashed #d1d5db', textCol:'#9ca3af' };
+  if (s === 1)         return { bg:'#fbbf24', border:'none',               textCol:'#78350f' };
+  if (s === 2)         return { bg:'#60a5fa', border:'none',               textCol:'#1e3a5f' };
+  if (s === 3)         return { bg:'#2563eb', border:'none',               textCol:'white'   };
+  if (s === 4)         return { bg:'#1d4ed8', border:'none',               textCol:'white'   };
+  return { bg:'#e5e7eb', border:'none', textCol:'#6b7280' };
+}
+
+function hmTooltip(d) {
+  if (d.status === 'weekend') return `<strong>${d.tag} ${d.date}</strong><br>Wochenende`;
+  if (d.status === 'future')  return `<strong>${d.tag} ${d.date}</strong><br>Geplanter Kurstag`;
+  if (d.status === 'missing') return `<strong>${d.tag} ${d.date}</strong><br>⛔ Fehltag – kein Login`;
+  const lvl = d.status === 1 ? 'Geringe Aktivität (&lt;1h)' : d.status === 2 ? 'Mittlere Aktivität (1–2h)' : d.status === 3 ? 'Hohe Aktivität (2–3h)' : 'Sehr hohe Aktivität (&gt;3h)';
+  return `<strong>${d.tag} ${d.date}</strong><br>${lvl}<br>⏱ ${d.time}<br>📚 ${d.quizze} Quizze`;
+}
+
+// Tooltip-Element
+const hmTip = document.createElement('div');
+hmTip.style.cssText = 'position:fixed;background:#1a1a2e;color:white;font-size:12px;padding:8px 12px;border-radius:8px;pointer-events:none;display:none;z-index:999;line-height:1.7;box-shadow:0 4px 20px rgba(0,0,0,0.3);min-width:160px;';
+document.body.appendChild(hmTip);
+
+const hg = document.getElementById('heatmap-grid');
+hg.style.cssText = 'display:table;width:100%;border-collapse:separate;border-spacing:0;';
+
+// Header-Zeile (Spaltenköpfe: Mo–So)
+const headerRow = document.createElement('div');
+headerRow.style.cssText = 'display:flex;gap:5px;margin-bottom:5px;padding-left:56px;';
+['Mo','Di','Mi','Do','Fr','Sa','So'].forEach(d => {
+  const th = document.createElement('div');
+  th.style.cssText = 'flex:1;text-align:center;font-size:11px;font-weight:600;color:#9ca3af;';
+  th.textContent = d;
+  headerRow.appendChild(th);
+});
+hg.appendChild(headerRow);
+
+// Zeilen
+HM_WEEKS.forEach(week => {
+  const row = document.createElement('div');
+  row.style.cssText = 'display:flex;align-items:center;gap:5px;margin-bottom:5px;';
+
+  // KW-Label links
+  const kwLbl = document.createElement('div');
+  kwLbl.style.cssText = 'font-size:10px;font-weight:600;color:#9ca3af;min-width:50px;text-align:right;padding-right:6px;line-height:1.3;';
+  kwLbl.innerHTML = `${week.kw}<br><span style="font-weight:400;font-size:9px;">${week.range}</span>`;
+  row.appendChild(kwLbl);
+
+  week.days.forEach(day => {
+    const c = hmColor(day.status);
+    const cell = document.createElement('div');
+    cell.style.cssText = `
+      flex:1; height:32px; border-radius:6px; cursor:pointer;
+      background:${c.bg}; border:${c.border};
+      transition:transform 0.12s, box-shadow 0.12s;
+      display:flex; align-items:center; justify-content:center;
+    `;
+
+    // Inhalt: Datum klein drin
+    const inner = document.createElement('span');
+    inner.style.cssText = `font-size:9px;font-weight:600;color:${c.textCol};line-height:1;`;
+    inner.textContent = day.status === 'weekend' ? '' : day.date.slice(0,5);
+    cell.appendChild(inner);
+
+    if (day.status !== 'weekend') {
+      cell.onmouseover = (e) => {
+        cell.style.transform = 'scale(1.15)';
+        cell.style.boxShadow = '0 3px 10px rgba(0,0,0,0.18)';
+        cell.style.zIndex = '10';
+        hmTip.innerHTML = hmTooltip(day);
+        hmTip.style.display = 'block';
+        hmTip.style.left = (e.clientX + 14) + 'px';
+        hmTip.style.top  = (e.clientY - 8) + 'px';
+      };
+      cell.onmousemove = (e) => {
+        hmTip.style.left = (e.clientX + 14) + 'px';
+        hmTip.style.top  = (e.clientY - 8) + 'px';
+      };
+      cell.onmouseout = () => {
+        cell.style.transform = '';
+        cell.style.boxShadow = '';
+        cell.style.zIndex = '';
+        hmTip.style.display = 'none';
+      };
+    }
+
+    row.appendChild(cell);
+  });
+
+  hg.appendChild(row);
+});
+
+// ── Zusammenfassung Aktivität nach Modul ──
+// scroll: Ø Scroll-Tiefe in %
+// done:   Fertigstellungsgrad in %
+// quiz:   Ø Quiz-Erfolg in %  (null = noch keine Quizze)
+// ukTime: Ø Zeit pro Unterkapitel in Minuten (null = noch nicht gestartet)
+// ukSoll: Soll-Zeit pro Unterkapitel in Minuten (Basis für Farbgebung)
+const modulData = [
+  { name:'Grundlagen IT-Systeme',       scroll:100, done:100, quiz:88,  ukTime:24, ukSoll:30 },
+  { name:'Netzwerktechnik Grundlagen',  scroll: 94, done:100, quiz:82,  ukTime:28, ukSoll:30 },
+  { name:'Betriebssysteme',             scroll: 88, done: 85, quiz:74,  ukTime:33, ukSoll:30 },
+  { name:'TCP/IP & Routing',            scroll: 76, done: 60, quiz:67,  ukTime:38, ukSoll:30 },
+  { name:'Subnetting & CIDR',           scroll: 52, done: 34, quiz:52,  ukTime:46, ukSoll:30 },
+  { name:'Sicherheitsgrundlagen',       scroll: 20, done:  0, quiz:null, ukTime:null, ukSoll:30 },
+  { name:'Firewalls & Zugriffsschutz',  scroll:  0, done:  0, quiz:null, ukTime:null, ukSoll:30 },
+  { name:'Virtualisierung',             scroll:  0, done:  0, quiz:null, ukTime:null, ukSoll:30 },
+  { name:'Cloud-Grundlagen',            scroll:  0, done:  0, quiz:null, ukTime:null, ukSoll:30 },
+  { name:'Datenbankgrundlagen',         scroll:  0, done:  0, quiz:null, ukTime:null, ukSoll:30 },
+  { name:'Projektmanagement Basics',    scroll:  0, done:  0, quiz:null, ukTime:null, ukSoll:30 },
+  { name:'Abschlussprojekt',            scroll:  0, done:  0, quiz:null, ukTime:null, ukSoll:30 },
+];
+
+function barCol(val, type) {
+  if (val === null || val === 0) return { bar:'#e5e7eb', txt:'#9ca3af' };
+  if (type === 'scroll') {
+    return val >= 80 ? { bar:'#60a5fa', txt:'#1d4ed8' }
+         : val >= 50 ? { bar:'#93c5fd', txt:'#2563eb' }
+                     : { bar:'#bfdbfe', txt:'#3b82f6' };
+  }
+  if (type === 'done') {
+    return val >= 80 ? { bar:'#10b981', txt:'#059669' }
+         : val >= 50 ? { bar:'#34d399', txt:'#10b981' }
+                     : { bar:'#6ee7b7', txt:'#34d399' };
+  }
+  if (type === 'quiz') {
+    return val >= 80 ? { bar:'#a78bfa', txt:'#6d28d9' }
+         : val >= 60 ? { bar:'#c4b5fd', txt:'#7c3aed' }
+                     : { bar:'#ede9fe', txt:'#8b5cf6' };
+  }
+  return { bar:'#e5e7eb', txt:'#9ca3af' };
+}
+
+function ukTimeCol(min, soll) {
+  if (min === null) return { bar:'#e5e7eb', txt:'#9ca3af' };
+  const ratio = min / soll;
+  return ratio <= 0.9 ? { bar:'#34d399', txt:'#059669' }   // schnell
+       : ratio <= 1.1 ? { bar:'#fb923c', txt:'#c2410c' }   // normal
+       : ratio <= 1.4 ? { bar:'#f97316', txt:'#9a3412' }   // etwas langsam
+                      : { bar:'#ef4444', txt:'#991b1b' };   // langsam
+}
+
+function bar(val, pct, col, label, unit) {
+  const display = val === null ? '—' : val + unit;
+  return `
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+      <div style="font-size:10px;color:#6b7280;min-width:116px;">${label}</div>
+      <div style="flex:1;background:#f3f4f6;border-radius:20px;height:6px;overflow:hidden;">
+        <div style="width:${pct}%;height:100%;background:${col.bar};border-radius:20px;"></div>
+      </div>
+      <div style="font-size:11px;font-weight:700;min-width:36px;text-align:right;color:${col.txt};">${display}</div>
+    </div>`;
+}
+
+const sb = document.getElementById('scroll-bars');
+modulData.forEach((m, i) => {
+  const sc = barCol(m.scroll, 'scroll');
+  const dn = barCol(m.done,   'done');
+  const qz = m.quiz !== null ? barCol(m.quiz, 'quiz') : { bar:'#e5e7eb', txt:'#9ca3af' };
+  const tc = ukTimeCol(m.ukTime, m.ukSoll);
+  const ukPct = m.ukTime !== null ? Math.min((m.ukTime / (m.ukSoll * 2)) * 100, 100) : 0;
+  const ukDisplay = m.ukTime !== null ? m.ukTime + ' min' : '—';
+
+  sb.innerHTML += `
+    <div style="padding:11px 0;border-bottom:1px solid #f3f4f6;">
+      <div style="font-size:12px;font-weight:600;color:#374151;margin-bottom:8px;">
+        <span style="font-size:10px;color:#9ca3af;font-weight:500;margin-right:5px;">M${i+1}</span>${m.name}
+      </div>
+      ${bar(m.scroll, m.scroll, sc, 'Scroll-Tiefe', '%')}
+      ${bar(m.done,   m.done,   dn, 'Fertigstellung', '%')}
+      ${bar(m.quiz,   m.quiz ?? 0, qz, 'Ø Quiz-Erfolg', '%')}
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+        <div style="font-size:10px;color:#6b7280;min-width:116px;">Ø Zeit / Unterkapitel</div>
+        <div style="flex:1;background:#f3f4f6;border-radius:20px;height:6px;overflow:hidden;">
+          <div style="width:${ukPct}%;height:100%;background:${tc.bar};border-radius:20px;"></div>
+        </div>
+        <div style="font-size:11px;font-weight:700;min-width:36px;text-align:right;color:${tc.txt};">${ukDisplay}</div>
+      </div>
+    </div>`;
+});
+
+// ── Pace bar chart ──
+const paceData = [0.93,1.17,1.40,1.70,1.12,1.58,1.61,1.43,0.88,1.20,1.55,1.62,1.10,0.95,1.38,1.65,1.72,1.45,1.60,1.58];
+const paceChart = document.getElementById('pace-chart');
+const maxPace = 2.0;
+paceData.forEach((v,i) => {
+  const wrap = document.createElement('div');
+  wrap.className = 'bar-wrap';
+  const bar = document.createElement('div');
+  bar.className = 'bar tooltip-target';
+  const col = v < 0.7 ? '#059669' : v < 1.0 ? '#10b981' : v < 1.5 ? '#f59e0b' : '#ef4444';
+  bar.style.cssText = `height:${(v/maxPace)*108}px;background:${col};`;
+  bar.innerHTML = `<span class="tt">${v}× Pace</span>`;
+  wrap.appendChild(bar);
+  paceChart.appendChild(wrap);
+});
+// Baseline line (1.0)
+paceChart.style.position = 'relative';
+const baseline = document.createElement('div');
+baseline.style.cssText = `position:absolute;left:0;right:0;bottom:${(1.0/maxPace)*108}px;height:1px;background:#9ca3af;pointer-events:none;`;
+const blLabel = document.createElement('span');
+blLabel.style.cssText = 'position:absolute;right:2px;top:-10px;font-size:9px;color:#9ca3af;';
+blLabel.textContent = 'Soll';
+baseline.appendChild(blLabel);
+paceChart.appendChild(baseline);
+
+// ── Score bar chart ──
+const scoreData = [80,60,33,50,58,80,72,65,60,70,80,75,68,55,70,78,82,67,71,70];
+const scoreChart = document.getElementById('score-chart');
+scoreData.forEach((v,i) => {
+  const wrap = document.createElement('div');
+  wrap.className = 'bar-wrap';
+  const bar = document.createElement('div');
+  bar.className = 'bar tooltip-target';
+  const col = v >= 80 ? '#10b981' : v >= 60 ? '#f59e0b' : '#ef4444';
+  bar.style.cssText = `height:${v * 1.1}px;background:${col};`;
+  bar.innerHTML = `<span class="tt">${v}%</span>`;
+  wrap.appendChild(bar);
+  scoreChart.appendChild(wrap);
+});
+</script>
+</body>
+</html>

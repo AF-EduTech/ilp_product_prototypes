@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lerndaten – Kursdetail</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: #f0f2f5; color: #1a1a2e; line-height: 1.5;
+}
+
+/* ── Header ── */
+.header {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  color: white; padding: 18px 32px;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.header-left { display:flex; align-items:center; gap:14px; }
+.back-btn {
+  background: rgba(255,255,255,0.12); border: none; color: white;
+  padding: 7px 14px; border-radius: 8px; font-size: 13px; cursor: pointer;
+  display:flex; align-items:center; gap:6px; white-space:nowrap;
+}
+.back-btn:hover { background: rgba(255,255,255,0.2); }
+.header-left h1 { font-size:18px; font-weight:600; }
+.header-left p  { font-size:12px; opacity:0.55; margin-top:2px; }
+.header-right   { display:flex; align-items:center; gap:14px; }
+.avatar {
+  width:38px; height:38px; border-radius:50%; background:#6366f1;
+  display:flex; align-items:center; justify-content:center;
+  font-weight:700; font-size:15px; color:white;
+}
+.hdr-name { font-size:13px; font-weight:500; }
+.hdr-role { font-size:11px; opacity:0.55; }
+
+/* ── Page ── */
+.page { max-width:1320px; margin:0 auto; padding:24px; }
+
+/* ── Basisdaten-Banner ── */
+.course-banner {
+  background: white; border-radius: 16px;
+  padding: 22px 28px; margin-bottom: 20px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  display: flex; gap: 32px; align-items: flex-start; flex-wrap: wrap;
+}
+.banner-main { flex:1; min-width:220px; }
+.banner-title { font-size:20px; font-weight:700; color:#1a1a2e; }
+.banner-sub   { font-size:13px; color:#6b7280; margin-top:3px; }
+.banner-chips { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+.banner-meta  {
+  display:grid; grid-template-columns:repeat(4,auto);
+  gap:0 32px; align-items:start; flex-wrap:wrap;
+}
+.meta-item { min-width:120px; }
+.meta-label { font-size:10px; font-weight:600; text-transform:uppercase;
+              letter-spacing:0.4px; color:#9ca3af; }
+.meta-value { font-size:14px; font-weight:600; color:#1a1a2e; margin-top:2px; }
+.meta-value.green  { color:#059669; }
+.meta-value.amber  { color:#d97706; }
+
+/* ── Fortschrittsbalken im Banner ── */
+.banner-progress {
+  width:100%; margin-top:16px;
+  padding-top:16px; border-top:1px solid #f3f4f6;
+}
+.bp-label { display:flex; justify-content:space-between;
+            font-size:12px; color:#6b7280; margin-bottom:6px; }
+.bp-bar-wrap { background:#f3f4f6; border-radius:20px; height:8px; overflow:hidden; }
+.bp-bar-fill { height:100%; border-radius:20px; background:#4361ee;
+               transition: width 0.5s; }
+
+/* ── Lernbegleiter-Block ── */
+.lb-block {
+  background: white; border-radius: 16px; padding: 20px 24px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06); margin-bottom: 20px;
+}
+.lb-block-title {
+  font-size:11px; font-weight:600; text-transform:uppercase;
+  letter-spacing:0.5px; color:#9ca3af; margin-bottom:14px;
+}
+.lb-list { display:flex; gap:16px; flex-wrap:wrap; }
+.lb-card {
+  display:flex; align-items:center; gap:12px;
+  background:#f9fafb; border-radius:12px; padding:12px 16px;
+  border:1px solid #f3f4f6; flex:1; min-width:200px;
+}
+.lb-avatar {
+  width:40px; height:40px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-weight:700; font-size:15px; color:white; flex-shrink:0;
+}
+.lb-name { font-size:13px; font-weight:600; color:#1a1a2e; }
+.lb-role { font-size:11px; color:#9ca3af; margin-top:1px; }
+.lb-courses { font-size:11px; color:#6b7280; margin-top:3px; }
+
+/* ── KPI Strip ── */
+.kpi-strip {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 14px; margin-bottom: 20px;
+}
+.kpi-card {
+  background: white; border-radius: 14px; padding: 18px 20px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  display: flex; align-items: center; gap: 14px;
+}
+.kpi-icon {
+  width:44px; height:44px; border-radius:12px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:20px; flex-shrink:0;
+}
+.kpi-icon.blue   { background:#eff6ff; }
+.kpi-icon.green  { background:#ecfdf5; }
+.kpi-icon.amber  { background:#fffbeb; }
+.kpi-icon.red    { background:#fef2f2; }
+.kpi-value       { font-size:26px; font-weight:700; line-height:1.1; }
+.kpi-value.blue  { color:#4361ee; }
+.kpi-value.green { color:#059669; }
+.kpi-value.amber { color:#d97706; }
+.kpi-value.red   { color:#dc2626; }
+.kpi-label { font-size:11px; color:#6b7280; font-weight:500; margin-top:2px; }
+.kpi-sub   { font-size:10px; color:#9ca3af; margin-top:3px; }
+.kpi-sub.warn { color:#d97706; }
+.kpi-sub.good { color:#059669; }
+
+/* ── Card ── */
+.card {
+  background: white; border-radius: 16px; padding: 22px 24px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06); margin-bottom: 20px;
+}
+.card-header {
+  display:flex; justify-content:space-between; align-items:center;
+  margin-bottom:16px; gap:12px; flex-wrap:wrap;
+}
+.card-title {
+  font-size:12px; font-weight:600; text-transform:uppercase;
+  letter-spacing:0.5px; color:#6b7280;
+}
+
+/* ── Search ── */
+.search-wrap { position:relative; }
+.search-wrap input {
+  width:260px; padding:7px 12px 7px 32px;
+  border:1px solid #e5e7eb; border-radius:8px;
+  font-size:13px; color:#374151; outline:none;
+}
+.search-wrap input:focus { border-color:#4361ee; }
+.search-icon {
+  position:absolute; left:10px; top:50%; transform:translateY(-50%);
+  font-size:13px; color:#9ca3af; pointer-events:none;
+}
+
+/* ── Table ── */
+.data-table {
+  width:100%; border-collapse:separate; border-spacing:0; font-size:13px;
+}
+.data-table th {
+  font-size:11px; font-weight:600; text-transform:uppercase;
+  letter-spacing:0.4px; color:#9ca3af; padding:8px 14px;
+  text-align:left; border-bottom:2px solid #f3f4f6;
+  white-space:nowrap; cursor:pointer; user-select:none;
+}
+.data-table th:hover { color:#4361ee; }
+.data-table th .sa { margin-left:3px; opacity:0.4; }
+.data-table th.sorted .sa { opacity:1; color:#4361ee; }
+.data-table td {
+  padding:11px 14px; border-bottom:1px solid #f9fafb; vertical-align:middle;
+}
+.data-table tr:last-child td { border-bottom:none; }
+.data-table tbody tr { cursor:pointer; transition:background 0.1s; }
+.data-table tbody tr:hover td { background:#f8f9ff; }
+
+/* ── Learner name cell ── */
+.l-name { font-weight:600; color:#1a1a2e; font-size:13px; }
+.l-sub  { font-size:11px; color:#9ca3af; margin-top:1px; }
+
+/* ── Chips ── */
+.chip {
+  display:inline-block; padding:2px 9px; border-radius:20px;
+  font-size:11px; font-weight:600;
+}
+.chip.green  { background:#d1fae5; color:#065f46; }
+.chip.amber  { background:#fef3c7; color:#92400e; }
+.chip.blue   { background:#dbeafe; color:#1d4ed8; }
+.chip.gray   { background:#f3f4f6; color:#6b7280; }
+.chip.red    { background:#fee2e2; color:#991b1b; }
+.chip.purple { background:#ede9fe; color:#6d28d9; }
+
+/* ── Mini progress ── */
+.mini-prog { display:flex; align-items:center; gap:7px; }
+.mini-bar-wrap {
+  flex:1; min-width:60px; background:#f3f4f6;
+  border-radius:20px; height:6px; overflow:hidden;
+}
+.mini-bar-fill { height:100%; border-radius:20px; }
+.mini-pct { font-size:11px; font-weight:700; min-width:30px; text-align:right; }
+
+/* ── Probleme badge ── */
+.prob-badge {
+  display:inline-flex; align-items:center; gap:4px;
+  padding:2px 8px; border-radius:20px; font-size:11px; font-weight:600;
+}
+.prob-badge.none { background:#f3f4f6; color:#9ca3af; }
+.prob-badge.warn { background:#fef3c7; color:#92400e; }
+.prob-badge.crit { background:#fee2e2; color:#991b1b; }
+
+/* ── Pace chip ── */
+.pace-fast   { color:#059669; font-weight:700; font-size:12px; }
+.pace-normal { color:#6b7280; font-weight:700; font-size:12px; }
+.pace-slow   { color:#d97706; font-weight:700; font-size:12px; }
+.pace-vslow  { color:#dc2626; font-weight:700; font-size:12px; }
+
+/* ── Active dot ── */
+.act-dot { display:inline-flex; align-items:center; gap:4px;
+           font-size:12px; font-weight:600; color:#059669; }
+.act-dot::before {
+  content:''; display:inline-block; width:7px; height:7px;
+  border-radius:50%; background:#10b981;
+  box-shadow:0 0 0 2px rgba(16,185,129,0.25);
+}
+
+/* ── Detail link ── */
+.detail-link {
+  font-size:11px; color:#4361ee; font-weight:600;
+  background:none; border:none; cursor:pointer; padding:0;
+}
+.detail-link:hover { text-decoration:underline; }
+
+/* ── No results ── */
+.no-results { text-align:center; padding:36px; color:#9ca3af;
+              font-size:13px; display:none; }
+</style>
+</head>
+<body>
+
+<!-- ── Header ── -->
+<div class="header">
+  <div class="header-left">
+    <button class="back-btn" onclick="history.back()">← Gesamtübersicht</button>
+    <div>
+      <h1>Python für Einsteiger</h1>
+      <p>Programmierkurs · Weiterbildung · Kurs-ID PY-2026-04</p>
+    </div>
+  </div>
+  <div class="header-right">
+    <div style="display:flex;align-items:center;gap:8px;">
+      <div class="avatar">LB</div>
+      <div>
+        <div class="hdr-name">Lernbegleiter-Portal</div>
+        <div class="hdr-role">Kursdetail-Ansicht</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="page">
+
+  <!-- ── Basisdaten-Banner ── -->
+  <div class="course-banner">
+    <div style="flex:1;min-width:280px;">
+      <div class="banner-title">Python für Einsteiger</div>
+      <div class="banner-sub">Programmierkurs · Weiterbildung · Kohorte Mai 2026</div>
+      <div class="banner-chips">
+        <span class="chip green">🟢 Laufend</span>
+        <span class="chip blue">Programmierkurs</span>
+        <span class="chip gray">Kurs-ID: PY-2026-04</span>
+      </div>
+      <div class="banner-progress">
+        <div class="bp-label">
+          <span>Kursverlauf</span>
+          <span style="font-weight:600;color:#4361ee;">Woche 3 von 3 · 58% abgelaufen</span>
+        </div>
+        <div class="bp-bar-wrap">
+          <div class="bp-bar-fill" style="width:58%;"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="banner-meta">
+      <div class="meta-item">
+        <div class="meta-label">Startdatum</div>
+        <div class="meta-value">28.04.2026</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-label">Enddatum</div>
+        <div class="meta-value">16.05.2026</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-label">Dauer</div>
+        <div class="meta-value">3 Wochen</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-label">Kurskategorie</div>
+        <div class="meta-value">Programmierkurs</div>
+      </div>
+      <div class="meta-item" style="margin-top:14px;">
+        <div class="meta-label">Lernende</div>
+        <div class="meta-value">12</div>
+      </div>
+      <div class="meta-item" style="margin-top:14px;">
+        <div class="meta-label">Gerade aktiv</div>
+        <div class="meta-value green">8</div>
+      </div>
+      <div class="meta-item" style="margin-top:14px;">
+        <div class="meta-label">Module gesamt</div>
+        <div class="meta-value">12</div>
+      </div>
+      <div class="meta-item" style="margin-top:14px;">
+        <div class="meta-label">Verbleibende Tage</div>
+        <div class="meta-value amber">12</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Lernbegleiter ── -->
+  <div class="lb-block">
+    <div class="lb-block-title">Lernbegleiter</div>
+    <div class="lb-list">
+      <div class="lb-card">
+        <div class="lb-avatar" style="background:#6366f1;">SM</div>
+        <div>
+          <div class="lb-name">Sabine Müller</div>
+          <div class="lb-role">Hauptverantwortlich</div>
+          <div class="lb-courses">3 laufende Kurse · seit 2022</div>
+        </div>
+      </div>
+      <div class="lb-card">
+        <div class="lb-avatar" style="background:#0891b2;">RK</div>
+        <div>
+          <div class="lb-name">Robert Klein</div>
+          <div class="lb-role">Co-Lernbegleiter</div>
+          <div class="lb-courses">2 laufende Kurse · seit 2023</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── KPI Strip ── -->
+  <div class="kpi-strip">
+    <div class="kpi-card">
+      <div class="kpi-icon blue">📊</div>
+      <div>
+        <div class="kpi-value blue">58%</div>
+        <div class="kpi-label">Ø Kursfortschritt</div>
+        <div class="kpi-sub">Gruppe gesamt</div>
+      </div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-icon green">🎯</div>
+      <div>
+        <div class="kpi-value green">71%</div>
+        <div class="kpi-label">Ø Quiz-Score</div>
+        <div class="kpi-sub good">+4% vs. Vorwoche</div>
+      </div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-icon amber">⏱</div>
+      <div>
+        <div class="kpi-value amber">1.4×</div>
+        <div class="kpi-label">Ø Pace-Ratio</div>
+        <div class="kpi-sub warn">Gruppe leicht verlangsamt</div>
+      </div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-icon red">🚨</div>
+      <div>
+        <div class="kpi-value red">3</div>
+        <div class="kpi-label">Lernende mit Problemen</div>
+        <div class="kpi-sub warn">Handlungsbedarf</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Lernenden-Tabelle ── -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">Lernende im Kurs</div>
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="learner-search" placeholder="Name suchen …" oninput="filterLearners()">
+      </div>
+    </div>
+
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th onclick="sortL(0)">Name <span class="sa">↕</span></th>
+          <th onclick="sortL(1)">Status <span class="sa">↕</span></th>
+          <th onclick="sortL(2)">Letzter Login <span class="sa">↕</span></th>
+          <th onclick="sortL(3)">Fortschritt <span class="sa">↕</span></th>
+          <th onclick="sortL(4)">Ø Quiz-Score <span class="sa">↕</span></th>
+          <th onclick="sortL(5)">Pace-Ratio <span class="sa">↕</span></th>
+          <th onclick="sortL(6)">Probleme <span class="sa">↕</span></th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="learner-body"></tbody>
+    </table>
+    <div class="no-results" id="no-results">Keine Lernenden gefunden.</div>
+  </div>
+
+</div><!-- /page -->
+
+<script>
+// ── Lerndaten Beispieldaten ──
+const LEARNERS = [
+  { name:'Mehmet Yilmaz',    email:'m.yilmaz@kurs.de',    login:'06.05.2026', aktiv:true,  fortschritt:34, quiz:67, pace:1.6, probleme:3 },
+  { name:'Lena Fischer',     email:'l.fischer@kurs.de',   login:'06.05.2026', aktiv:true,  fortschritt:72, quiz:88, pace:0.9, probleme:0 },
+  { name:'Jonas Weber',      email:'j.weber@kurs.de',     login:'05.05.2026', aktiv:false, fortschritt:65, quiz:79, pace:1.1, probleme:0 },
+  { name:'Ayşe Kaya',        email:'a.kaya@kurs.de',      login:'06.05.2026', aktiv:true,  fortschritt:81, quiz:92, pace:0.7, probleme:0 },
+  { name:'Tobias Braun',     email:'t.braun@kurs.de',     login:'02.05.2026', aktiv:false, fortschritt:28, quiz:51, pace:1.9, probleme:2 },
+  { name:'Sarah Hoffmann',   email:'s.hoffmann@kurs.de',  login:'06.05.2026', aktiv:true,  fortschritt:58, quiz:74, pace:1.2, probleme:1 },
+  { name:'Kevin Schmidt',    email:'k.schmidt@kurs.de',   login:'29.04.2026', aktiv:false, fortschritt:12, quiz:44, pace:2.1, probleme:3 },
+  { name:'Mia Schulz',       email:'m.schulz@kurs.de',    login:'06.05.2026', aktiv:true,  fortschritt:77, quiz:85, pace:0.8, probleme:0 },
+  { name:'Felix Wagner',     email:'f.wagner@kurs.de',    login:'05.05.2026', aktiv:false, fortschritt:61, quiz:70, pace:1.3, probleme:0 },
+  { name:'Nina Becker',      email:'n.becker@kurs.de',    login:'06.05.2026', aktiv:true,  fortschritt:45, quiz:63, pace:1.5, probleme:1 },
+  { name:'David Zimmermann', email:'d.zimmer@kurs.de',    login:'06.05.2026', aktiv:true,  fortschritt:88, quiz:94, pace:0.6, probleme:0 },
+  { name:'Carina Krause',    email:'c.krause@kurs.de',    login:'03.05.2026', aktiv:false, fortschritt:53, quiz:68, pace:1.4, probleme:0 },
+];
+
+let lSort = { col:-1, asc:true };
+let lSearch = '';
+
+function paceClass(p) {
+  return p < 0.7 ? 'pace-fast' : p <= 1.1 ? 'pace-normal' : p <= 1.5 ? 'pace-slow' : 'pace-vslow';
+}
+function paceLabel(p) {
+  return p < 0.7 ? `↑ ${p}×` : p <= 1.1 ? `${p}×` : p <= 1.5 ? `▼ ${p}×` : `▼▼ ${p}×`;
+}
+function fpColor(v) {
+  return v >= 75 ? '#10b981' : v >= 40 ? '#f59e0b' : '#60a5fa';
+}
+function qColor(v) {
+  return v >= 80 ? '#059669' : v >= 60 ? '#d97706' : '#dc2626';
+}
+
+function renderLearners() {
+  const tbody = document.getElementById('learner-body');
+  tbody.innerHTML = '';
+
+  let rows = LEARNERS.filter(l => {
+    const q = lSearch.toLowerCase();
+    return !q || l.name.toLowerCase().includes(q) || l.email.toLowerCase().includes(q);
+  });
+
+  if (lSort.col >= 0) {
+    const keys = ['name','aktiv','login','fortschritt','quiz','pace','probleme'];
+    rows.sort((a,b) => {
+      let va = a[keys[lSort.col]], vb = b[keys[lSort.col]];
+      if (typeof va === 'string') { va = va.toLowerCase(); vb = vb.toLowerCase(); }
+      return lSort.asc ? (va > vb ? 1 : -1) : (va < vb ? 1 : -1);
+    });
+  }
+
+  document.getElementById('no-results').style.display = rows.length === 0 ? 'block' : 'none';
+
+  rows.forEach(l => {
+    const statusHtml = l.aktiv
+      ? `<span class="act-dot">Aktiv</span>`
+      : `<span style="font-size:12px;color:#9ca3af;">Inaktiv</span>`;
+
+    const fpCol = fpColor(l.fortschritt);
+    const qCol  = qColor(l.quiz);
+
+    const probHtml = l.probleme === 0
+      ? `<span class="prob-badge none">—</span>`
+      : l.probleme >= 3
+      ? `<span class="prob-badge crit">⚠ ${l.probleme}</span>`
+      : `<span class="prob-badge warn">⚠ ${l.probleme}</span>`;
+
+    // Initialen für Avatar
+    const initials = l.name.split(' ').map(n => n[0]).join('').slice(0,2);
+    const avatarColors = ['#6366f1','#0891b2','#059669','#d97706','#dc2626','#7c3aed','#0f766e'];
+    const avatarCol = avatarColors[l.name.charCodeAt(0) % avatarColors.length];
+
+    const tr = document.createElement('tr');
+    tr.onclick = () => window.location.href = 'lerndaten-lernender.html';
+    tr.innerHTML = `
+      <td>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="width:32px;height:32px;border-radius:50%;background:${avatarCol};
+               display:flex;align-items:center;justify-content:center;
+               font-size:12px;font-weight:700;color:white;flex-shrink:0;">${initials}</div>
+          <div>
+            <div class="l-name">${l.name}</div>
+            <div class="l-sub">${l.email}</div>
+          </div>
+        </div>
+      </td>
+      <td>${statusHtml}</td>
+      <td style="font-size:12px;color:#6b7280;">${l.login}</td>
+      <td style="min-width:120px;">
+        <div class="mini-prog">
+          <div class="mini-bar-wrap">
+            <div class="mini-bar-fill" style="width:${l.fortschritt}%;background:${fpCol};"></div>
+          </div>
+          <span class="mini-pct" style="color:${fpCol};">${l.fortschritt}%</span>
+        </div>
+      </td>
+      <td>
+        <div class="mini-prog">
+          <div class="mini-bar-wrap">
+            <div class="mini-bar-fill" style="width:${l.quiz}%;background:${qCol};"></div>
+          </div>
+          <span class="mini-pct" style="color:${qCol};">${l.quiz}%</span>
+        </div>
+      </td>
+      <td><span class="${paceClass(l.pace)}">${paceLabel(l.pace)}</span></td>
+      <td>${probHtml}</td>
+      <td><button class="detail-link" onclick="event.stopPropagation();window.location.href='lerndaten-lernender.html'">Details →</button></td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function filterLearners() {
+  lSearch = document.getElementById('learner-search').value;
+  renderLearners();
+}
+
+function sortL(col) {
+  if (lSort.col === col) { lSort.asc = !lSort.asc; }
+  else { lSort = { col, asc: true }; }
+  document.querySelectorAll('.data-table th').forEach((th,i) => {
+    th.classList.toggle('sorted', i === col);
+    const sa = th.querySelector('.sa');
+    if (sa) sa.textContent = i === col ? (lSort.asc ? '↑' : '↓') : '↕';
+  });
+  renderLearners();
+}
+
+renderLearners();
+</script>
+</body>
+</html>

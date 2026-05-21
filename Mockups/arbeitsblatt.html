@@ -1,0 +1,1036 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arbeitsblatt – Datenbankauswahl im Unternehmenskontext</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+:root {
+  --indigo:    #4361ee;
+  --indigo-lt: #eef2ff;
+  --indigo-md: #c7d2fe;
+  --violet:    #7c3aed;
+  --green:     #059669;
+  --green-lt:  #d1fae5;
+  --green-md:  #a7f3d0;
+  --amber:     #d97706;
+  --amber-lt:  #fef3c7;
+  --amber-md:  #fde68a;
+  --red:       #dc2626;
+  --red-lt:    #fee2e2;
+  --navy:      #1a1a2e;
+  --gray-50:   #f8f9fc;
+  --gray-100:  #f3f4f6;
+  --gray-200:  #e5e7eb;
+  --gray-300:  #d1d5db;
+  --gray-400:  #9ca3af;
+  --gray-600:  #4b5563;
+  --gray-700:  #374151;
+  --gray-800:  #1f2937;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--gray-50);
+  color: var(--navy);
+  font-size: 14px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+/* ══════════════════ TOP NAV (wie course-redesign) ══════════════════ */
+.top-nav {
+  background: var(--navy);
+  padding: 0 24px;
+  height: 54px;
+  display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; z-index: 50;
+}
+.nav-left  { display: flex; align-items: center; gap: 14px; }
+.nav-back {
+  display: flex; align-items: center; gap: 6px;
+  color: rgba(255,255,255,0.6); text-decoration: none;
+  font-size: 13px; font-weight: 500;
+  padding: 5px 12px; border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.15);
+}
+.nav-back:hover { background: rgba(255,255,255,0.08); color: white; }
+.nav-divider { width: 1px; height: 26px; background: rgba(255,255,255,0.12); }
+.nav-title  { font-size: 14px; font-weight: 600; color: white; }
+.nav-sub    { font-size: 11px; color: rgba(255,255,255,0.4); }
+.nav-right  { display: flex; align-items: center; gap: 10px; }
+
+/* Progress pill in nav */
+.nav-progress {
+  display: flex; align-items: center; gap: 8px;
+  padding: 5px 12px; border-radius: 99px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.12);
+}
+.np-label { font-size: 12px; color: rgba(255,255,255,0.5); }
+.np-count { font-size: 12px; font-weight: 700; color: white; }
+.np-bar-wrap { width: 64px; height: 4px; background: rgba(255,255,255,0.12); border-radius: 99px; overflow: hidden; }
+.np-bar { height: 100%; background: var(--amber); border-radius: 99px; transition: width 0.4s; }
+
+/* ══════════════════ MAIN LAYOUT ══════════════════ */
+.main {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 36px 24px 80px;
+}
+
+/* ══════════════════ ARBEITSBLATT HEADER ══════════════════ */
+.wb-header {
+  background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+  border: 2px solid var(--amber-md);
+  border-radius: 16px;
+  padding: 24px 28px;
+  margin-bottom: 32px;
+}
+.wb-chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--amber); color: white;
+  font-size: 11px; font-weight: 700; letter-spacing: 0.5px;
+  padding: 3px 10px; border-radius: 99px;
+  margin-bottom: 10px;
+}
+.wb-title { font-size: 20px; font-weight: 800; color: var(--gray-800); margin-bottom: 6px; }
+.wb-meta  {
+  display: flex; gap: 16px; flex-wrap: wrap;
+  font-size: 12px; color: var(--gray-600); margin-bottom: 14px;
+}
+.wb-meta span { display: flex; align-items: center; gap: 4px; }
+.wb-scenario {
+  background: white;
+  border-left: 4px solid var(--amber);
+  border-radius: 0 10px 10px 0;
+  padding: 14px 16px;
+  font-size: 13px; color: var(--gray-700); line-height: 1.7;
+}
+.wb-scenario-label {
+  font-size: 11px; font-weight: 700; color: var(--amber);
+  text-transform: uppercase; letter-spacing: 1px;
+  margin-bottom: 6px;
+}
+
+/* ══════════════════ STEP INDICATOR ══════════════════ */
+.step-indicator {
+  display: flex; align-items: center; gap: 0;
+  margin-bottom: 28px;
+}
+.step-dot {
+  width: 32px; height: 32px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 700; flex-shrink: 0;
+  border: 2px solid var(--gray-300);
+  background: white; color: var(--gray-400);
+  transition: all 0.3s;
+  position: relative; z-index: 1;
+}
+.step-dot.done    { background: var(--green); border-color: var(--green); color: white; }
+.step-dot.current { background: var(--amber); border-color: var(--amber); color: white; box-shadow: 0 0 0 4px var(--amber-lt); }
+.step-dot.bonus   { background: white; border-color: var(--violet); color: var(--violet); }
+.step-dot.bonus.done   { background: var(--violet); color: white; }
+.step-dot.bonus.current { box-shadow: 0 0 0 4px #f3e8ff; }
+.step-line {
+  flex: 1; height: 2px; background: var(--gray-200); transition: background 0.3s;
+}
+.step-line.done { background: var(--green); }
+.step-label-row {
+  display: flex; margin-top: 6px; margin-bottom: 24px;
+}
+.step-label {
+  font-size: 10px; color: var(--gray-400); font-weight: 600;
+  text-align: center; flex: 1;
+  transition: color 0.3s;
+}
+.step-label:first-child { text-align: left; }
+.step-label:last-child  { text-align: right; }
+.step-label.current { color: var(--amber); }
+.step-label.done    { color: var(--green); }
+.step-label.bonus   { color: var(--violet); }
+
+/* ══════════════════ TASK CARD ══════════════════ */
+.task-card {
+  background: white;
+  border: 1.5px solid var(--gray-200);
+  border-radius: 14px;
+  overflow: hidden;
+  margin-bottom: 20px;
+  transition: box-shadow 0.2s;
+  display: none; /* hidden by default, shown by JS */
+}
+.task-card.visible { display: block; }
+.task-card.active  { border-color: var(--amber); box-shadow: 0 0 0 3px var(--amber-lt); }
+.task-card.bonus-active { border-color: var(--violet); box-shadow: 0 0 0 3px #f3e8ff; }
+.task-card.completed { border-color: var(--green-md); }
+
+.task-head {
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--gray-100);
+  display: flex; align-items: center; gap: 12px;
+}
+.task-num {
+  width: 28px; height: 28px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 800; flex-shrink: 0;
+  background: var(--amber-lt); color: var(--amber);
+  border: 2px solid var(--amber-md);
+}
+.task-num.bonus-num { background: #f3e8ff; color: var(--violet); border-color: #ddd6fe; }
+.task-num.done-num  { background: var(--green-lt); color: var(--green); border-color: var(--green-md); }
+.task-num-label {
+  font-size: 10px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 1px; color: var(--gray-400);
+}
+.task-title { font-size: 14px; font-weight: 700; color: var(--gray-800); }
+
+.task-body { padding: 18px 20px; }
+
+.task-question {
+  font-size: 13px; color: var(--gray-700); line-height: 1.7;
+  margin-bottom: 14px;
+  padding: 12px 14px;
+  background: var(--gray-50);
+  border-radius: 8px;
+  border-left: 3px solid var(--amber);
+}
+.task-card.bonus-active .task-question { border-left-color: var(--violet); }
+.task-card.completed .task-question { border-left-color: var(--green); }
+
+.task-textarea {
+  width: 100%; border: 1.5px solid var(--gray-200);
+  border-radius: 10px; padding: 12px 14px;
+  font-size: 13px; font-family: inherit;
+  resize: vertical; min-height: 90px;
+  color: var(--gray-800); outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  line-height: 1.7;
+}
+.task-textarea:focus { border-color: var(--amber); box-shadow: 0 0 0 3px var(--amber-lt); }
+.task-card.bonus-active .task-textarea:focus { border-color: var(--violet); box-shadow: 0 0 0 3px #f3e8ff; }
+.task-textarea:disabled { background: var(--gray-50); color: var(--gray-600); cursor: default; }
+.char-count { text-align: right; font-size: 11px; color: var(--gray-400); margin-top: 4px; }
+
+.task-foot {
+  padding: 12px 20px;
+  border-top: 1px solid var(--gray-100);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.task-foot-left  { font-size: 12px; color: var(--gray-400); }
+.task-foot-right { display: flex; gap: 8px; }
+
+/* ══════════════════ FEEDBACK BOX ══════════════════ */
+.feedback-box {
+  margin-top: 14px;
+  border-radius: 10px; overflow: hidden;
+  border: 1.5px solid;
+  display: none;
+}
+.feedback-box.visible { display: block; animation: slideDown 0.25s ease; }
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.feedback-box.good { border-color: var(--green-md); }
+.feedback-box.ok   { border-color: var(--amber-md); }
+.feedback-box.miss { border-color: var(--gray-300); }
+
+.fb-head {
+  padding: 10px 14px;
+  display: flex; align-items: center; gap: 8px;
+  font-size: 12px; font-weight: 700;
+}
+.feedback-box.good .fb-head { background: var(--green-lt); color: #065f46; }
+.feedback-box.ok   .fb-head { background: var(--amber-lt); color: #92400e; }
+.feedback-box.miss .fb-head { background: var(--gray-100); color: var(--gray-600); }
+
+.fb-body { padding: 12px 14px; font-size: 12px; line-height: 1.7; }
+.feedback-box.good .fb-body { background: #f0fdf4; color: #14532d; }
+.feedback-box.ok   .fb-body { background: #fffbeb; color: #78350f; }
+.feedback-box.miss .fb-body { background: white;   color: var(--gray-700); }
+
+.sample-label {
+  font-size: 11px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.8px; margin-bottom: 6px; opacity: 0.7;
+}
+.sample-answer {
+  background: rgba(0,0,0,0.04); border-radius: 7px;
+  padding: 10px 12px; font-size: 12px; line-height: 1.7;
+  border-left: 3px solid currentColor; opacity: 0.9;
+}
+
+/* ══════════════════ BUTTONS ══════════════════ */
+.btn {
+  padding: 9px 20px; border-radius: 9px;
+  font-size: 13px; font-weight: 600; font-family: inherit;
+  border: none; cursor: pointer; transition: all 0.15s;
+  display: inline-flex; align-items: center; gap: 6px;
+}
+.btn-primary { background: var(--amber); color: white; }
+.btn-primary:hover { background: #b45309; transform: translateY(-1px); box-shadow: 0 4px 14px rgba(217,119,6,0.35); }
+.btn-primary:disabled { opacity: 0.4; cursor: default; transform: none; box-shadow: none; }
+.btn-secondary { background: white; color: var(--gray-600); border: 1.5px solid var(--gray-200); }
+.btn-secondary:hover { border-color: var(--gray-400); color: var(--gray-800); }
+.btn-green  { background: var(--green); color: white; }
+.btn-green:hover  { background: #047857; }
+.btn-violet { background: var(--violet); color: white; }
+.btn-violet:hover { background: #6d28d9; }
+.btn-ghost  { background: transparent; color: var(--gray-400); border: 1.5px dashed var(--gray-300); }
+.btn-ghost:hover { color: var(--gray-600); border-color: var(--gray-400); }
+
+/* ══════════════════ BONUS GATE ══════════════════ */
+.bonus-gate {
+  background: linear-gradient(135deg, #1a1a2e 0%, #2d1f4e 100%);
+  border-radius: 16px; padding: 32px 28px;
+  text-align: center; margin: 28px 0;
+  position: relative; overflow: hidden;
+}
+.bonus-gate::before {
+  content: '';
+  position: absolute; top: -40%; left: -10%;
+  width: 120%; height: 100%;
+  background: radial-gradient(ellipse at 50% 60%, rgba(124,58,237,0.2) 0%, transparent 65%);
+  pointer-events: none;
+}
+.bonus-gate-icon { font-size: 42px; margin-bottom: 12px; }
+.bonus-gate-title { font-size: 18px; font-weight: 800; color: white; margin-bottom: 6px; }
+.bonus-gate-sub   { font-size: 13px; color: rgba(255,255,255,0.5); margin-bottom: 24px; line-height: 1.6; }
+.bonus-gate-btns  { display: flex; gap: 12px; justify-content: center; }
+.btn-bonus-yes { background: var(--violet); color: white; padding: 11px 28px; border-radius: 10px;
+  font-size: 14px; font-weight: 700; border: none; cursor: pointer; font-family: inherit;
+  box-shadow: 0 4px 20px rgba(124,58,237,0.4); transition: all 0.2s;
+  animation: pulsePurple 2.5s ease-in-out infinite;
+}
+.btn-bonus-yes:hover { background: #6d28d9; transform: translateY(-1px); box-shadow: 0 6px 26px rgba(124,58,237,0.5); animation: none; }
+@keyframes pulsePurple {
+  0%,100% { box-shadow: 0 4px 20px rgba(124,58,237,0.4); }
+  50%      { box-shadow: 0 4px 32px rgba(124,58,237,0.65); }
+}
+.btn-bonus-no { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.5);
+  padding: 11px 22px; border-radius: 10px; font-size: 13px; font-weight: 600;
+  border: 1px solid rgba(255,255,255,0.15); cursor: pointer; font-family: inherit;
+  transition: all 0.15s;
+}
+.btn-bonus-no:hover { background: rgba(255,255,255,0.12); color: rgba(255,255,255,0.7); }
+
+/* ══════════════════ SUMMARY VIEW ══════════════════ */
+.summary { display: none; }
+.summary.visible { display: block; animation: fadeIn 0.4s ease; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+.summary-header {
+  background: linear-gradient(135deg, var(--green-lt) 0%, #ecfdf5 100%);
+  border: 2px solid var(--green-md);
+  border-radius: 16px; padding: 24px 28px; margin-bottom: 28px;
+  text-align: center;
+}
+.summary-icon  { font-size: 40px; margin-bottom: 10px; }
+.summary-title { font-size: 20px; font-weight: 800; color: var(--gray-800); margin-bottom: 4px; }
+.summary-sub   { font-size: 13px; color: var(--gray-600); }
+.summary-stats {
+  display: flex; justify-content: center; gap: 24px; margin-top: 16px;
+}
+.stat-item { text-align: center; }
+.stat-val   { font-size: 24px; font-weight: 800; }
+.stat-label { font-size: 11px; color: var(--gray-400); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+.stat-item.green .stat-val { color: var(--green); }
+.stat-item.amber .stat-val { color: var(--amber); }
+.stat-item.violet .stat-val { color: var(--violet); }
+
+/* Summary task item */
+.summary-task {
+  background: white; border-radius: 14px;
+  border: 1.5px solid var(--gray-200);
+  margin-bottom: 16px; overflow: hidden;
+}
+.summary-task.bonus-task { border-color: #ddd6fe; }
+.st-head {
+  padding: 12px 18px;
+  background: var(--gray-50);
+  border-bottom: 1px solid var(--gray-100);
+  display: flex; align-items: flex-start; gap: 10px;
+}
+.st-num {
+  width: 24px; height: 24px; border-radius: 50%; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 800;
+  background: var(--amber-lt); color: var(--amber); border: 1.5px solid var(--amber-md);
+}
+.st-num.bonus { background: #f3e8ff; color: var(--violet); border-color: #ddd6fe; }
+.st-question  { font-size: 13px; font-weight: 600; color: var(--gray-800); flex: 1; }
+.st-body { padding: 14px 18px; display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.st-body.full { grid-template-columns: 1fr; }
+.answer-block, .sample-block {
+  border-radius: 9px; padding: 12px 14px; font-size: 12px; line-height: 1.7;
+}
+.answer-block {
+  background: #f9fafb; border: 1.5px solid var(--gray-200);
+}
+.answer-block-label { font-size: 10px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 1px; color: var(--gray-400); margin-bottom: 6px; }
+.answer-block-text  { color: var(--gray-700); }
+.sample-block {
+  background: var(--green-lt); border: 1.5px solid var(--green-md);
+}
+.sample-block-label { font-size: 10px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 1px; color: var(--green); margin-bottom: 6px; }
+.sample-block-text  { color: #065f46; }
+.st-feedback {
+  padding: 10px 18px; border-top: 1px solid var(--gray-100);
+  font-size: 12px; display: flex; align-items: flex-start; gap: 8px;
+}
+.st-feedback.good { background: #f0fdf4; color: #065f46; }
+.st-feedback.ok   { background: #fffbeb; color: #78350f; }
+.st-feedback.miss { background: var(--gray-50); color: var(--gray-600); }
+
+/* ══════════════════ TRANSITION ══════════════════ */
+.section-transition { display: none; }
+.section-transition.visible { display: block; }
+</style>
+</head>
+<body>
+
+<!-- ── TOP NAV ── -->
+<nav class="top-nav">
+  <div class="nav-left">
+    <a href="#" class="nav-back">← Zurück</a>
+    <div class="nav-divider"></div>
+    <div>
+      <div class="nav-title">Modul 3 · UK 2.4</div>
+      <div class="nav-sub">Datenbanksysteme im Vergleich</div>
+    </div>
+  </div>
+  <div class="nav-right">
+    <div class="nav-progress">
+      <span class="np-label">Aufgabe</span>
+      <span class="np-count" id="nav-count">1 / 3</span>
+      <div class="np-bar-wrap">
+        <div class="np-bar" id="nav-bar" style="width:0%"></div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- ── MAIN ── -->
+<main class="main">
+
+  <!-- ARBEITSBLATT HEADER -->
+  <div class="wb-header">
+    <div class="wb-chip">📋 Arbeitsblatt</div>
+    <div class="wb-title">Datenbankauswahl im Unternehmenskontext</div>
+    <div class="wb-meta">
+      <span>📚 Modul 3 · Unterkapitel 2.4</span>
+      <span>⏱ ca. 15 Min.</span>
+      <span>✏️ 3 Aufgaben + 2 Zusatzaufgaben</span>
+    </div>
+    <div class="wb-scenario">
+      <div class="wb-scenario-label">Szenario</div>
+      Du bist Datenbankarchitekt bei einem mittelständischen Handelsunternehmen.
+      Dein Team muss entscheiden, ob für das neue Berichtssystem ein OLTP- oder
+      OLAP-Datenbanksystem eingesetzt wird. Beide Optionen werden intern diskutiert.
+      Deine Aufgabe ist es, die Entscheidung fundiert zu begründen.
+    </div>
+  </div>
+
+  <!-- STEP INDICATOR -->
+  <div id="step-indicator" class="step-indicator">
+    <div class="step-dot current" id="sd-1">1</div>
+    <div class="step-line" id="sl-1"></div>
+    <div class="step-dot" id="sd-2">2</div>
+    <div class="step-line" id="sl-2"></div>
+    <div class="step-dot" id="sd-3">3</div>
+    <div class="step-line" id="sl-3" style="background:var(--gray-200)"></div>
+    <div class="step-dot bonus" id="sd-b1">Z1</div>
+    <div class="step-line" id="sl-b1"></div>
+    <div class="step-dot bonus" id="sd-b2">Z2</div>
+  </div>
+  <div id="step-labels" class="step-label-row">
+    <span class="step-label current" id="sl-lbl-1">Anforderungen</span>
+    <span class="step-label" id="sl-lbl-2">Kompromisse</span>
+    <span class="step-label" id="sl-lbl-3">Empfehlung</span>
+    <span class="step-label bonus" id="sl-lbl-b1">⭐ Praxisbeispiel</span>
+    <span class="step-label bonus" id="sl-lbl-b2">⭐ Hybrid</span>
+  </div>
+
+  <!-- ══════════════ AUFGABE 1 ══════════════ -->
+  <div class="task-card visible active" id="task-1">
+    <div class="task-head">
+      <div class="task-num" id="tnum-1">1</div>
+      <div>
+        <div class="task-num-label">Aufgabe 1 von 3</div>
+        <div class="task-title">Anforderungsanalyse</div>
+      </div>
+    </div>
+    <div class="task-body">
+      <div class="task-question">
+        Analysiere das Szenario: Welche Anforderungen sprächen für ein <strong>OLTP</strong>-System,
+        welche für ein <strong>OLAP</strong>-System? Nenne jeweils mindestens zwei Argumente
+        für jede Seite und begründe sie kurz.
+      </div>
+      <textarea class="task-textarea" id="ans-1" oninput="updateCount(1)"
+        placeholder="Deine Antwort…
+
+Für OLTP spricht:
+- …
+
+Für OLAP spricht:
+- …"></textarea>
+      <div class="char-count"><span id="cc-1">0</span> Zeichen</div>
+      <div class="feedback-box" id="fb-1"></div>
+    </div>
+    <div class="task-foot">
+      <div class="task-foot-left" id="foot-hint-1">Tipp: Denke an Echtzeit-Transaktionen vs. Auswertungen.</div>
+      <div class="task-foot-right">
+        <button class="btn btn-primary" id="btn-submit-1" onclick="submitTask(1)" disabled>
+          Einreichen →
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════ AUFGABE 2 ══════════════ -->
+  <div class="task-card" id="task-2">
+    <div class="task-head">
+      <div class="task-num" id="tnum-2">2</div>
+      <div>
+        <div class="task-num-label">Aufgabe 2 von 3</div>
+        <div class="task-title">Kompromisse und Risiken</div>
+      </div>
+    </div>
+    <div class="task-body">
+      <div class="task-question">
+        Welche Kompromisse müsstest du bei deiner Entscheidung eingehen?
+        Beschreibe konkret, was du bei der Wahl eines <strong>OLAP</strong>-Systems für das
+        Berichtssystem aufgeben würdest und warum das dennoch sinnvoll sein kann.
+      </div>
+      <textarea class="task-textarea" id="ans-2" oninput="updateCount(2)"
+        placeholder="Deine Antwort…"></textarea>
+      <div class="char-count"><span id="cc-2">0</span> Zeichen</div>
+      <div class="feedback-box" id="fb-2"></div>
+    </div>
+    <div class="task-foot">
+      <div class="task-foot-left" id="foot-hint-2">Denke an Schreibgeschwindigkeit, Kosten, Komplexität.</div>
+      <div class="task-foot-right">
+        <button class="btn btn-primary" id="btn-submit-2" onclick="submitTask(2)" disabled>
+          Einreichen →
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════ AUFGABE 3 ══════════════ -->
+  <div class="task-card" id="task-3">
+    <div class="task-head">
+      <div class="task-num" id="tnum-3">3</div>
+      <div>
+        <div class="task-num-label">Aufgabe 3 von 3</div>
+        <div class="task-title">Abschlussempfehlung</div>
+      </div>
+    </div>
+    <div class="task-body">
+      <div class="task-question">
+        Formuliere eine klare Empfehlung für dein Team: Welches System empfiehlst du
+        für das Berichtssystem und warum? Berücksichtige dabei die Anforderungen
+        aus Aufgabe 1 und die Kompromisse aus Aufgabe 2.
+      </div>
+      <textarea class="task-textarea" id="ans-3" oninput="updateCount(3)"
+        placeholder="Meine Empfehlung lautet…"></textarea>
+      <div class="char-count"><span id="cc-3">0</span> Zeichen</div>
+      <div class="feedback-box" id="fb-3"></div>
+    </div>
+    <div class="task-foot">
+      <div class="task-foot-left" id="foot-hint-3">Nimm klar Stellung – eine begründete Position ist besser als ein „es kommt drauf an".</div>
+      <div class="task-foot-right">
+        <button class="btn btn-primary" id="btn-submit-3" onclick="submitTask(3)" disabled>
+          Abschließen →
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════ BONUS GATE ══════════════ -->
+  <div class="bonus-gate section-transition" id="bonus-gate">
+    <div class="bonus-gate-icon">⭐</div>
+    <div class="bonus-gate-title">Sehr gut! Alle Aufgaben abgeschlossen.</div>
+    <div class="bonus-gate-sub">
+      Es gibt noch <strong style="color:white">2 Zusatzaufgaben</strong>, die dein Verständnis
+      vertiefen.<br>Sie sind freiwillig – aber du lernst dabei deutlich mehr.
+    </div>
+    <div class="bonus-gate-btns">
+      <button class="btn-bonus-yes" onclick="startBonus()">⭐ Ja, Zusatzaufgaben lösen</button>
+      <button class="btn-bonus-no"  onclick="skipBonus()">Nein, direkt zur Auswertung</button>
+    </div>
+  </div>
+
+  <!-- ══════════════ ZUSATZAUFGABE 1 ══════════════ -->
+  <div class="task-card" id="task-b1">
+    <div class="task-head">
+      <div class="task-num bonus-num" id="tnum-b1">Z1</div>
+      <div>
+        <div class="task-num-label" style="color:var(--violet)">⭐ Zusatzaufgabe 1 von 2</div>
+        <div class="task-title">Praxisrecherche</div>
+      </div>
+    </div>
+    <div class="task-body">
+      <div class="task-question" style="border-left-color:var(--violet)">
+        Recherchiere ein reales Unternehmen, das beide Datenbanktypen parallel einsetzt
+        (z. B. Amazon, SAP, Zalando). Beschreibe kurz, wie OLTP und OLAP dort
+        zusammenarbeiten und welchen Nutzen das bringt.
+      </div>
+      <textarea class="task-textarea bonus-ta" id="ans-b1" oninput="updateCount('b1')"
+        placeholder="Unternehmen: …
+
+Wie sie OLTP einsetzen: …
+
+Wie sie OLAP einsetzen: …
+
+Zusammenspiel: …"></textarea>
+      <div class="char-count"><span id="cc-b1">0</span> Zeichen</div>
+      <div class="feedback-box" id="fb-b1"></div>
+    </div>
+    <div class="task-foot">
+      <div class="task-foot-left" style="color:var(--violet)">⭐ Zusatzaufgabe</div>
+      <div class="task-foot-right">
+        <button class="btn btn-violet" id="btn-submit-b1" onclick="submitTask('b1')" disabled>
+          Einreichen →
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════ ZUSATZAUFGABE 2 ══════════════ -->
+  <div class="task-card" id="task-b2">
+    <div class="task-head">
+      <div class="task-num bonus-num" id="tnum-b2">Z2</div>
+      <div>
+        <div class="task-num-label" style="color:var(--violet)">⭐ Zusatzaufgabe 2 von 2</div>
+        <div class="task-title">Hybride Architektur</div>
+      </div>
+    </div>
+    <div class="task-body">
+      <div class="task-question" style="border-left-color:var(--violet)">
+        Skizziere in eigenen Worten, wie eine <strong>hybride Datenbankarchitektur</strong>
+        (HTAP – Hybrid Transactional/Analytical Processing) das Problem lösen könnte,
+        beide Anforderungen gleichzeitig zu erfüllen. Welche Vor- und Nachteile siehst du?
+      </div>
+      <textarea class="task-textarea bonus-ta" id="ans-b2" oninput="updateCount('b2')"
+        placeholder="Idee einer hybriden Architektur: …
+
+Vorteile: …
+
+Nachteile: …"></textarea>
+      <div class="char-count"><span id="cc-b2">0</span> Zeichen</div>
+      <div class="feedback-box" id="fb-b2"></div>
+    </div>
+    <div class="task-foot">
+      <div class="task-foot-left" style="color:var(--violet)">⭐ Zusatzaufgabe</div>
+      <div class="task-foot-right">
+        <button class="btn btn-violet" id="btn-submit-b2" onclick="submitTask('b2')" disabled>
+          Zur Auswertung →
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════ ZUSAMMENFASSUNG ══════════════ -->
+  <div class="summary" id="summary">
+
+    <div class="summary-header">
+      <div class="summary-icon">🎉</div>
+      <div class="summary-title">Arbeitsblatt abgeschlossen!</div>
+      <div class="summary-sub">Hier siehst du alle deine Antworten mit Musterlösungen und Feedback.</div>
+      <div class="summary-stats">
+        <div class="stat-item green">
+          <div class="stat-val" id="stat-good">–</div>
+          <div class="stat-label">Sehr gut</div>
+        </div>
+        <div class="stat-item amber">
+          <div class="stat-val" id="stat-ok">–</div>
+          <div class="stat-label">Ansatzweise</div>
+        </div>
+        <div class="stat-item violet">
+          <div class="stat-val" id="stat-bonus">–</div>
+          <div class="stat-label">Zusatz</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Summary items injected by JS -->
+    <div id="summary-items"></div>
+
+    <!-- CTA -->
+    <div style="text-align:center;margin-top:28px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+      <button class="btn btn-secondary" onclick="window.print()">🖨 Drucken / Speichern</button>
+      <button class="btn btn-green" onclick="alert('Weiter zum nächsten Unterkapitel!')">Weiter → UK 2.5</button>
+    </div>
+
+  </div>
+
+</main>
+
+<script>
+// ══════════════════════════════════════════════
+//  DATA
+// ══════════════════════════════════════════════
+const TASKS = {
+  1: {
+    sample: `Für OLTP spricht:
+• Echtzeitverarbeitung von Bestellungen und Lagerbewegungen
+• ACID-Transaktionen sichern Datenkonsistenz bei gleichzeitigen Schreibzugriffen
+• Normalisiertes Schema reduziert Datenduplikation
+
+Für OLAP spricht:
+• Berichtssysteme benötigen komplexe Aggregationen über große Zeiträume
+• Historische Datenanalyse und KPI-Auswertungen sind OLAP-typisch
+• Denormalisiertes Schema beschleunigt Leseabfragen`,
+    feedback: {
+      good: `Sehr gut! Du hast beide Perspektiven klar herausgearbeitet. Besonders wichtig ist der Punkt mit den ACID-Transaktionen für OLTP – genau das unterscheidet die Systeme grundlegend.`,
+      ok: `Guter Ansatz! Du hast die wichtigsten Aspekte erkannt. Vertiefe noch, warum Berichtssysteme typischerweise auf historischen Daten arbeiten und warum das OLAP begünstigt.`,
+      miss: `Schaue nochmals auf das Szenario: Ein Handelsunternehmen benötigt sowohl laufende Transaktionen (OLTP) als auch Auswertungen für Entscheidungen (OLAP). Die Musterlösung zeigt, welche Argumente erwartet wurden.`
+    }
+  },
+  2: {
+    sample: `Bei der Wahl von OLAP für das Berichtssystem würde man folgende Kompromisse eingehen:
+• Geringere Schreibgeschwindigkeit – OLAP ist nicht für häufige Einzelschreibzugriffe optimiert
+• Höherer Implementierungsaufwand – ETL-Prozesse müssen Daten aus dem OLTP-System übertragen
+• Datenverzögerung – OLAP-Daten sind in der Regel nicht in Echtzeit, sondern stündlich oder täglich aktuell
+
+Dennoch sinnvoll, weil:
+• Das Berichtssystem primär Leseabfragen durchführt
+• Komplexe Aggregationen in OLTP-Systemen den Produktivbetrieb belasten würden`,
+    feedback: {
+      good: `Ausgezeichnet! Die Erwähnung der Datenverzögerung (Latenz) ist ein zentraler Kompromiss, der oft übersehen wird. Deine Begründung zeigt ein reifes Systemverständnis.`,
+      ok: `Du hast wichtige Kompromisse erkannt. Ergänze noch den Aspekt der Datenverzögerung: OLAP-Daten sind selten in Echtzeit aktuell – das ist für ein Berichtssystem aber oft akzeptabel.`,
+      miss: `Der Kernkompromiss bei OLAP ist die fehlende Echtzeit-Schreibfähigkeit und der Aufwand für ETL-Prozesse. Die Musterlösung zeigt, welche Aspekte hier erwartet werden.`
+    }
+  },
+  3: {
+    sample: `Empfehlung: OLAP-System für das Berichtssystem.
+
+Begründung:
+Das Berichtssystem dient der Analyse und Entscheidungsunterstützung, nicht der Transaktionsverarbeitung. Da komplexe Abfragen über große Datenmengen im Vordergrund stehen, ist OLAP die richtige Wahl.
+
+Die operativen Transaktionen verbleiben im bestehenden OLTP-System. Ein ETL-Prozess überträgt die Daten nächtlich ins OLAP-Warehouse. Diese Architektur schützt das Produktionssystem vor Analyseabfragen und ermöglicht optimierte Reports.`,
+    feedback: {
+      good: `Klare, gut begründete Empfehlung! Du hast verstanden, dass beide Systeme nicht im Wettbewerb stehen, sondern sich ergänzen. Die Trennung von OLTP-Produktion und OLAP-Analyse ist die industriestandard Lösung.`,
+      ok: `Du hast eine klare Stellung bezogen – gut! Ergänze noch, dass das OLTP-System für laufende Transaktionen weiter genutzt wird und OLAP nur für Berichte zuständig ist.`,
+      miss: `Eine gute Empfehlung zeigt, welches System du wählst UND warum – und was mit dem anderen System passiert. Schau dir die Musterlösung an, wie man das strukturiert.`
+    }
+  },
+  'b1': {
+    sample: `Beispiel: Amazon
+
+OLTP: Amazon verwendet OLTP-Datenbanken für alle Transaktionen – Bestellungen, Lagerbewegungen, Zahlungen. Millisekunden-Antwortzeiten sind hier kritisch.
+
+OLAP: AWS Redshift (ein Amazon-eigenes OLAP-Data-Warehouse) aggregiert Milliarden von Transaktionen und liefert Analysen für Pricing, Logistik-Optimierung und Empfehlungssysteme.
+
+Zusammenspiel: Transaktionsdaten fließen via ETL-Pipelines aus den OLTP-Systemen in Redshift. Analysten und ML-Modelle arbeiten gegen Redshift, ohne den Produktivbetrieb zu belasten.
+
+Nutzen: Operativer Betrieb und strategische Analyse sind vollständig entkoppelt.`,
+    feedback: {
+      good: `Sehr gutes Praxisbeispiel! Die Verbindung zwischen OLTP-Transaktionsverarbeitung und OLAP-Analyse durch ETL-Pipelines ist genau das Muster, das in der Industrie dominiert.`,
+      ok: `Gutes Beispiel! Versuche beim nächsten Mal, den ETL-Fluss zwischen den Systemen explizit zu beschreiben – das ist das Herzstück der Architektur.`,
+      miss: `Schaue dir die Musterlösung an – besonders das Zusammenspiel der Systeme ist entscheidend, nicht nur die Nennung der Technologien.`
+    }
+  },
+  'b2': {
+    sample: `HTAP-Architektur (Hybrid Transactional/Analytical Processing):
+
+Idee: Eine einzige Datenbank verarbeitet sowohl Transaktionen als auch Analysen in Echtzeit. Technologien: Google Spanner, TiDB, SAP HANA.
+
+Vorteile:
+• Echtzeit-Analysen ohne Datenverzögerung (kein ETL nötig)
+• Geringere Systemkomplexität – weniger bewegliche Teile
+• Kostengünstiger als zwei getrennte Systeme zu betreiben
+
+Nachteile:
+• Höhere Kosten pro Knoten (spezialisierte Hardware/Software)
+• Analyseabfragen können Transaktionsperformance beeinflussen
+• Weniger ausgereifte Tooling-Ökosysteme als dedizierte OLAP-Lösungen`,
+    feedback: {
+      good: `Hervorragend! Du hast HTAP korrekt als Brücke zwischen OLTP und OLAP identifiziert. Die Nennung konkreter Technologien zeigt, dass du über das Lehrmaterial hinaus recherchiert hast.`,
+      ok: `Guter Ansatz! Ergänze konkrete Technologien (SAP HANA, TiDB, Google Spanner) und den wichtigsten Nachteil: Analyseabfragen können Transaktionslatenz erhöhen.`,
+      miss: `HTAP ist ein faszinierendes Konzept – die Musterlösung zeigt, wie man Vor- und Nachteile strukturiert abwägt. Lies sie durch und überlege, welche Punkte du beim nächsten Mal ergänzen würdest.`
+    }
+  }
+};
+
+// ══════════════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════════════
+const state = {
+  currentTask: 1,
+  completedTasks: [],
+  bonusMode: false,
+  bonusDeclined: false,
+  feedbackMap: {},   // taskId → 'good' | 'ok' | 'miss'
+};
+const REGULAR_TASKS  = [1, 2, 3];
+const BONUS_TASKS    = ['b1', 'b2'];
+
+// ══════════════════════════════════════════════
+//  CHAR COUNT & ENABLE SUBMIT
+// ══════════════════════════════════════════════
+function updateCount(id) {
+  const ta  = document.getElementById('ans-' + id);
+  const cc  = document.getElementById('cc-' + id);
+  const btn = document.getElementById('btn-submit-' + id);
+  const len = ta.value.trim().length;
+  cc.textContent = len;
+  btn.disabled = len < 30;
+}
+
+// ══════════════════════════════════════════════
+//  EVALUATE (simple heuristic on word count)
+// ══════════════════════════════════════════════
+function evaluate(id) {
+  const text  = (document.getElementById('ans-' + id).value || '').trim();
+  const words = text.split(/\s+/).filter(Boolean).length;
+  if (words >= 40) return 'good';
+  if (words >= 15) return 'ok';
+  return 'miss';
+}
+
+// ══════════════════════════════════════════════
+//  SUBMIT TASK
+// ══════════════════════════════════════════════
+function submitTask(id) {
+  const quality = evaluate(id);
+  state.feedbackMap[id] = quality;
+  state.completedTasks.push(id);
+
+  // Disable textarea & button
+  document.getElementById('ans-' + id).disabled = true;
+  document.getElementById('btn-submit-' + id).disabled = true;
+
+  // Show feedback
+  showFeedback(id, quality);
+
+  // Mark step indicator done
+  markStepDone(id);
+
+  // Mark card completed
+  const card = document.getElementById('task-' + id);
+  card.classList.remove('active', 'bonus-active');
+  card.classList.add('completed');
+  const numEl = document.getElementById('tnum-' + id);
+  numEl.textContent = '✓';
+  numEl.classList.add('done-num');
+
+  // Wait briefly then advance
+  setTimeout(() => advance(id), 800);
+}
+
+// ══════════════════════════════════════════════
+//  SHOW FEEDBACK
+// ══════════════════════════════════════════════
+function showFeedback(id, quality) {
+  const fb   = document.getElementById('fb-' + id);
+  const data = TASKS[id];
+  const icons = { good: '✅', ok: '💡', miss: '📖' };
+  const titles = { good: 'Super!', ok: 'Guter Ansatz', miss: 'Schau dir die Musterlösung an' };
+
+  fb.className = 'feedback-box visible ' + quality;
+  fb.innerHTML = `
+    <div class="fb-head">${icons[quality]} ${titles[quality]}</div>
+    <div class="fb-body">
+      <p>${data.feedback[quality]}</p>
+      <div class="sample-label" style="margin-top:12px">Musterlösung</div>
+      <div class="sample-answer">${data.sample.replace(/\n/g, '<br>')}</div>
+    </div>`;
+}
+
+// ══════════════════════════════════════════════
+//  ADVANCE TO NEXT STEP
+// ══════════════════════════════════════════════
+function advance(id) {
+  // Regular tasks
+  if (id === 1) { showTask(2); return; }
+  if (id === 2) { showTask(3); return; }
+  if (id === 3) {
+    // All regular done → show bonus gate
+    updateNavProgress(3, 3);
+    showBonusGate();
+    return;
+  }
+  // Bonus tasks
+  if (id === 'b1') { showTask('b2'); return; }
+  if (id === 'b2') { showSummary(); return; }
+}
+
+// ══════════════════════════════════════════════
+//  SHOW TASK
+// ══════════════════════════════════════════════
+function showTask(id) {
+  const card = document.getElementById('task-' + id);
+  card.classList.add('visible');
+  const isBonus = String(id).startsWith('b');
+  card.classList.add(isBonus ? 'bonus-active' : 'active');
+  card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+  // Update step indicator current
+  const sdId = isBonus ? 'sd-' + id : 'sd-' + id;
+  document.querySelectorAll('.step-dot').forEach(d => d.classList.remove('current'));
+  const dot = document.getElementById('sd-' + id);
+  if (dot) dot.classList.add('current');
+
+  // Update labels
+  document.querySelectorAll('.step-label').forEach(l => l.classList.remove('current'));
+  const lbl = document.getElementById('sl-lbl-' + id);
+  if (lbl) lbl.classList.add('current');
+
+  // Nav progress
+  const reg = REGULAR_TASKS.indexOf(id);
+  if (reg >= 0) updateNavProgress(reg + 1, 3);
+}
+
+// ══════════════════════════════════════════════
+//  MARK STEP DONE
+// ══════════════════════════════════════════════
+function markStepDone(id) {
+  const dot = document.getElementById('sd-' + id);
+  if (dot) { dot.classList.remove('current'); dot.classList.add('done'); dot.textContent = '✓'; }
+
+  const lbl = document.getElementById('sl-lbl-' + id);
+  if (lbl) { lbl.classList.remove('current'); lbl.classList.add('done'); }
+
+  // Connecting line
+  const lineId = id === 'b1' ? 'sl-b1' : id === 'b2' ? null : 'sl-' + id;
+  if (lineId) {
+    const line = document.getElementById(lineId);
+    if (line) line.style.background = 'var(--green)';
+  }
+}
+
+// ══════════════════════════════════════════════
+//  NAV PROGRESS
+// ══════════════════════════════════════════════
+function updateNavProgress(current, total) {
+  document.getElementById('nav-count').textContent = current + ' / ' + total;
+  document.getElementById('nav-bar').style.width = Math.round((current / total) * 100) + '%';
+}
+
+// ══════════════════════════════════════════════
+//  BONUS GATE
+// ══════════════════════════════════════════════
+function showBonusGate() {
+  const gate = document.getElementById('bonus-gate');
+  gate.classList.add('visible');
+  gate.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function startBonus() {
+  state.bonusMode = true;
+  document.getElementById('bonus-gate').style.display = 'none';
+  document.getElementById('nav-count').textContent = 'Zusatz 1 / 2';
+  document.getElementById('nav-bar').style.background = 'var(--violet)';
+  showTask('b1');
+}
+
+function skipBonus() {
+  state.bonusDeclined = true;
+  document.getElementById('bonus-gate').style.display = 'none';
+  showSummary();
+}
+
+// ══════════════════════════════════════════════
+//  SUMMARY
+// ══════════════════════════════════════════════
+function showSummary() {
+  // Count stats
+  let good = 0, ok = 0, bonus = 0;
+  Object.entries(state.feedbackMap).forEach(([id, q]) => {
+    const isBonus = String(id).startsWith('b');
+    if (isBonus) bonus++;
+    else if (q === 'good') good++;
+    else if (q === 'ok') ok++;
+  });
+  document.getElementById('stat-good').textContent   = good;
+  document.getElementById('stat-ok').textContent     = ok;
+  document.getElementById('stat-bonus').textContent  = bonus;
+
+  // Build summary items
+  const container = document.getElementById('summary-items');
+  const allIds = [...REGULAR_TASKS, ...(state.bonusMode ? BONUS_TASKS : [])];
+  container.innerHTML = '';
+
+  allIds.forEach((id, idx) => {
+    if (!state.completedTasks.includes(id)) return;
+    const isBonus = String(id).startsWith('b');
+    const quality = state.feedbackMap[id];
+    const data    = TASKS[id];
+    const answer  = document.getElementById('ans-' + id).value.trim();
+    const icons   = { good:'✅', ok:'💡', miss:'📖' };
+    const fbTitles= { good:'Sehr gut beantwortet', ok:'Ansatzweise richtig', miss:'Musterlösung lesen' };
+    const qLabels = { 1:'Aufgabe 1', 2:'Aufgabe 2', 3:'Aufgabe 3', 'b1':'⭐ Zusatz 1', 'b2':'⭐ Zusatz 2' };
+
+    const titles = {
+      1:  'Anforderungsanalyse',
+      2:  'Kompromisse und Risiken',
+      3:  'Abschlussempfehlung',
+      'b1':'Praxisrecherche',
+      'b2':'Hybride Architektur'
+    };
+    const questions = {
+      1:  'Welche Anforderungen sprächen für OLTP, welche für OLAP?',
+      2:  'Welche Kompromisse müsstest du bei deiner Entscheidung eingehen?',
+      3:  'Formuliere eine klare Empfehlung für dein Team.',
+      'b1':'Recherchiere ein reales Unternehmen, das beide Datenbanktypen einsetzt.',
+      'b2':'Skizziere eine hybride HTAP-Architektur.'
+    };
+
+    container.innerHTML += `
+      <div class="summary-task ${isBonus ? 'bonus-task' : ''}">
+        <div class="st-head">
+          <div class="st-num ${isBonus ? 'bonus' : ''}">${isBonus ? id.replace('b','Z') : id}</div>
+          <div>
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:${isBonus ? 'var(--violet)' : 'var(--amber)'};margin-bottom:2px">${qLabels[id]} · ${titles[id]}</div>
+            <div class="st-question">${questions[id]}</div>
+          </div>
+        </div>
+        <div class="st-body">
+          <div class="answer-block">
+            <div class="answer-block-label">Deine Antwort</div>
+            <div class="answer-block-text">${answer.replace(/\n/g, '<br>') || '<em style="color:var(--gray-400)">keine Antwort</em>'}</div>
+          </div>
+          <div class="sample-block">
+            <div class="sample-block-label">Musterlösung</div>
+            <div class="sample-block-text">${data.sample.replace(/\n/g, '<br>')}</div>
+          </div>
+        </div>
+        <div class="st-feedback ${quality}">
+          <span>${icons[quality]}</span>
+          <span><strong>${fbTitles[quality]}:</strong> ${data.feedback[quality]}</span>
+        </div>
+      </div>`;
+  });
+
+  const summaryEl = document.getElementById('summary');
+  summaryEl.classList.add('visible');
+  summaryEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+  // Hide step indicator
+  document.getElementById('step-indicator').style.display = 'none';
+  document.getElementById('step-labels').style.display = 'none';
+
+  // Update nav
+  document.getElementById('nav-count').textContent = 'Fertig ✓';
+  document.getElementById('nav-bar').style.width = '100%';
+  document.getElementById('nav-bar').style.background = 'var(--green)';
+}
+
+// ══════════════════════════════════════════════
+//  INIT – enable submit when typing
+// ══════════════════════════════════════════════
+document.querySelectorAll('.task-textarea').forEach(ta => {
+  ta.addEventListener('input', () => {
+    const id  = ta.id.replace('ans-', '');
+    const btn = document.getElementById('btn-submit-' + id);
+    if (btn) btn.disabled = ta.value.trim().length < 30;
+  });
+});
+</script>
+</body>
+</html>

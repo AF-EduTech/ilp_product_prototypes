@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lerndaten – Gesamtübersicht</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: #f0f2f5;
+  color: #1a1a2e;
+  line-height: 1.5;
+}
+
+/* ── Header ── */
+.header {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  color: white;
+  padding: 18px 32px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.header-left h1 { font-size: 20px; font-weight: 600; }
+.header-left p  { font-size: 12px; opacity: 0.55; margin-top: 2px; }
+.header-right   { display:flex; align-items:center; gap:16px; }
+.avatar {
+  width:38px; height:38px; border-radius:50%;
+  background:#6366f1; display:flex; align-items:center;
+  justify-content:center; font-weight:700; font-size:15px; color:white;
+}
+.hdr-name { font-size:13px; font-weight:500; }
+.hdr-role { font-size:11px; opacity:0.55; }
+.live-dot {
+  display:inline-block; width:8px; height:8px; border-radius:50%;
+  background:#10b981; margin-right:5px;
+  box-shadow:0 0 0 3px rgba(16,185,129,0.25);
+  animation: pulse-green 2s infinite;
+}
+@keyframes pulse-green {
+  0%,100% { box-shadow:0 0 0 3px rgba(16,185,129,0.25); }
+  50%      { box-shadow:0 0 0 6px rgba(16,185,129,0.1); }
+}
+.live-label { font-size:12px; color:#10b981; font-weight:600; }
+
+/* ── Page ── */
+.page { max-width:1320px; margin:0 auto; padding:24px; }
+
+/* ── KPI Strip ── */
+.kpi-strip {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 14px;
+  margin-bottom: 24px;
+}
+.kpi-card {
+  background: white;
+  border-radius: 14px;
+  padding: 18px 20px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  display: flex; align-items: center; gap: 14px;
+}
+.kpi-card.highlight {
+  background: linear-gradient(135deg, #1a1a2e 0%, #1e3a5f 100%);
+}
+.kpi-icon {
+  width:44px; height:44px; border-radius:12px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:20px; flex-shrink:0;
+}
+.kpi-icon.blue   { background:#eff6ff; }
+.kpi-icon.green  { background:#ecfdf5; }
+.kpi-icon.amber  { background:#fffbeb; }
+.kpi-icon.purple { background:#faf5ff; }
+.kpi-icon.teal   { background:#f0fdfa; }
+.kpi-icon.dark   { background:rgba(255,255,255,0.1); }
+.kpi-value       { font-size:26px; font-weight:700; line-height:1.1; }
+.kpi-value.blue   { color:#4361ee; }
+.kpi-value.green  { color:#059669; }
+.kpi-value.amber  { color:#d97706; }
+.kpi-value.purple { color:#7c3aed; }
+.kpi-value.teal   { color:#0d9488; }
+.kpi-value.white  { color:white; }
+.kpi-label { font-size:11px; color:#6b7280; font-weight:500; margin-top:2px; }
+.kpi-label.white  { color:rgba(255,255,255,0.65); }
+.kpi-sub  { font-size:10px; margin-top:3px; }
+.kpi-sub.green { color:#059669; }
+.kpi-sub.amber { color:#d97706; }
+.kpi-sub.white { color:rgba(255,255,255,0.5); }
+
+/* ── Active learners live card ── */
+.live-card {
+  background: white;
+  border-radius: 14px;
+  padding: 18px 20px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  display: flex; align-items: center; gap: 14px;
+  border-left: 4px solid #10b981;
+}
+.live-num  { font-size:26px; font-weight:700; color:#059669; line-height:1.1; }
+.live-lbl  { font-size:11px; color:#6b7280; font-weight:500; margin-top:2px; }
+.live-time { font-size:10px; color:#9ca3af; margin-top:3px; }
+
+/* ── Card ── */
+.card {
+  background: white;
+  border-radius: 16px;
+  padding: 22px 24px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  margin-bottom: 20px;
+}
+.card-header {
+  display:flex; justify-content:space-between; align-items:center;
+  margin-bottom: 16px; gap:12px; flex-wrap:wrap;
+}
+.card-title {
+  font-size:12px; font-weight:600; text-transform:uppercase;
+  letter-spacing:0.5px; color:#6b7280;
+}
+
+/* ── Search + filter bar ── */
+.toolbar {
+  display:flex; gap:10px; align-items:center; flex-wrap:wrap;
+}
+.search-wrap {
+  position:relative; flex:1; min-width:220px;
+}
+.search-wrap input {
+  width:100%; padding:8px 12px 8px 34px;
+  border:1px solid #e5e7eb; border-radius:8px;
+  font-size:13px; color:#374151; outline:none;
+  transition: border-color 0.15s;
+}
+.search-wrap input:focus { border-color:#4361ee; }
+.search-icon {
+  position:absolute; left:10px; top:50%; transform:translateY(-50%);
+  font-size:14px; color:#9ca3af; pointer-events:none;
+}
+.filter-btn {
+  font-size:12px; padding:7px 14px;
+  border-radius:8px; border:1px solid #e5e7eb;
+  background:white; color:#6b7280; cursor:pointer;
+  font-weight:500; transition:all 0.15s; white-space:nowrap;
+}
+.filter-btn:hover  { border-color:#4361ee; color:#4361ee; }
+.filter-btn.active { background:#4361ee; color:white; border-color:#4361ee; }
+
+/* ── Table ── */
+.data-table {
+  width:100%; border-collapse:separate; border-spacing:0; font-size:13px;
+}
+.data-table th {
+  font-size:11px; font-weight:600; text-transform:uppercase;
+  letter-spacing:0.4px; color:#9ca3af;
+  padding:8px 14px; text-align:left;
+  border-bottom:2px solid #f3f4f6;
+  white-space:nowrap; cursor:pointer; user-select:none;
+}
+.data-table th:hover { color:#4361ee; }
+.data-table th .sort-arrow { margin-left:4px; opacity:0.4; }
+.data-table th.sorted .sort-arrow { opacity:1; color:#4361ee; }
+.data-table td {
+  padding:12px 14px; border-bottom:1px solid #f9fafb;
+  vertical-align:middle;
+}
+.data-table tr:last-child td { border-bottom:none; }
+.data-table tbody tr { cursor:pointer; transition:background 0.1s; }
+.data-table tbody tr:hover td { background:#f8f9ff; }
+
+/* ── Course name cell ── */
+.course-name { font-weight:600; color:#1a1a2e; font-size:13px; }
+.course-sub  { font-size:11px; color:#9ca3af; margin-top:1px; }
+
+/* ── Chips ── */
+.chip {
+  display:inline-block; padding:2px 9px; border-radius:20px;
+  font-size:11px; font-weight:600;
+}
+.chip.green  { background:#d1fae5; color:#065f46; }
+.chip.amber  { background:#fef3c7; color:#92400e; }
+.chip.blue   { background:#dbeafe; color:#1d4ed8; }
+.chip.gray   { background:#f3f4f6; color:#6b7280; }
+.chip.purple { background:#ede9fe; color:#6d28d9; }
+.chip.red    { background:#fee2e2; color:#991b1b; }
+.chip.teal   { background:#ccfbf1; color:#0f766e; }
+
+/* ── Mini progress bar ── */
+.mini-prog {
+  display:flex; align-items:center; gap:7px;
+}
+.mini-bar-wrap {
+  flex:1; min-width:60px; background:#f3f4f6;
+  border-radius:20px; height:6px; overflow:hidden;
+}
+.mini-bar-fill { height:100%; border-radius:20px; }
+.mini-pct { font-size:11px; font-weight:700; min-width:28px; text-align:right; }
+
+/* ── Problem badge ── */
+.prob-badge {
+  display:inline-flex; align-items:center; gap:4px;
+  padding:2px 8px; border-radius:20px;
+  font-size:11px; font-weight:600;
+  background:#fee2e2; color:#991b1b;
+}
+.prob-badge.none { background:#f3f4f6; color:#9ca3af; }
+.prob-badge.warn { background:#fef3c7; color:#92400e; }
+
+/* ── Type badge ── */
+.type-wb  { background:#eff6ff; color:#1d4ed8; }
+.type-us  { background:#faf5ff; color:#6d28d9; }
+
+/* ── Active dot ── */
+.act-dot {
+  display:inline-flex; align-items:center; gap:5px;
+  font-size:12px; font-weight:600; color:#059669;
+}
+.act-dot::before {
+  content:''; display:inline-block; width:7px; height:7px;
+  border-radius:50%; background:#10b981;
+  box-shadow:0 0 0 2px rgba(16,185,129,0.25);
+}
+
+/* ── No results ── */
+.no-results {
+  text-align:center; padding:40px; color:#9ca3af; font-size:13px;
+  display:none;
+}
+
+/* ── Section divider in table ── */
+.section-row td {
+  background:#f8f9ff; font-size:11px; font-weight:600;
+  text-transform:uppercase; letter-spacing:0.5px;
+  color:#6b7280; padding:6px 14px;
+  border-bottom:1px solid #e5e7eb;
+  cursor:default;
+}
+.section-row:hover td { background:#f8f9ff !important; }
+
+/* ── Tooltip ── */
+.has-tip { position:relative; }
+.tip {
+  display:none; position:absolute; bottom:calc(100% + 6px); left:50%;
+  transform:translateX(-50%);
+  background:#1a1a2e; color:white; font-size:11px;
+  padding:5px 9px; border-radius:6px; white-space:nowrap; z-index:200;
+  pointer-events:none;
+}
+.has-tip:hover .tip { display:block; }
+
+/* ── Two-col ── */
+.two-col { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:20px; }
+
+/* ── Detail link ── */
+.detail-link {
+  font-size:11px; color:#4361ee; font-weight:600;
+  background:none; border:none; cursor:pointer; padding:0;
+  white-space:nowrap;
+}
+.detail-link:hover { text-decoration:underline; }
+</style>
+</head>
+<body>
+
+<!-- ── Header ── -->
+<div class="header">
+  <div class="header-left">
+    <div>
+      <h1>Lerndaten · Gesamtübersicht</h1>
+      <p>Alle laufenden und abgeschlossenen Kurse &amp; Umschulungsklassen</p>
+    </div>
+  </div>
+  <div class="header-right">
+    <span class="live-dot"></span><span class="live-label">Live</span>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <div class="avatar">LB</div>
+      <div>
+        <div class="hdr-name">Lernbegleiter-Portal</div>
+        <div class="hdr-role">Alle Kurse · Admin-Ansicht</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="page">
+
+  <!-- ── KPI Strip ── -->
+  <div class="kpi-strip">
+
+    <div class="kpi-card">
+      <div class="kpi-icon blue">📚</div>
+      <div>
+        <div class="kpi-value blue">12</div>
+        <div class="kpi-label">Laufende Kurse</div>
+        <div class="kpi-sub amber">+3 starten diese Woche</div>
+      </div>
+    </div>
+
+    <div class="kpi-card">
+      <div class="kpi-icon purple">🎓</div>
+      <div>
+        <div class="kpi-value purple">4</div>
+        <div class="kpi-label">Umschulungsklassen</div>
+        <div class="kpi-sub green">alle planmäßig</div>
+      </div>
+    </div>
+
+    <div class="kpi-card">
+      <div class="kpi-icon green">👥</div>
+      <div>
+        <div class="kpi-value green">143</div>
+        <div class="kpi-label">Aktive Lernende</div>
+        <div class="kpi-sub" style="color:#9ca3af;">in laufenden Kursen</div>
+      </div>
+    </div>
+
+    <div class="kpi-card">
+      <div class="kpi-icon teal">🧑‍🏫</div>
+      <div>
+        <div class="kpi-value teal">18</div>
+        <div class="kpi-label">Lernbegleiter</div>
+        <div class="kpi-sub" style="color:#9ca3af;">in laufenden Kursen</div>
+      </div>
+    </div>
+
+    <div class="live-card">
+      <div class="kpi-icon" style="background:#ecfdf5;font-size:22px;">🟢</div>
+      <div>
+        <div style="display:flex;align-items:baseline;gap:6px;">
+          <div class="live-num" id="live-counter">37</div>
+          <div style="font-size:13px;color:#9ca3af;font-weight:500;">/ 143</div>
+        </div>
+        <div class="live-lbl">Gerade aktiv (jetzt)</div>
+        <div class="live-time" id="live-time">Stand: 19.05.2026, 10:42 Uhr</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── Mini-Statistiken ── -->
+  <div class="two-col">
+    <div class="card" style="margin-bottom:0;">
+      <div class="card-header" style="margin-bottom:14px;">
+        <div class="card-title">Laufende Kurse nach Typ</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div>
+          <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px;">
+            <span style="color:#374151;font-weight:500;">Weiterbildungskurse</span>
+            <span style="color:#4361ee;font-weight:700;">12</span>
+          </div>
+          <div style="background:#f3f4f6;border-radius:20px;height:7px;overflow:hidden;">
+            <div style="width:75%;height:100%;background:#4361ee;border-radius:20px;"></div>
+          </div>
+        </div>
+        <div>
+          <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px;">
+            <span style="color:#374151;font-weight:500;">Umschulungsklassen</span>
+            <span style="color:#7c3aed;font-weight:700;">4</span>
+          </div>
+          <div style="background:#f3f4f6;border-radius:20px;height:7px;overflow:hidden;">
+            <div style="width:25%;height:100%;background:#7c3aed;border-radius:20px;"></div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:6px;">
+          <div style="background:#f9fafb;border-radius:10px;padding:10px;text-align:center;">
+            <div style="font-size:16px;font-weight:700;color:#374151;">5</div>
+            <div style="font-size:10px;color:#9ca3af;">Programmierkurse</div>
+          </div>
+          <div style="background:#f9fafb;border-radius:10px;padding:10px;text-align:center;">
+            <div style="font-size:16px;font-weight:700;color:#374151;">4</div>
+            <div style="font-size:10px;color:#9ca3af;">Methodikkurse</div>
+          </div>
+          <div style="background:#f9fafb;border-radius:10px;padding:10px;text-align:center;">
+            <div style="font-size:16px;font-weight:700;color:#374151;">3</div>
+            <div style="font-size:10px;color:#9ca3af;">Tool-Trainings</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:0;">
+      <div class="card-header" style="margin-bottom:14px;">
+        <div class="card-title">Problemindikatoren · laufende Kurse</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 12px;border-radius:10px;background:#fff5f5;border:1px solid #fee2e2;">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-size:16px;">🐢</span>
+            <div>
+              <div style="font-size:12px;font-weight:600;color:#374151;">Langsam-Lerner</div>
+              <div style="font-size:11px;color:#9ca3af;">Pace-Ratio &gt; 1.4 über 3+ Tage</div>
+            </div>
+          </div>
+          <span class="chip red">11 Lernende</span>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 12px;border-radius:10px;background:#fffdf0;border:1px solid #fef3c7;">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-size:16px;">❓</span>
+            <div>
+              <div style="font-size:12px;font-weight:600;color:#374151;">Quiz-Schwierigkeiten</div>
+              <div style="font-size:11px;color:#9ca3af;">Score &lt; 60% in einem Unterkapitel</div>
+            </div>
+          </div>
+          <span class="chip amber">19 Lernende</span>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 12px;border-radius:10px;background:#fff5f5;border:1px solid #fecaca;">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-size:16px;">💤</span>
+            <div>
+              <div style="font-size:12px;font-weight:600;color:#374151;">Inaktivität &gt; 3 Werktage</div>
+              <div style="font-size:11px;color:#9ca3af;">Kein Login seit mehreren Tagen</div>
+            </div>
+          </div>
+          <span class="chip red">6 Lernende</span>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 12px;border-radius:10px;background:#f9fafb;border:1px solid #f3f4f6;">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-size:16px;">⚠️</span>
+            <div>
+              <div style="font-size:12px;font-weight:600;color:#374151;">Dropout-Risiko</div>
+              <div style="font-size:11px;color:#9ca3af;">Kombination mehrerer Indikatoren</div>
+            </div>
+          </div>
+          <span class="chip amber">4 Lernende</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Kurstabelle ── -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">Kurse &amp; Umschulungsklassen</div>
+      <div class="toolbar">
+        <div class="search-wrap">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="search-input" placeholder="Kursname, Kategorie, Lernbegleiter suchen …" oninput="filterTable()">
+        </div>
+        <button class="filter-btn active" data-filter="all"    onclick="setFilter('all',this)">Alle</button>
+        <button class="filter-btn"        data-filter="active" onclick="setFilter('active',this)">Laufend</button>
+        <button class="filter-btn"        data-filter="past"   onclick="setFilter('past',this)">Abgeschlossen</button>
+        <button class="filter-btn"        data-filter="wb"     onclick="setFilter('wb',this)">Weiterbildung</button>
+        <button class="filter-btn"        data-filter="us"     onclick="setFilter('us',this)">Umschulung</button>
+      </div>
+    </div>
+
+    <table class="data-table" id="course-table">
+      <thead>
+        <tr>
+          <th onclick="sortTable(0)">Kurs / Klasse <span class="sort-arrow">↕</span></th>
+          <th onclick="sortTable(1)">Typ <span class="sort-arrow">↕</span></th>
+          <th onclick="sortTable(2)">Status <span class="sort-arrow">↕</span></th>
+          <th onclick="sortTable(3)">Zeitraum <span class="sort-arrow">↕</span></th>
+          <th onclick="sortTable(4)">Lernende <span class="sort-arrow">↕</span></th>
+          <th onclick="sortTable(5)">Lernbegleiter <span class="sort-arrow">↕</span></th>
+          <th onclick="sortTable(6)">Ø Fortschritt <span class="sort-arrow">↕</span></th>
+          <th onclick="sortTable(7)">Probleme <span class="sort-arrow">↕</span></th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="table-body"></tbody>
+    </table>
+    <div class="no-results" id="no-results">Keine Einträge gefunden.</div>
+  </div>
+
+</div><!-- /page -->
+
+<script>
+// ── Live-Counter Simulation ──
+let liveCount = 37;
+setInterval(() => {
+  liveCount += Math.random() < 0.5 ? 1 : -1;
+  liveCount = Math.max(28, Math.min(52, liveCount));
+  document.getElementById('live-counter').textContent = liveCount;
+  const now = new Date();
+  document.getElementById('live-time').textContent =
+    'Stand: ' + now.toLocaleDateString('de-DE') + ', ' +
+    now.toLocaleTimeString('de-DE', { hour:'2-digit', minute:'2-digit' }) + ' Uhr';
+}, 8000);
+
+// ── Kurs-Daten ──
+const COURSES = [
+  // Laufende Weiterbildungskurse
+  { name:'Python für Einsteiger',          sub:'Programmierkurs',        type:'wb', cat:'Programmierkurs',   status:'active', start:'28.04.2026', end:'16.05.2026', lernende:12, lb:'S. Müller',          fortschritt:58, probleme:3, aktive:8  },
+  { name:'Java Grundlagen',                sub:'Programmierkurs',        type:'wb', cat:'Programmierkurs',   status:'active', start:'05.05.2026', end:'23.05.2026', lernende:10, lb:'A. Schneider',       fortschritt:34, probleme:1, aktive:5  },
+  { name:'JavaScript & React',             sub:'Programmierkurs',        type:'wb', cat:'Programmierkurs',   status:'active', start:'12.05.2026', end:'30.05.2026', lernende:11, lb:'T. Wagner',          fortschritt:18, probleme:0, aktive:6  },
+  { name:'SQL Server Administration',      sub:'Tooltraining',           type:'wb', cat:'Tooltraining',      status:'active', start:'28.04.2026', end:'09.05.2026', lernende: 8, lb:'S. Müller',          fortschritt:72, probleme:2, aktive:3  },
+  { name:'Microsoft Azure Grundlagen',     sub:'Tooltraining',           type:'wb', cat:'Tooltraining',      status:'active', start:'05.05.2026', end:'16.05.2026', lernende: 9, lb:'R. Klein',           fortschritt:47, probleme:1, aktive:4  },
+  { name:'Scrum Master Zertifizierung',    sub:'Methodikkurs',           type:'wb', cat:'Methodikkurs',      status:'active', start:'19.05.2026', end:'06.06.2026', lernende:14, lb:'A. Schneider',       fortschritt: 8, probleme:0, aktive:9  },
+  { name:'Kanban & Lean Management',       sub:'Methodikkurs',           type:'wb', cat:'Methodikkurs',      status:'active', start:'12.05.2026', end:'30.05.2026', lernende:13, lb:'T. Wagner',          fortschritt:22, probleme:2, aktive:7  },
+  { name:'Windows Server 2022',            sub:'Tooltraining',           type:'wb', cat:'Tooltraining',      status:'active', start:'19.05.2026', end:'07.06.2026', lernende: 7, lb:'R. Klein',           fortschritt: 5, probleme:0, aktive:4  },
+  { name:'PHP & Laravel Grundlagen',       sub:'Programmierkurs',        type:'wb', cat:'Programmierkurs',   status:'active', start:'05.05.2026', end:'23.05.2026', lernende:10, lb:'M. Bauer',           fortschritt:39, probleme:4, aktive:5  },
+  { name:'PRINCE2 Foundation',             sub:'Methodikkurs',           type:'wb', cat:'Methodikkurs',      status:'active', start:'28.04.2026', end:'16.05.2026', lernende:15, lb:'M. Bauer',           fortschritt:65, probleme:1, aktive:6  },
+  { name:'HTML & CSS für Einsteiger',      sub:'Programmierkurs',        type:'wb', cat:'Programmierkurs',   status:'active', start:'19.05.2026', end:'30.05.2026', lernende: 9, lb:'S. Müller',          fortschritt: 3, probleme:0, aktive:7  },
+  { name:'Microsoft 365 Grundlagen',       sub:'Tooltraining',           type:'wb', cat:'Tooltraining',      status:'active', start:'12.05.2026', end:'23.05.2026', lernende:11, lb:'A. Schneider',       fortschritt:29, probleme:1, aktive:5  },
+  // Laufende Umschulungsklassen
+  { name:'Fachinformatiker AE · 2024-A',   sub:'Umschulung · LF 5/20',  type:'us', cat:'Umschulung',        status:'active', start:'01.09.2024', end:'31.08.2026', lernende:14, lb:'T. Wagner',          fortschritt:44, probleme:5, aktive:9  },
+  { name:'Fachinformatiker AE · 2024-B',   sub:'Umschulung · LF 4/20',  type:'us', cat:'Umschulung',        status:'active', start:'01.10.2024', end:'30.09.2026', lernende:12, lb:'R. Klein',           fortschritt:31, probleme:3, aktive:6  },
+  { name:'Fachinformatiker SI · 2023-A',   sub:'Umschulung · LF 13/20', type:'us', cat:'Umschulung',        status:'active', start:'01.03.2023', end:'28.02.2025', lernende:11, lb:'M. Bauer',           fortschritt:78, probleme:2, aktive:4  },
+  { name:'Fachinformatiker AE · 2025-A',   sub:'Umschulung · LF 1/20',  type:'us', cat:'Umschulung',        status:'active', start:'01.02.2025', end:'31.01.2027', lernende:13, lb:'A. Schneider',       fortschritt:14, probleme:1, aktive:8  },
+  // Abgeschlossene Kurse
+  { name:'Python Grundlagen',              sub:'Programmierkurs',        type:'wb', cat:'Programmierkurs',   status:'past',   start:'17.03.2026', end:'04.04.2026', lernende:12, lb:'S. Müller',          fortschritt:100, probleme:0, aktive:0  },
+  { name:'Scrum Einführung',               sub:'Methodikkurs',           type:'wb', cat:'Methodikkurs',      status:'past',   start:'24.02.2026', end:'14.03.2026', lernende:15, lb:'T. Wagner',          fortschritt:100, probleme:0, aktive:0  },
+  { name:'Office 365 Intensiv',            sub:'Tooltraining',           type:'wb', cat:'Tooltraining',      status:'past',   start:'03.02.2026', end:'21.02.2026', lernende: 8, lb:'R. Klein',           fortschritt:100, probleme:0, aktive:0  },
+  { name:'Java Fortgeschrittene',          sub:'Programmierkurs',        type:'wb', cat:'Programmierkurs',   status:'past',   start:'13.01.2026', end:'31.01.2026', lernende:10, lb:'M. Bauer',           fortschritt:100, probleme:0, aktive:0  },
+  { name:'Fachinformatiker SI · 2022-A',   sub:'Umschulung · Abschluss', type:'us', cat:'Umschulung',       status:'past',   start:'01.09.2022', end:'31.08.2024', lernende:13, lb:'A. Schneider',       fortschritt:100, probleme:0, aktive:0  },
+];
+
+// ── State ──
+let currentFilter = 'all';
+let currentSort   = { col:-1, asc:true };
+let searchTerm    = '';
+
+// ── Render ──
+function renderTable() {
+  const tbody = document.getElementById('table-body');
+  tbody.innerHTML = '';
+
+  let rows = COURSES.filter(c => {
+    const matchFilter =
+      currentFilter === 'all'    ? true :
+      currentFilter === 'active' ? c.status === 'active' :
+      currentFilter === 'past'   ? c.status === 'past'   :
+      currentFilter === 'wb'     ? c.type   === 'wb'     :
+      currentFilter === 'us'     ? c.type   === 'us'     : true;
+
+    const q = searchTerm.toLowerCase();
+    const matchSearch = !q ||
+      c.name.toLowerCase().includes(q) ||
+      c.cat.toLowerCase().includes(q)  ||
+      c.lb.toLowerCase().includes(q)   ||
+      c.sub.toLowerCase().includes(q);
+
+    return matchFilter && matchSearch;
+  });
+
+  // Sort
+  if (currentSort.col >= 0) {
+    rows.sort((a, b) => {
+      const keys = ['name','cat','status','start','lernende','lb','fortschritt','probleme'];
+      const k = keys[currentSort.col];
+      let va = a[k], vb = b[k];
+      if (typeof va === 'string') va = va.toLowerCase();
+      if (typeof vb === 'string') vb = vb.toLowerCase();
+      return currentSort.asc ? (va > vb ? 1 : -1) : (va < vb ? 1 : -1);
+    });
+  }
+
+  document.getElementById('no-results').style.display = rows.length === 0 ? 'block' : 'none';
+
+  // Section headers when showing all or mixed
+  let lastStatus = null;
+  rows.forEach(c => {
+    if (currentFilter === 'all' && c.status !== lastStatus) {
+      lastStatus = c.status;
+      const sec = document.createElement('tr');
+      sec.className = 'section-row';
+      sec.innerHTML = `<td colspan="9">${c.status === 'active' ? '🟢 Laufende Kurse & Umschulungsklassen' : '✅ Abgeschlossene Kurse & Klassen'}</td>`;
+      tbody.appendChild(sec);
+    }
+
+    // KPI: Fortschritt color
+    const fpCol = c.fortschritt >= 80 ? '#10b981' : c.fortschritt >= 40 ? '#f59e0b' : '#60a5fa';
+
+    // Probleme badge
+    const probHtml = c.probleme === 0
+      ? `<span class="prob-badge none">—</span>`
+      : c.probleme >= 4
+      ? `<span class="prob-badge">⚠ ${c.probleme}</span>`
+      : `<span class="prob-badge warn">⚠ ${c.probleme}</span>`;
+
+    // Aktive Lernende
+    const aktHtml = c.status === 'active' && c.aktive > 0
+      ? `<span class="act-dot">${c.aktive}</span>`
+      : `<span style="color:#9ca3af;font-size:12px;">—</span>`;
+
+    // Typ chip
+    const typeHtml = c.type === 'us'
+      ? `<span class="chip purple type-us">Umschulung</span>`
+      : c.cat === 'Programmierkurs' ? `<span class="chip blue">Programmierung</span>`
+      : c.cat === 'Methodikkurs'    ? `<span class="chip teal">Methodik</span>`
+      :                               `<span class="chip gray">Tooltraining</span>`;
+
+    // Status chip
+    const statHtml = c.status === 'active'
+      ? `<span class="chip green">Laufend</span>`
+      : `<span class="chip gray">Abgeschl.</span>`;
+
+    const tr = document.createElement('tr');
+    tr.dataset.status = c.status;
+    tr.dataset.type   = c.type;
+    tr.onclick = () => window.location.href = 'lerndaten-kurs.html';
+    tr.innerHTML = `
+      <td>
+        <div class="course-name">${c.name}</div>
+        <div class="course-sub">${c.sub}</div>
+      </td>
+      <td>${typeHtml}</td>
+      <td>${statHtml}</td>
+      <td style="font-size:12px;color:#6b7280;white-space:nowrap;">${c.start}<br><span style="color:#9ca3af;">→ ${c.end}</span></td>
+      <td>
+        <div style="font-size:13px;font-weight:600;">${c.lernende}</div>
+        <div style="font-size:11px;color:#9ca3af;margin-top:1px;">${aktHtml} aktiv</div>
+      </td>
+      <td style="font-size:12px;color:#374151;">${c.lb}</td>
+      <td style="min-width:110px;">
+        <div class="mini-prog">
+          <div class="mini-bar-wrap">
+            <div class="mini-bar-fill" style="width:${c.fortschritt}%;background:${fpCol};"></div>
+          </div>
+          <span class="mini-pct" style="color:${fpCol};">${c.fortschritt}%</span>
+        </div>
+      </td>
+      <td>${probHtml}</td>
+      <td><button class="detail-link" onclick="event.stopPropagation();window.location.href='lerndaten-kurs.html'">Details →</button></td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+// ── Filter ──
+function setFilter(f, btn) {
+  currentFilter = f;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderTable();
+}
+
+// ── Search ──
+function filterTable() {
+  searchTerm = document.getElementById('search-input').value;
+  renderTable();
+}
+
+// ── Sort ──
+function sortTable(col) {
+  if (currentSort.col === col) {
+    currentSort.asc = !currentSort.asc;
+  } else {
+    currentSort = { col, asc: true };
+  }
+  document.querySelectorAll('.data-table th').forEach((th, i) => {
+    th.classList.toggle('sorted', i === col);
+    const arrow = th.querySelector('.sort-arrow');
+    if (arrow) arrow.textContent = i === col ? (currentSort.asc ? '↑' : '↓') : '↕';
+  });
+  renderTable();
+}
+
+// ── Init ──
+renderTable();
+</script>
+</body>
+</html>

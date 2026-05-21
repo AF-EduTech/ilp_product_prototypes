@@ -1,0 +1,1459 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kursansicht – Redesign</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --indigo:    #4361ee;
+            --indigo-lt: #eef2ff;
+            --indigo-md: #c7d2fe;
+            --violet:    #7c3aed;
+            --green:     #059669;
+            --green-lt:  #d1fae5;
+            --amber:     #d97706;
+            --amber-lt:  #fef3c7;
+            --red:       #dc2626;
+            --red-lt:    #fee2e2;
+            --gray-50:   #f8f9fc;
+            --gray-100:  #f3f4f6;
+            --gray-200:  #e5e7eb;
+            --gray-400:  #9ca3af;
+            --gray-600:  #4b5563;
+            --gray-800:  #1f2937;
+            --navy:      #1a1a2e;
+
+            /* Phase colours */
+            --vorher-bg:   #f0fdfa;
+            --vorher-c:    #0d9488;
+            --waehrend-bg: #eef2ff;
+            --waehrend-c:  #4361ee;
+            --nachher-bg:  #fffbeb;
+            --nachher-c:   #d97706;
+            --schluss-bg:  #faf5ff;
+            --schluss-c:   #7c3aed;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--gray-50);
+            color: var(--navy);
+            line-height: 1.6;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            font-size: 14px;
+        }
+
+        /* ══════════════════════════════════
+           TOP NAV
+           ══════════════════════════════════ */
+        .top-nav {
+            background: var(--navy);
+            color: white;
+            padding: 0 24px;
+            height: 54px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
+            z-index: 30;
+        }
+
+        .top-nav-left { display: flex; align-items: center; gap: 14px; }
+
+        .nav-back {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            color: rgba(255,255,255,0.65);
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 500;
+            padding: 5px 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.15);
+            transition: all 0.15s;
+        }
+        .nav-back:hover { background: rgba(255,255,255,0.1); color: white; }
+
+        .nav-divider { width: 1px; height: 26px; background: rgba(255,255,255,0.12); }
+
+        .nav-course { display: flex; flex-direction: column; gap: 1px; }
+        .nav-course-name { font-size: 14px; font-weight: 600; }
+        .nav-course-sub  { font-size: 11px; opacity: 0.45; }
+
+        .top-nav-right { display: flex; align-items: center; gap: 14px; }
+
+        .nav-prog-wrap { display: flex; align-items: center; gap: 8px; }
+        .nav-prog-label { font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.6); }
+        .nav-prog-bar {
+            width: 96px; height: 5px;
+            background: rgba(255,255,255,0.12);
+            border-radius: 99px; overflow: hidden;
+        }
+        .nav-prog-bar .fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4361ee, #7c3aed);
+            border-radius: 99px;
+        }
+
+        .nav-avatar {
+            width: 32px; height: 32px; border-radius: 50%;
+            background: linear-gradient(135deg, #4361ee, #7c3aed);
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; font-size: 12px; color: white;
+            flex-shrink: 0;
+        }
+
+        /* ══════════════════════════════════
+           MAIN LAYOUT
+           ══════════════════════════════════ */
+        .app-layout { flex: 1; display: flex; overflow: hidden; }
+
+        /* ══════════════════════════════════
+           SIDEBAR
+           ══════════════════════════════════ */
+        .sidebar {
+            width: 288px;
+            background: white;
+            border-right: 1px solid var(--gray-200);
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+
+        .sidebar-head {
+            padding: 14px 16px 12px;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .sidebar-search {
+            width: 100%;
+            padding: 8px 12px 8px 34px;
+            border: 1.5px solid var(--gray-200);
+            border-radius: 8px;
+            font-size: 13px;
+            font-family: inherit;
+            outline: none;
+            background: var(--gray-50) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E") 10px center no-repeat;
+            transition: border-color 0.15s;
+            color: var(--navy);
+        }
+        .sidebar-search:focus { border-color: var(--indigo); background-color: white; }
+        .sidebar-search::placeholder { color: var(--gray-400); }
+
+        .sidebar-tree { flex: 1; overflow-y: auto; padding: 6px 0 12px; }
+
+        /* Module row */
+        .module-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 9px 16px;
+            cursor: pointer;
+            user-select: none;
+            transition: background 0.1s;
+        }
+        .module-row:hover { background: var(--gray-50); }
+
+        .mod-icon {
+            width: 26px; height: 26px; border-radius: 7px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 12px; font-weight: 700; flex-shrink: 0;
+        }
+        .mod-icon.done   { background: var(--green-lt); color: var(--green); }
+        .mod-icon.active { background: var(--indigo-lt); color: var(--indigo); }
+        .mod-icon.todo   { background: var(--gray-100); color: var(--gray-400); }
+
+        .mod-info { flex: 1; min-width: 0; }
+        .mod-name {
+            font-size: 13px; font-weight: 600; color: var(--gray-800);
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .mod-progress { font-size: 11px; color: var(--gray-400); margin-top: 1px; }
+        .mod-progress .done-count { color: var(--green); font-weight: 600; }
+
+        .mod-chevron {
+            font-size: 9px; color: var(--gray-400);
+            transition: transform 0.2s; flex-shrink: 0;
+        }
+        .mod-chevron.open { transform: rotate(90deg); }
+
+        /* Progress bar per module */
+        .mod-bar-wrap { padding: 0 16px 6px 52px; }
+        .mod-bar {
+            height: 3px; background: var(--gray-100); border-radius: 99px; overflow: hidden;
+        }
+        .mod-bar .fill { height: 100%; border-radius: 99px; }
+        .mod-bar .fill.done   { background: var(--green); }
+        .mod-bar .fill.active { background: var(--indigo); }
+
+        /* Chapter rows */
+        .chapters { display: none; }
+        .chapters.open { display: block; }
+
+        .chapter-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 7px 16px 7px 52px;
+            cursor: pointer;
+            font-size: 13px;
+            color: var(--gray-600);
+            transition: background 0.1s;
+        }
+        .chapter-row:hover { background: var(--gray-50); }
+        .chapter-row.active { color: var(--indigo); font-weight: 600; }
+
+        .ch-dot {
+            width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0;
+        }
+        .ch-dot.done   { background: var(--green); }
+        .ch-dot.active { background: var(--indigo); }
+        .ch-dot.todo   { background: var(--gray-200); border: 1px solid var(--gray-400); }
+
+        /* Subchapter rows */
+        .subchapters { display: none; }
+        .subchapters.open { display: block; }
+
+        .uk-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 5px 16px 5px 72px;
+            cursor: pointer;
+            font-size: 12px;
+            color: #6b7280;
+            transition: all 0.1s;
+            border-left: 2px solid transparent;
+        }
+        .uk-row:hover { background: var(--gray-50); }
+        .uk-row.active {
+            background: var(--indigo-lt);
+            color: var(--indigo);
+            font-weight: 600;
+            border-left-color: var(--indigo);
+        }
+        .uk-row.done { color: var(--green); }
+
+        .uk-check { font-size: 11px; flex-shrink: 0; width: 14px; text-align: center; }
+
+        /* Sidebar footer */
+        .sidebar-foot {
+            padding: 10px 16px 12px;
+            border-top: 1px solid var(--gray-200);
+        }
+        .sf-row {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 5px;
+        }
+        .sf-label { font-size: 11px; font-weight: 600; color: var(--gray-400); }
+        .sf-val   { font-size: 11px; font-weight: 700; color: var(--indigo); }
+        .sf-bar {
+            height: 4px; background: var(--gray-100); border-radius: 99px; overflow: hidden;
+        }
+        .sf-bar .fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--indigo), var(--violet));
+            border-radius: 99px;
+        }
+
+        /* ══════════════════════════════════
+           CONTENT AREA
+           ══════════════════════════════════ */
+        .content-area {
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            scroll-behavior: smooth;
+        }
+
+        /* Sticky context bar */
+        .context-bar {
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            background: white;
+            border-bottom: 1px solid var(--gray-200);
+            padding: 0 32px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+        }
+
+        .breadcrumb {
+            display: flex; align-items: center; gap: 6px;
+            font-size: 12px; color: var(--gray-400);
+        }
+        .breadcrumb .crumb      { cursor: pointer; transition: color 0.1s; }
+        .breadcrumb .crumb:hover { color: var(--indigo); }
+        .breadcrumb .sep        { opacity: 0.4; }
+        .breadcrumb .current    { color: var(--navy); font-weight: 600; }
+
+        .phase-pills { display: flex; align-items: center; gap: 6px; }
+
+        .phase-pill {
+            padding: 3px 11px;
+            border-radius: 99px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s;
+            border: 1.5px solid transparent;
+            white-space: nowrap;
+        }
+        .phase-pill.vorher   { color: var(--vorher-c);   background: var(--vorher-bg);   border-color: rgba(13,148,136,0.2); }
+        .phase-pill.waehrend { color: var(--waehrend-c); background: var(--waehrend-bg); border-color: rgba(67,97,238,0.2); }
+        .phase-pill.nachher  { color: var(--nachher-c);  background: var(--nachher-bg);  border-color: rgba(217,119,6,0.2); }
+        .phase-pill.schluss  { color: var(--schluss-c);  background: var(--schluss-bg);  border-color: rgba(124,58,237,0.2); }
+
+        .phase-pill.active.vorher   { background: var(--vorher-c);   color: white; border-color: var(--vorher-c); }
+        .phase-pill.active.waehrend { background: var(--waehrend-c); color: white; border-color: var(--waehrend-c); }
+        .phase-pill.active.nachher  { background: var(--nachher-c);  color: white; border-color: var(--nachher-c); }
+        .phase-pill.active.schluss  { background: var(--schluss-c);  color: white; border-color: var(--schluss-c); }
+
+        /* ── UK title block ── */
+        .uk-title-block {
+            padding: 32px 32px 24px;
+            background: white;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .uk-sup {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            color: var(--gray-400);
+            margin-bottom: 6px;
+        }
+
+        .uk-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--navy);
+            line-height: 1.3;
+            margin-bottom: 14px;
+        }
+
+        .uk-meta-row {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .uk-stat {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            color: var(--gray-600);
+        }
+
+        .uk-stat-icon { font-size: 14px; }
+
+        .uk-stat strong { color: var(--navy); font-weight: 700; }
+
+        .uk-prog-wrap {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-left: auto;
+        }
+
+        .uk-prog-label { font-size: 12px; font-weight: 600; color: var(--gray-400); }
+        .uk-prog-bar {
+            width: 120px; height: 6px;
+            background: var(--gray-100); border-radius: 99px; overflow: hidden;
+        }
+        .uk-prog-bar .fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--indigo), var(--violet));
+            border-radius: 99px;
+        }
+        .uk-prog-val { font-size: 12px; font-weight: 700; color: var(--indigo); }
+
+        /* ── Phase sections ── */
+        .phase-section {
+            padding: 24px 32px 28px;
+        }
+
+        .phase-section.vorher   { background: var(--vorher-bg); }
+        .phase-section.waehrend { background: var(--waehrend-bg); }
+        .phase-section.nachher  { background: var(--nachher-bg); }
+        .phase-section.schluss  { background: var(--schluss-bg); }
+
+        /* ── CE Card ── */
+        .ce-card {
+            background: white;
+            border-radius: 12px;
+            border: 1px solid var(--gray-200);
+            max-width: 740px;
+            margin: 0 auto 16px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            transition: box-shadow 0.15s;
+        }
+        .ce-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+        .ce-card:last-child { margin-bottom: 0; }
+
+        /* Phase-coloured left border per section */
+        .phase-section.vorher   .ce-card { border-left: 4px solid var(--vorher-c); }
+        .phase-section.waehrend .ce-card { border-left: 4px solid var(--waehrend-c); }
+        .phase-section.nachher  .ce-card { border-left: 4px solid var(--nachher-c); }
+        .phase-section.schluss  .ce-card { border-left: 4px solid var(--schluss-c); }
+
+        /* CE card header */
+        .ce-head {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 18px 10px;
+            border-bottom: 1px solid var(--gray-100);
+        }
+
+        .ce-type-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 3px 10px;
+            border-radius: 99px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .chip-text      { background: #e0f2fe; color: #0369a1; }
+        .chip-quiz      { background: #fce7f3; color: #9d174d; }
+        .chip-video     { background: #fee2e2; color: #991b1b; }
+        .chip-bild      { background: #ecfdf5; color: #065f46; }
+        .chip-reflexion { background: #fdf4ff; color: #6b21a8; }
+        .chip-beispiel  { background: #fff7ed; color: #9a3412; }
+        .chip-luecke    { background: #fffbeb; color: #92400e; }
+        .chip-lernziel  { background: var(--indigo-lt); color: var(--indigo); }
+        .chip-zusammen  { background: #f0fdf4; color: #166534; }
+
+        .ce-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--navy);
+            flex: 1;
+        }
+
+        .ce-done-badge {
+            display: flex; align-items: center; gap: 4px;
+            font-size: 11px; font-weight: 600; color: var(--green);
+        }
+
+        /* CE card body */
+        .ce-body { padding: 16px 18px 18px; }
+
+        .ce-body p {
+            font-size: 14px;
+            line-height: 1.7;
+            color: var(--gray-800);
+            margin-bottom: 12px;
+        }
+        .ce-body p:last-child { margin-bottom: 0; }
+
+        /* Callout box */
+        .callout {
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin: 12px 0;
+            font-size: 13px;
+            line-height: 1.6;
+            display: flex;
+            gap: 10px;
+        }
+        .callout-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+        .callout-text { flex: 1; }
+
+        .phase-section.vorher   .callout { background: #ccfbf1; border-left: 3px solid var(--vorher-c); }
+        .phase-section.waehrend .callout { background: #e0e7ff; border-left: 3px solid var(--waehrend-c); }
+        .phase-section.nachher  .callout { background: #fde68a; border-left: 3px solid var(--nachher-c); }
+        .phase-section.schluss  .callout { background: #ede9fe; border-left: 3px solid var(--schluss-c); }
+
+        /* Lernziel */
+        .lernziel-box {
+            background: var(--indigo-lt);
+            border: 1.5px solid var(--indigo-md);
+            border-radius: 10px;
+            padding: 14px 18px;
+        }
+        .lernziel-label {
+            font-size: 11px; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 0.4px; color: var(--indigo); margin-bottom: 8px;
+            display: flex; align-items: center; gap: 6px;
+        }
+        .lernziel-box ul { padding-left: 18px; }
+        .lernziel-box ul li {
+            font-size: 14px; line-height: 1.65; color: var(--gray-800); margin-bottom: 4px;
+        }
+
+        /* Video placeholder */
+        .video-placeholder {
+            background: var(--gray-800);
+            border-radius: 8px;
+            aspect-ratio: 16/9;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            color: white;
+            margin: 4px 0;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        .video-placeholder::before {
+            content: '';
+            position: absolute; inset: 0;
+            background: linear-gradient(135deg, #1e3a5f 0%, #0f172a 100%);
+        }
+        .video-play {
+            width: 52px; height: 52px; border-radius: 50%;
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(4px);
+            border: 2px solid rgba(255,255,255,0.3);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px;
+            position: relative; z-index: 1;
+            transition: background 0.15s;
+        }
+        .video-placeholder:hover .video-play { background: rgba(255,255,255,0.25); }
+        .video-meta { position: relative; z-index: 1; font-size: 13px; opacity: 0.7; }
+
+        /* Quiz */
+        .quiz-wrap { display: flex; flex-direction: column; gap: 8px; }
+
+        .quiz-q {
+            font-size: 14px; font-weight: 600; color: var(--navy);
+            margin-bottom: 12px; line-height: 1.5;
+        }
+
+        .quiz-option {
+            display: flex; align-items: center; gap: 10px;
+            padding: 10px 14px;
+            border: 1.5px solid var(--gray-200);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            color: var(--gray-600);
+            transition: all 0.15s;
+            background: white;
+        }
+        .quiz-option:hover { border-color: var(--indigo); color: var(--navy); background: var(--indigo-lt); }
+        .quiz-option.selected { border-color: var(--indigo); background: var(--indigo-lt); color: var(--indigo); font-weight: 600; }
+        .quiz-option.correct  { border-color: var(--green); background: var(--green-lt); color: var(--green); font-weight: 600; }
+        .quiz-option.wrong    { border-color: var(--red); background: var(--red-lt); color: var(--red); }
+
+        .option-radio {
+            width: 18px; height: 18px; border-radius: 50%;
+            border: 2px solid var(--gray-300);
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+        .quiz-option.selected .option-radio,
+        .quiz-option.correct  .option-radio { border-color: var(--indigo); background: var(--indigo); }
+        .quiz-option.correct  .option-radio { border-color: var(--green); background: var(--green); }
+        .option-radio::after {
+            content: '';
+            width: 7px; height: 7px; border-radius: 50%; background: white;
+        }
+
+        .quiz-btn {
+            margin-top: 12px;
+            align-self: flex-start;
+            padding: 9px 20px;
+            background: var(--indigo);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.15s;
+            font-family: inherit;
+        }
+        .quiz-btn:hover { background: #3a50d9; }
+
+        /* Lückentext */
+        .luecke-wrap { line-height: 2.0; font-size: 14px; color: var(--gray-800); }
+        .luecke-input {
+            display: inline-block;
+            border: none;
+            border-bottom: 2px solid var(--indigo);
+            background: var(--indigo-lt);
+            border-radius: 4px 4px 0 0;
+            padding: 2px 10px;
+            font-size: 14px;
+            font-family: inherit;
+            color: var(--indigo);
+            font-weight: 600;
+            outline: none;
+            min-width: 100px;
+            transition: border-color 0.15s;
+        }
+        .luecke-input:focus { border-color: var(--violet); background: #f5f3ff; color: var(--violet); }
+        .luecke-hint {
+            margin-top: 10px;
+            font-size: 12px; color: var(--gray-400);
+            font-style: italic;
+        }
+
+        /* Reflexion */
+        .reflexion-q {
+            font-size: 14px; font-weight: 600; color: var(--navy);
+            margin-bottom: 12px; line-height: 1.5;
+        }
+        .reflexion-textarea {
+            width: 100%;
+            min-height: 96px;
+            border: 1.5px solid var(--gray-200);
+            border-radius: 8px;
+            padding: 12px 14px;
+            font-size: 14px;
+            font-family: inherit;
+            color: var(--navy);
+            resize: vertical;
+            outline: none;
+            transition: border-color 0.15s;
+            background: var(--gray-50);
+            line-height: 1.6;
+        }
+        .reflexion-textarea:focus { border-color: var(--violet); background: white; }
+        .reflexion-submit {
+            margin-top: 10px;
+            padding: 8px 18px;
+            background: var(--violet);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+            transition: background 0.15s;
+        }
+        .reflexion-submit:hover { background: #6d28d9; }
+
+        /* Image placeholder */
+        .img-placeholder {
+            background: var(--gray-100);
+            border-radius: 8px;
+            height: 180px;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            color: var(--gray-400);
+            font-size: 13px;
+            gap: 8px;
+        }
+        .img-placeholder .img-icon { font-size: 32px; }
+
+        /* Zusammenfassung */
+        .zusammen-box {
+            background: #f0fdf4;
+            border: 1.5px solid #bbf7d0;
+            border-radius: 10px;
+            padding: 14px 18px;
+        }
+        .zusammen-label {
+            font-size: 11px; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 0.4px; color: var(--green); margin-bottom: 10px;
+            display: flex; align-items: center; gap: 6px;
+        }
+        .zusammen-box ul { padding-left: 18px; }
+        .zusammen-box ul li {
+            font-size: 14px; line-height: 1.65; color: var(--gray-800); margin-bottom: 4px;
+        }
+
+        /* UK nav */
+        .uk-nav {
+            max-width: 740px;
+            margin: 28px auto 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .uk-nav-btn {
+            display: flex; align-items: center; gap: 8px;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-size: 13px; font-weight: 600;
+            cursor: pointer; transition: all 0.15s;
+            font-family: inherit;
+            text-decoration: none;
+        }
+
+        .uk-nav-prev {
+            background: white;
+            border: 1.5px solid var(--gray-200);
+            color: var(--gray-600);
+        }
+        .uk-nav-prev:hover { border-color: var(--indigo); color: var(--indigo); }
+
+        .uk-nav-next {
+            background: var(--indigo);
+            border: 1.5px solid var(--indigo);
+            color: white;
+            margin-left: auto;
+        }
+        .uk-nav-next:hover { background: #3a50d9; }
+
+        /* Bottom padding */
+        .content-bottom { height: 40px; }
+
+        /* ══════════════════════════════════
+           GLOSSAR – Inline Term
+           ══════════════════════════════════ */
+        .gterm {
+            border-bottom: 2px dotted #a5b4fc;
+            color: inherit;
+            cursor: pointer;
+            position: relative;
+            font-weight: inherit;
+            transition: color 0.12s;
+            white-space: nowrap;
+        }
+        .gterm:hover { color: var(--indigo); border-bottom-color: var(--indigo); }
+
+        /* Tooltip (Desktop hover) */
+        .gterm .gtooltip {
+            display: none;
+            position: absolute;
+            bottom: calc(100% + 8px);
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--navy);
+            color: white;
+            border-radius: 8px;
+            padding: 9px 13px;
+            font-size: 12px;
+            line-height: 1.5;
+            width: 240px;
+            pointer-events: none;
+            z-index: 100;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+            font-weight: 400;
+        }
+        .gterm .gtooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 6px solid transparent;
+            border-top-color: var(--navy);
+        }
+        .gterm .gtooltip .gtt-term {
+            font-weight: 700;
+            font-size: 12px;
+            margin-bottom: 4px;
+            color: #a5b4fc;
+        }
+        .gterm .gtooltip .gtt-hint {
+            font-size: 10px;
+            opacity: 0.5;
+            margin-top: 6px;
+        }
+        .gterm:hover .gtooltip { display: block; }
+
+        /* ══════════════════════════════════
+           GLOSSAR – Side Drawer
+           ══════════════════════════════════ */
+        .glossar-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 50;
+        }
+        .glossar-overlay.open { display: block; }
+
+        .glossar-backdrop {
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,0.18);
+        }
+
+        .glossar-drawer {
+            position: absolute;
+            top: 54px; /* below top-nav */
+            right: 0;
+            bottom: 0;
+            width: 340px;
+            background: white;
+            box-shadow: -4px 0 24px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            transform: translateX(100%);
+            transition: transform 0.25s cubic-bezier(0.4,0,0.2,1);
+        }
+        .glossar-overlay.open .glossar-drawer {
+            transform: translateX(0);
+        }
+
+        .gd-head {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            padding: 20px 20px 14px;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .gd-label {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            color: var(--indigo);
+            margin-bottom: 4px;
+        }
+
+        .gd-term {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--navy);
+            line-height: 1.2;
+        }
+
+        .gd-aliases {
+            margin-top: 5px;
+            font-size: 12px;
+            color: var(--gray-400);
+        }
+        .gd-aliases span { color: var(--gray-600); }
+
+        .gd-close {
+            width: 28px; height: 28px;
+            border-radius: 6px;
+            border: 1px solid var(--gray-200);
+            background: white;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 16px;
+            color: var(--gray-400);
+            cursor: pointer;
+            flex-shrink: 0;
+            transition: all 0.12s;
+            margin-top: 2px;
+        }
+        .gd-close:hover { border-color: var(--indigo); color: var(--indigo); }
+
+        .gd-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 18px 20px;
+        }
+
+        .gd-section-label {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--gray-400);
+            margin-bottom: 8px;
+        }
+
+        .gd-definition {
+            font-size: 14px;
+            line-height: 1.7;
+            color: var(--gray-800);
+            margin-bottom: 18px;
+        }
+
+        .gd-divider {
+            height: 1px;
+            background: var(--gray-100);
+            margin: 16px 0;
+        }
+
+        .gd-context-label {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--gray-400);
+            margin-bottom: 8px;
+        }
+
+        .gd-context-box {
+            background: var(--indigo-lt);
+            border-left: 3px solid var(--indigo);
+            border-radius: 0 6px 6px 0;
+            padding: 10px 12px;
+            font-size: 13px;
+            line-height: 1.6;
+            color: var(--gray-800);
+        }
+        .gd-context-box mark {
+            background: #c7d2fe;
+            color: var(--indigo);
+            font-weight: 600;
+            border-radius: 2px;
+            padding: 0 2px;
+        }
+
+        .gd-foot {
+            padding: 14px 20px;
+            border-top: 1px solid var(--gray-200);
+        }
+
+        .gd-glossar-link {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--indigo);
+            text-decoration: none;
+            padding: 8px 14px;
+            border: 1.5px solid var(--indigo-md);
+            border-radius: 8px;
+            background: var(--indigo-lt);
+            transition: all 0.12s;
+        }
+        .gd-glossar-link:hover { background: var(--indigo); color: white; border-color: var(--indigo); }
+
+    </style>
+</head>
+<body>
+
+<!-- ══════════════════════ TOP NAV ══════════════════════ -->
+<nav class="top-nav">
+    <div class="top-nav-left">
+        <a class="nav-back" href="#">&#8592; Meine Kurse</a>
+        <div class="nav-divider"></div>
+        <div class="nav-course">
+            <span class="nav-course-name">Microsoft Teams: Einstieg und zentrale Funktionen</span>
+            <span class="nav-course-sub">Modul 1 · Kapitel 1 · UK 1.1.3</span>
+        </div>
+    </div>
+    <div class="top-nav-right">
+        <div class="nav-prog-wrap">
+            <span class="nav-prog-label">32 %</span>
+            <div class="nav-prog-bar"><div class="fill" style="width:32%"></div></div>
+        </div>
+        <div class="nav-avatar">DK</div>
+    </div>
+</nav>
+
+<!-- ══════════════════════ MAIN ══════════════════════ -->
+<div class="app-layout">
+
+    <!-- ═══ SIDEBAR ═══ -->
+    <aside class="sidebar">
+        <div class="sidebar-head">
+            <input class="sidebar-search" type="text" placeholder="Kapitel suchen …">
+        </div>
+
+        <div class="sidebar-tree">
+
+            <!-- Modul 1 – aktiv -->
+            <div class="module-row" onclick="toggleMod(this)">
+                <div class="mod-icon active">1</div>
+                <div class="mod-info">
+                    <div class="mod-name">Microsoft Teams: Einstieg und zentrale Funktionen</div>
+                    <div class="mod-progress"><span class="done-count">3</span> / 5 Kapitel</div>
+                </div>
+                <span class="mod-chevron open">▶</span>
+            </div>
+            <div class="mod-bar-wrap">
+                <div class="mod-bar"><div class="fill active" style="width:60%"></div></div>
+            </div>
+
+            <div class="chapters open">
+
+                <!-- Kapitel 1.1 – aktiv -->
+                <div class="chapter-row active" onclick="toggleCh(this)">
+                    <span class="ch-dot active"></span>
+                    1.1 Grundlagen und erste Schritte mit Microsoft Teams
+                    <span style="margin-left:auto;font-size:9px;color:#9ca3af;">▶</span>
+                </div>
+                <div class="subchapters open">
+                    <div class="uk-row done" onclick="selectUK(this)">
+                        <span class="uk-check">✓</span>
+                        Überblick und Voraussetzungen für Microsoft Teams
+                    </div>
+                    <div class="uk-row done" onclick="selectUK(this)">
+                        <span class="uk-check">✓</span>
+                        Aktuelle Entwicklungen und App-Integration
+                    </div>
+                    <div class="uk-row active" onclick="selectUK(this)">
+                        <span class="uk-check">●</span>
+                        Navigation und Benutzeroberfläche in Teams
+                    </div>
+                    <div class="uk-row" onclick="selectUK(this)">
+                        <span class="uk-check">○</span>
+                        Suchfunktionen, Status und Benachrichtigungen
+                    </div>
+                </div>
+
+                <!-- Kapitel 1.2 -->
+                <div class="chapter-row" onclick="toggleCh(this)">
+                    <span class="ch-dot todo"></span>
+                    1.2 Struktur und Verwaltung von Teams und Kanälen
+                    <span style="margin-left:auto;font-size:9px;color:#9ca3af;">▶</span>
+                </div>
+                <div class="subchapters">
+                    <div class="uk-row" onclick="selectUK(this)">
+                        <span class="uk-check">○</span>Teams erstellen und verwalten</div>
+                    <div class="uk-row" onclick="selectUK(this)">
+                        <span class="uk-check">○</span>Kanäle und Tabs einrichten</div>
+                    <div class="uk-row" onclick="selectUK(this)">
+                        <span class="uk-check">○</span>Mitglieder und Berechtigungen</div>
+                </div>
+
+                <!-- Kapitel 1.3 -->
+                <div class="chapter-row" onclick="toggleCh(this)">
+                    <span class="ch-dot todo"></span>
+                    1.3 Teamorganisation und Copilot-Einsatz
+                    <span style="margin-left:auto;font-size:9px;color:#9ca3af;">▶</span>
+                </div>
+                <div class="subchapters"></div>
+
+            </div>
+
+            <!-- Modul 2 – gesperrt -->
+            <div class="module-row" onclick="toggleMod(this)">
+                <div class="mod-icon todo">2</div>
+                <div class="mod-info">
+                    <div class="mod-name">Kommunikation und Zusammenarbeit mit Microsoft Teams</div>
+                    <div class="mod-progress">0 / 4 Kapitel</div>
+                </div>
+                <span class="mod-chevron">▶</span>
+            </div>
+            <div class="mod-bar-wrap">
+                <div class="mod-bar"><div class="fill" style="width:0%"></div></div>
+            </div>
+            <div class="chapters"></div>
+
+            <!-- Modul 3 -->
+            <div class="module-row" onclick="toggleMod(this)">
+                <div class="mod-icon todo">3</div>
+                <div class="mod-info">
+                    <div class="mod-name">Meetings planen und durchführen</div>
+                    <div class="mod-progress">0 / 3 Kapitel</div>
+                </div>
+                <span class="mod-chevron">▶</span>
+            </div>
+            <div class="mod-bar-wrap">
+                <div class="mod-bar"><div class="fill" style="width:0%"></div></div>
+            </div>
+            <div class="chapters"></div>
+
+        </div>
+
+        <div class="sidebar-foot">
+            <div class="sf-row">
+                <span class="sf-label">Gesamtfortschritt</span>
+                <span class="sf-val">32 %</span>
+            </div>
+            <div class="sf-bar"><div class="fill" style="width:32%"></div></div>
+        </div>
+    </aside>
+
+    <!-- ═══ GLOSSAR DRAWER ═══ -->
+    <div class="glossar-overlay" id="glossarOverlay">
+        <div class="glossar-backdrop" onclick="closeGlossar()"></div>
+        <div class="glossar-drawer" id="glossarDrawer">
+            <div class="gd-head">
+                <div>
+                    <div class="gd-label">Glossar</div>
+                    <div class="gd-term" id="gd-term">—</div>
+                    <div class="gd-aliases" id="gd-aliases"></div>
+                </div>
+                <button class="gd-close" onclick="closeGlossar()">✕</button>
+            </div>
+            <div class="gd-body">
+                <div class="gd-section-label">Erläuterung</div>
+                <div class="gd-definition" id="gd-definition">—</div>
+                <div class="gd-divider"></div>
+                <div class="gd-context-label">Im Text</div>
+                <div class="gd-context-box" id="gd-context">—</div>
+            </div>
+            <div class="gd-foot">
+                <a href="#" class="gd-glossar-link">📖 Vollständiges Glossar öffnen →</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ CONTENT AREA ═══ -->
+    <main class="content-area" id="contentArea">
+
+        <!-- Sticky context bar -->
+        <div class="context-bar">
+            <div class="breadcrumb">
+                <span class="crumb">Modul 1</span>
+                <span class="sep">›</span>
+                <span class="crumb">1.1 Grundlagen und erste Schritte</span>
+                <span class="sep">›</span>
+                <span class="current">1.1.3 Navigation und Benutzeroberfläche</span>
+            </div>
+            <div class="phase-pills">
+                <div class="phase-pill vorher active" id="pill-vorher" onclick="scrollToPhase('vorher')">Vorher</div>
+                <div class="phase-pill waehrend"       id="pill-waehrend" onclick="scrollToPhase('waehrend')">Während</div>
+                <div class="phase-pill nachher"        id="pill-nachher" onclick="scrollToPhase('nachher')">Nachher</div>
+                <div class="phase-pill schluss"        id="pill-schluss" onclick="scrollToPhase('schluss')">Schluss</div>
+            </div>
+        </div>
+
+        <!-- UK Title block -->
+        <div class="uk-title-block">
+            <div class="uk-sup">Unterkapitel 1.1.3</div>
+            <div class="uk-title">Navigation und Benutzeroberfläche in Teams</div>
+            <div class="uk-meta-row">
+                <div class="uk-stat"><span class="uk-stat-icon">📖</span> <strong>10</strong>&nbsp;Lerninhalte</div>
+                <div class="uk-stat"><span class="uk-stat-icon">⏱</span> ca. <strong>20 min</strong></div>
+                <div class="uk-stat"><span class="uk-stat-icon">✅</span> <strong>4</strong>&nbsp;von 10 abgeschlossen</div>
+                <div class="uk-prog-wrap">
+                    <span class="uk-prog-label">Fortschritt</span>
+                    <div class="uk-prog-bar"><div class="fill" style="width:40%"></div></div>
+                    <span class="uk-prog-val">40 %</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ─── PHASE: VORHER ─── -->
+        <div class="phase-section vorher" id="phase-vorher">
+
+            <!-- CE 1: Lernziel -->
+            <div class="ce-card">
+                <div class="ce-head">
+                    <span class="ce-type-chip chip-lernziel">🎯 Lernziel</span>
+                    <span class="ce-title">Was du in diesem Unterkapitel lernst</span>
+                    <span class="ce-done-badge">✓ gelesen</span>
+                </div>
+                <div class="ce-body">
+                    <div class="lernziel-box">
+                        <div class="lernziel-label">🎯 Nach diesem Unterkapitel kannst du …</div>
+                        <ul>
+                            <li>die Hauptbereiche der Teams-Oberfläche benennen und deren Funktion erklären</li>
+                            <li>die Navigationsleiste gezielt nutzen, um zwischen Bereichen zu wechseln</li>
+                            <li>die Suchleiste und Schnellbefehle einsetzen</li>
+                            <li>Einstellungen und dein Profil aufrufen und anpassen</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CE 2: Aktivierung -->
+            <div class="ce-card">
+                <div class="ce-head">
+                    <span class="ce-type-chip chip-text">💬 Einstieg</span>
+                    <span class="ce-title">Stell dir vor …</span>
+                    <span class="ce-done-badge">✓ gelesen</span>
+                </div>
+                <div class="ce-body">
+                    <p>Du startest heute deinen ersten Arbeitstag in einem neuen Unternehmen. Dein Team nutzt Microsoft Teams für alles – Absprachen, Dateien, Meetings. Du öffnest die App und siehst … eine Menge Icons und Bereiche.</p>
+                    <div class="callout">
+                        <span class="callout-icon">🧭</span>
+                        <span class="callout-text">Damit du dich sofort zurechtfindest, schauen wir uns gemeinsam den Aufbau der Teams-Oberfläche an — Schritt für Schritt.</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ─── PHASE: WÄHREND ─── -->
+        <div class="phase-section waehrend" id="phase-waehrend">
+
+            <!-- CE 3: Text -->
+            <div class="ce-card">
+                <div class="ce-head">
+                    <span class="ce-type-chip chip-text">📄 Text</span>
+                    <span class="ce-title">Die Navigationsleiste</span>
+                    <span class="ce-done-badge">✓ gelesen</span>
+                </div>
+                <div class="ce-body">
+                    <p>Die <span class="gterm" onclick="openGlossar('navigationsleiste')" data-term="navigationsleiste">Navigationsleiste<span class="gtooltip"><div class="gtt-term">Navigationsleiste</div>Vertikale Leiste am linken Rand von Teams mit Icons für alle Hauptbereiche wie Chat, Kalender und Dateien.<div class="gtt-hint">Klicken für vollständige Erläuterung</div></span></span> ist dein zentrales Steuerungselement in Teams. Sie enthält feste Icons für die wichtigsten Bereiche: <strong>Aktivität</strong>, <strong>Chat</strong>, <strong>Teams</strong>, <strong>Kalender</strong> und <strong>Dateien</strong>.</p>
+                    <p>Über das <span class="gterm" onclick="openGlossar('dreipunktmenu')" data-term="dreipunktmenu">Drei-Punkte-Menü<span class="gtooltip"><div class="gtt-term">Drei-Punkte-Menü</div>Symbol (…) in der Navigationsleiste, das weitere installierte Apps und Dienste zugänglich macht.<div class="gtt-hint">Klicken für vollständige Erläuterung</div></span></span> erreichst du weitere Apps, die dein <span class="gterm" onclick="openGlossar('administrator')" data-term="administrator">Administrator<span class="gtooltip"><div class="gtt-term">Administrator</div>Person mit erweiterten Verwaltungsrechten in Microsoft Teams, die Apps, Einstellungen und Benutzerberechtigungen verwaltet.<div class="gtt-hint">Klicken für vollständige Erläuterung</div></span></span> hinzugefügt hat — zum Beispiel Planner oder Schichten. Du kannst die Reihenfolge der Icons durch Ziehen anpassen.</p>
+                    <div class="callout">
+                        <span class="callout-icon">💡</span>
+                        <span class="callout-text">Tipp: Mit <strong>Strg + 1–9</strong> (Windows) oder <strong>Cmd + 1–9</strong> (Mac) springst du direkt zum entsprechenden Bereich — ohne Mausklick.</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CE 4: Bild -->
+            <div class="ce-card">
+                <div class="ce-head">
+                    <span class="ce-type-chip chip-bild">🖼 Abbildung</span>
+                    <span class="ce-title">Aufbau der Teams-Oberfläche</span>
+                </div>
+                <div class="ce-body">
+                    <div class="img-placeholder">
+                        <span class="img-icon">🖼</span>
+                        <span>Annotierter Screenshot: Teams-Navigationsleiste mit beschrifteten Bereichen</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CE 5: Video -->
+            <div class="ce-card">
+                <div class="ce-head">
+                    <span class="ce-type-chip chip-video">▶ Video</span>
+                    <span class="ce-title">Rundgang durch die Teams-Oberfläche (4:30 min)</span>
+                </div>
+                <div class="ce-body">
+                    <div class="video-placeholder">
+                        <div class="video-play">▶</div>
+                        <span class="video-meta">Rundgang durch die Teams-Oberfläche · 4:30 min</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CE 6: Beispiel -->
+            <div class="ce-card">
+                <div class="ce-head">
+                    <span class="ce-type-chip chip-beispiel">💡 Beispiel</span>
+                    <span class="ce-title">So sieht es in der Praxis aus</span>
+                </div>
+                <div class="ce-body">
+                    <p>Sabrina arbeitet im Vertrieb und wechselt zwischen Chat und Kalender: Morgens checkt sie zuerst die <strong>Aktivitäten</strong> (Icon ganz oben) um <span class="gterm" onclick="openGlossar('erwaehnung')" data-term="erwaehnung">Erwähnungen<span class="gtooltip"><div class="gtt-term">Erwähnung</div>Benachrichtigung, wenn jemand deinen Namen mit @Name in einem Chat oder Kanal erwähnt hat.<div class="gtt-hint">Klicken für vollständige Erläuterung</div></span></span> zu sehen, dann öffnet sie den <strong>Kalender</strong> für ihr 10-Uhr-Meeting.</p>
+                    <div class="callout">
+                        <span class="callout-icon">📌</span>
+                        <span class="callout-text">Sie hat den Kalender in der <span class="gterm" onclick="openGlossar('navigationsleiste')" data-term="navigationsleiste">Navigationsleiste<span class="gtooltip"><div class="gtt-term">Navigationsleiste</div>Vertikale Leiste am linken Rand von Teams mit Icons für alle Hauptbereiche.<div class="gtt-hint">Klicken für vollständige Erläuterung</div></span></span> ganz nach oben gezogen, weil sie ihn täglich braucht — Teams erlaubt genau das.</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ─── PHASE: NACHHER ─── -->
+        <div class="phase-section nachher" id="phase-nachher">
+
+            <!-- CE 7: Lückentext -->
+            <div class="ce-card">
+                <div class="ce-head">
+                    <span class="ce-type-chip chip-luecke">✏ Lückentext</span>
+                    <span class="ce-title">Wissen anwenden</span>
+                </div>
+                <div class="ce-body">
+                    <div class="luecke-wrap">
+                        <p style="margin-bottom:14px;font-size:13px;color:#6b7280;font-style:italic;">Ergänze die Lücken mit dem passenden Begriff aus dem Abschnitt „Die Navigationsleiste".</p>
+                        Die vertikale Leiste am <input class="luecke-input" placeholder="?" size="6"> Rand der Teams-Oberfläche enthält Icons für die wichtigsten Bereiche.
+                        Mit dem Tastenkürzel <input class="luecke-input" placeholder="?" size="10"> (Windows) wechselst du direkt zwischen Bereichen, ohne die Maus zu nutzen.
+                        Weitere Apps erreichst du über das <input class="luecke-input" placeholder="?" size="12">.
+                    </div>
+                    <div class="luecke-hint">Lies bei Unsicherheit den Abschnitt „Die Navigationsleiste" nochmals durch.</div>
+                    <button class="quiz-btn" style="margin-top:14px;">Antworten prüfen</button>
+                </div>
+            </div>
+
+            <!-- CE 8: Quiz -->
+            <div class="ce-card">
+                <div class="ce-head">
+                    <span class="ce-type-chip chip-quiz">❓ Quiz</span>
+                    <span class="ce-title">Lerncheck</span>
+                </div>
+                <div class="ce-body">
+                    <div class="quiz-wrap">
+                        <div class="quiz-q">Welche Aussage zur Navigationsleiste in Microsoft Teams ist korrekt?</div>
+                        <div class="quiz-option" onclick="selectOption(this)">
+                            <span class="option-radio"></span>
+                            Die Reihenfolge der Icons ist fest vorgegeben und kann nicht verändert werden.
+                        </div>
+                        <div class="quiz-option selected" onclick="selectOption(this)">
+                            <span class="option-radio"></span>
+                            Die Icons können durch Ziehen in der Reihenfolge angepasst werden.
+                        </div>
+                        <div class="quiz-option" onclick="selectOption(this)">
+                            <span class="option-radio"></span>
+                            Die Navigationsleiste befindet sich am oberen Rand des Bildschirms.
+                        </div>
+                        <div class="quiz-option" onclick="selectOption(this)">
+                            <span class="option-radio"></span>
+                            Das Drei-Punkte-Menü öffnet immer den Kalender.
+                        </div>
+                        <button class="quiz-btn">Antwort prüfen</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CE 9: Reflexion -->
+            <div class="ce-card">
+                <div class="ce-head">
+                    <span class="ce-type-chip chip-reflexion">🔍 Selbstreflexion</span>
+                    <span class="ce-title">Übertrage es auf deinen Alltag</span>
+                </div>
+                <div class="ce-body">
+                    <div class="reflexion-wrap">
+                        <div class="reflexion-q">Welche Bereiche der Teams-Navigationsleiste wirst du in deinem Arbeitsalltag am häufigsten nutzen — und warum?</div>
+                        <textarea class="reflexion-textarea" placeholder="Schreib deine Gedanken hier …"></textarea>
+                        <button class="reflexion-submit">Reflexion speichern</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ─── PHASE: SCHLUSS ─── -->
+        <div class="phase-section schluss" id="phase-schluss">
+
+            <!-- CE 10: Zusammenfassung -->
+            <div class="ce-card">
+                <div class="ce-head">
+                    <span class="ce-type-chip chip-zusammen">📋 Zusammenfassung</span>
+                    <span class="ce-title">Das Wichtigste auf einen Blick</span>
+                </div>
+                <div class="ce-body">
+                    <div class="zusammen-box">
+                        <div class="zusammen-label">✅ Das hast du gelernt</div>
+                        <ul>
+                            <li>Die vertikale <strong>Navigationsleiste</strong> ist dein Steuerungselement — sie enthält Aktivität, Chat, Teams, Kalender und Dateien.</li>
+                            <li>Mit dem <strong>Drei-Punkte-Menü</strong> erreichst du weitere Apps.</li>
+                            <li>Die Reihenfolge der Icons ist per <strong>Drag & Drop</strong> anpassbar.</li>
+                            <li>Tastenkürzel <strong>Strg/Cmd + 1–9</strong> ermöglichen schnelles Wechseln ohne Maus.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- UK Navigation -->
+            <div class="uk-nav">
+                <a class="uk-nav-btn uk-nav-prev" href="#">&#8592; Aktuelle Entwicklungen und App-Integration</a>
+                <a class="uk-nav-btn uk-nav-next" href="#">Suchfunktionen, Status und Benachrichtigungen &#8594;</a>
+            </div>
+
+        </div>
+
+        <div class="content-bottom"></div>
+    </main>
+
+</div>
+
+<script>
+    // ══════════════════════════════════
+    // GLOSSAR DATA
+    // ══════════════════════════════════
+    const glossar = {
+        navigationsleiste: {
+            term: 'Navigationsleiste',
+            aliases: ['Nav-Leiste', 'Seitenleiste'],
+            definition: 'Die vertikale Leiste am linken Rand der Microsoft Teams-Oberfläche. Sie enthält Icons für alle zentralen Bereiche: Aktivität, Chat, Teams, Kalender, Dateien sowie weitere installierte Apps. Die Reihenfolge der Icons kann per Drag & Drop individuell angepasst werden.',
+            context: 'Die <mark>Navigationsleiste</mark> ist dein zentrales Steuerungselement in Teams.'
+        },
+        dreipunktmenu: {
+            term: 'Drei-Punkte-Menü',
+            aliases: ['Mehr-Menü', '… (Auslassungszeichen)'],
+            definition: 'Das Symbol mit drei Punkten (…) in der Navigationsleiste von Microsoft Teams. Ein Klick darauf öffnet eine Liste aller weiteren Apps und Dienste, die vom Administrator installiert wurden — zum Beispiel Planner, Schichten oder Forms.',
+            context: 'Über das <mark>Drei-Punkte-Menü</mark> erreichst du weitere Apps, die dein Administrator hinzugefügt hat.'
+        },
+        administrator: {
+            term: 'Administrator',
+            aliases: ['Admin', 'Teams-Admin', 'IT-Administrator'],
+            definition: 'Eine Person mit erweiterten Verwaltungsrechten in Microsoft Teams. Administratoren können Apps freischalten oder sperren, Benutzerkonten verwalten, Richtlinien festlegen und Einstellungen für die gesamte Organisation konfigurieren.',
+            context: 'Apps, die dein <mark>Administrator</mark> hinzugefügt hat — zum Beispiel Planner oder Schichten.'
+        },
+        erwaehnung: {
+            term: 'Erwähnung',
+            aliases: ['@Mention', 'Mention', '@-Erwähnung'],
+            definition: 'Eine gezielte Benachrichtigung in Microsoft Teams, ausgelöst wenn jemand deinen Namen mit @Vorname oder @Vollständiger Name in einem Chat, Kanal oder einer Nachricht verwendet. Erwähnungen erscheinen im Aktivitäts-Feed und erzeugen eine Push-Benachrichtigung.',
+            context: 'Morgens checkt sie zuerst die Aktivitäten, um <mark>Erwähnungen</mark> zu sehen.'
+        }
+    };
+
+    function openGlossar(key) {
+        const entry = glossar[key];
+        if (!entry) return;
+
+        document.getElementById('gd-term').textContent = entry.term;
+
+        const aliasEl = document.getElementById('gd-aliases');
+        if (entry.aliases && entry.aliases.length) {
+            aliasEl.innerHTML = 'Auch: <span>' + entry.aliases.join(', ') + '</span>';
+        } else {
+            aliasEl.innerHTML = '';
+        }
+
+        document.getElementById('gd-definition').textContent = entry.definition;
+        document.getElementById('gd-context').innerHTML = entry.context;
+
+        const overlay = document.getElementById('glossarOverlay');
+        overlay.classList.add('open');
+        // trigger animation after display
+        requestAnimationFrame(() => {
+            document.getElementById('glossarDrawer').style.transform = 'translateX(0)';
+        });
+    }
+
+    function closeGlossar() {
+        document.getElementById('glossarOverlay').classList.remove('open');
+    }
+
+    // Close on Escape
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') closeGlossar();
+    });
+
+    // ── Sidebar toggles ──
+    function toggleMod(el) {
+        const chevron = el.querySelector('.mod-chevron');
+        const chapters = el.closest('.sidebar-tree').querySelectorAll('.chapters');
+        // find the chapters div right after the bar-wrap
+        const barWrap = el.nextElementSibling;
+        const chaps = barWrap ? barWrap.nextElementSibling : null;
+        if (!chaps) return;
+        const open = chaps.classList.toggle('open');
+        chevron.classList.toggle('open', open);
+    }
+
+    function toggleCh(el) {
+        const subs = el.nextElementSibling;
+        if (!subs) return;
+        subs.classList.toggle('open');
+    }
+
+    function selectUK(el) {
+        document.querySelectorAll('.uk-row').forEach(r => r.classList.remove('active'));
+        el.classList.add('active');
+    }
+
+    // ── Phase pill scroll & activation ──
+    const phases = ['vorher', 'waehrend', 'nachher', 'schluss'];
+
+    function scrollToPhase(id) {
+        const el = document.getElementById('phase-' + id);
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function setActivePill(id) {
+        phases.forEach(p => {
+            const pill = document.getElementById('pill-' + p);
+            if (pill) pill.classList.toggle('active', p === id);
+        });
+    }
+
+    const contentArea = document.getElementById('contentArea');
+    contentArea.addEventListener('scroll', () => {
+        const scrollTop = contentArea.scrollTop + 80;
+        let current = phases[0];
+        phases.forEach(p => {
+            const sec = document.getElementById('phase-' + p);
+            if (sec && sec.offsetTop <= scrollTop) current = p;
+        });
+        setActivePill(current);
+    });
+
+    // ── Quiz option select ──
+    function selectOption(el) {
+        el.closest('.quiz-wrap').querySelectorAll('.quiz-option').forEach(o => o.classList.remove('selected'));
+        el.classList.add('selected');
+    }
+</script>
+
+</body>
+</html>

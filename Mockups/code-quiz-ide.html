@@ -1,0 +1,1083 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Code-Quiz IDE – Mockup</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+:root {
+  --navy:      #1a1a2e;
+  --indigo:    #4361ee;
+  --indigo-lt: #eef2ff;
+  --violet:    #7c3aed;
+  --green:     #059669;
+  --green-lt:  #d1fae5;
+  --amber:     #d97706;
+  --red:       #dc2626;
+  --gray-50:   #f8f9fc;
+  --gray-100:  #f3f4f6;
+  --gray-200:  #e5e7eb;
+  --gray-400:  #9ca3af;
+  --gray-600:  #4b5563;
+  --gray-800:  #1f2937;
+
+  /* Editor-Farben (One Dark-ähnlich) */
+  --ed-bg:       #1e2433;
+  --ed-bg2:      #252d3d;
+  --ed-bg3:      #2d3748;
+  --ed-border:   #374151;
+  --ed-gutter:   #3d4a5c;
+  --ed-ln:       #4a5568;
+  --ed-text:     #cdd6f4;
+  --ed-kw:       #89b4fa;  /* keywords – blau */
+  --ed-fn:       #cba6f7;  /* functions – lila */
+  --ed-str:      #a6e3a1;  /* strings – grün */
+  --ed-num:      #fab387;  /* numbers – orange */
+  --ed-cm:       #6c7a8d;  /* comments – grau */
+  --ed-type:     #f38ba8;  /* types/classes – rosa */
+  --ed-op:       #89dceb;  /* operators – cyan */
+  --ed-var:      #cdd6f4;  /* variables – helles grau */
+  --ed-attr:     #f9e2af;  /* attributes/tags – gelb */
+  --ed-err-bg:   #3d1515;
+  --ed-err-ln:   #7f1d1d;
+  --ed-err-text: #fca5a5;
+  --ed-warn-bg:  #3d2e00;
+  --ed-warn-ln:  #7a5c00;
+  --ed-warn-text:#fde68a;
+  --ed-ok-bg:    #0a2a1a;
+  --ed-ok-text:  #86efac;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--gray-50);
+  color: var(--navy);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* ── Page header ── */
+.page-header {
+  background: var(--navy);
+  padding: 20px 40px;
+  display: flex; align-items: baseline; gap: 14px;
+}
+.page-header h1 { font-size: 18px; font-weight: 700; color: white; }
+.page-header p  { font-size: 13px; color: rgba(255,255,255,0.4); }
+
+.page-body { max-width: 980px; margin: 0 auto; padding: 40px 24px 80px; }
+
+/* ── Section ── */
+.s-label { font-size: 11px; font-weight: 700; letter-spacing: 1.5px;
+  text-transform: uppercase; color: var(--gray-400); margin-bottom: 4px; }
+.s-title { font-size: 20px; font-weight: 800; color: var(--gray-800); margin-bottom: 6px; }
+.s-desc  { font-size: 13px; color: var(--gray-600); line-height: 1.7;
+  max-width: 620px; margin-bottom: 28px; }
+
+.divider { height: 1px; background: var(--gray-200); margin: 48px 0; }
+
+/* ══════════════════════════════════════════════
+   IDE SHELL
+   ══════════════════════════════════════════════ */
+.ide {
+  background: var(--ed-bg);
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1.5px solid var(--ed-border);
+  font-family: 'Fira Code', 'Cascadia Code', 'JetBrains Mono', 'Consolas', monospace;
+  font-size: 13px;
+  line-height: 1.75;
+  margin-bottom: 20px;
+}
+
+/* ── IDE Title bar ── */
+.ide-titlebar {
+  background: #161b27;
+  padding: 10px 16px;
+  display: flex; align-items: center; gap: 12px;
+  border-bottom: 1px solid var(--ed-border);
+}
+.ide-dots { display: flex; gap: 6px; }
+.ide-dot { width: 12px; height: 12px; border-radius: 50%; }
+.ide-dot:nth-child(1) { background: #ff5f56; }
+.ide-dot:nth-child(2) { background: #ffbd2e; }
+.ide-dot:nth-child(3) { background: #27c93f; }
+
+.ide-tabs { display: flex; gap: 2px; margin-left: 8px; flex: 1; }
+.ide-tab {
+  padding: 4px 14px; border-radius: 6px 6px 0 0;
+  font-size: 12px; color: #6b7280; cursor: pointer;
+  border: 1px solid transparent; border-bottom: none;
+  font-family: inherit;
+}
+.ide-tab.active {
+  background: var(--ed-bg2); color: var(--ed-text);
+  border-color: var(--ed-border); border-bottom-color: var(--ed-bg2);
+  margin-bottom: -1px; position: relative; z-index: 1;
+}
+
+/* Language selector */
+.lang-select-wrap { display: flex; align-items: center; gap: 8px; }
+.lang-label { font-size: 11px; color: #4a5568; font-family: inherit; }
+.lang-select {
+  background: var(--ed-bg3); color: var(--ed-text);
+  border: 1px solid var(--ed-border); border-radius: 6px;
+  padding: 3px 8px; font-size: 12px; font-family: inherit;
+  cursor: pointer; outline: none;
+}
+.lang-badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 3px 10px; border-radius: 99px;
+  font-size: 11px; font-weight: 700; font-family: inherit;
+}
+.lang-php    { background: #4f3d7a; color: #c4b5fd; }
+.lang-html   { background: #7a2d1a; color: #fca5a5; }
+.lang-js     { background: #7a6a00; color: #fde68a; }
+.lang-java   { background: #7a1f1f; color: #fca5a5; }
+.lang-python { background: #1a4a6e; color: #93c5fd; }
+
+/* ── IDE toolbar ── */
+.ide-toolbar {
+  background: var(--ed-bg2);
+  padding: 8px 16px;
+  display: flex; align-items: center; gap: 10px;
+  border-bottom: 1px solid var(--ed-border);
+}
+.ide-toolbar-left  { display: flex; align-items: center; gap: 10px; flex: 1; }
+.ide-toolbar-right { display: flex; align-items: center; gap: 8px; }
+
+.quiz-mode-chip {
+  display: flex; align-items: center; gap: 5px;
+  padding: 3px 10px; border-radius: 99px;
+  font-size: 11px; font-weight: 700; font-family: inherit;
+}
+.mode-debug   { background: #7f1d1d; color: #fca5a5; }
+.mode-assert  { background: #1e3a5f; color: #93c5fd; }
+.mode-explain { background: #3b1f6e; color: #c4b5fd; }
+
+.ide-btn {
+  padding: 5px 12px; border-radius: 7px;
+  font-size: 12px; font-weight: 600; font-family: inherit;
+  border: none; cursor: pointer; transition: all 0.15s;
+  display: flex; align-items: center; gap: 5px;
+}
+.btn-run    { background: #059669; color: white; }
+.btn-run:hover    { background: #047857; }
+.btn-hint   { background: var(--ed-bg3); color: #94a3b8; border: 1px solid var(--ed-border); }
+.btn-hint:hover   { color: var(--ed-text); }
+.btn-reset  { background: var(--ed-bg3); color: #94a3b8; border: 1px solid var(--ed-border); }
+.btn-submit { background: var(--indigo); color: white; }
+.btn-submit:hover { background: #3451d1; }
+
+/* ── Editor split pane ── */
+.ide-panes {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  min-height: 260px;
+}
+.ide-pane {
+  display: flex; flex-direction: column;
+  border-right: 1px solid var(--ed-border);
+  overflow: hidden;
+}
+.ide-pane:last-child { border-right: none; }
+.ide-pane-header {
+  background: #1a2030;
+  padding: 5px 14px;
+  font-size: 10px; font-weight: 700;
+  color: #4a5568; letter-spacing: 1px; text-transform: uppercase;
+  border-bottom: 1px solid var(--ed-border);
+  display: flex; justify-content: space-between; align-items: center;
+}
+.ide-pane-header .pane-status {
+  display: flex; align-items: center; gap: 5px;
+  font-size: 10px; font-weight: 600;
+}
+.status-err  { color: #f87171; }
+.status-ok   { color: #86efac; }
+.status-warn { color: #fbbf24; }
+
+/* ── Code display (read-only, given code) ── */
+.code-view {
+  flex: 1; overflow: auto; padding: 10px 0;
+  background: var(--ed-bg);
+}
+.code-line {
+  display: flex; align-items: flex-start;
+  padding: 0 16px 0 0; min-height: 24px;
+}
+.code-line:hover { background: rgba(255,255,255,0.03); }
+.code-line.err-line { background: var(--ed-err-bg); border-left: 3px solid #ef4444; }
+.code-line.warn-line { background: var(--ed-warn-bg); border-left: 3px solid #f59e0b; }
+.ln { /* line number */
+  width: 42px; text-align: right;
+  color: var(--ed-ln); font-size: 12px; padding: 0 12px 0 0;
+  flex-shrink: 0; user-select: none; position: relative;
+}
+.code-line.err-line  .ln { color: #f87171; }
+.code-line.warn-line .ln { color: #fbbf24; }
+.ln-icon { position: absolute; right: 0; top: 0; font-size: 11px; }
+.code-text { flex: 1; color: var(--ed-text); white-space: pre; }
+
+/* Syntax token styles */
+.kw   { color: var(--ed-kw); }   /* keywords */
+.fn   { color: var(--ed-fn); }   /* function names */
+.str  { color: var(--ed-str); }  /* strings */
+.num  { color: var(--ed-num); }  /* numbers */
+.cm   { color: var(--ed-cm); font-style: italic; } /* comments */
+.tp   { color: var(--ed-type); } /* types/classes */
+.op   { color: var(--ed-op); }   /* operators/tags */
+.attr { color: var(--ed-attr); } /* attrs/html tags */
+.err-tok { /* wavy underline for syntax error tokens */
+  text-decoration: underline wavy #ef4444;
+  color: #fca5a5;
+}
+.warn-tok { text-decoration: underline wavy #f59e0b; color: #fde68a; }
+
+/* ── Editable area ── */
+.code-editor-wrap {
+  flex: 1; position: relative; background: var(--ed-bg2);
+  display: flex;
+}
+.code-editor-gutter {
+  background: var(--ed-bg); padding: 10px 0;
+  width: 42px; flex-shrink: 0;
+  border-right: 1px solid var(--ed-gutter);
+}
+.gutter-ln {
+  display: block; text-align: right;
+  padding-right: 10px; min-height: 24px;
+  color: var(--ed-ln); font-size: 12px; user-select: none;
+}
+.code-editor {
+  flex: 1; padding: 10px 16px;
+  background: transparent; border: none; outline: none;
+  color: var(--ed-text); font-family: inherit; font-size: 13px;
+  line-height: 1.75; resize: none; tab-size: 2;
+  caret-color: var(--ed-text);
+}
+.code-editor::placeholder { color: #3d4a5c; }
+.code-editor:focus { background: rgba(255,255,255,0.01); }
+
+/* ── Console / Output panel ── */
+.ide-console {
+  background: #12161f;
+  border-top: 1px solid var(--ed-border);
+  min-height: 80px; max-height: 180px;
+  overflow-y: auto;
+}
+.console-bar {
+  padding: 5px 14px;
+  background: #161b27;
+  border-bottom: 1px solid var(--ed-border);
+  font-size: 10px; font-weight: 700; color: #4a5568;
+  letter-spacing: 1px; text-transform: uppercase;
+  display: flex; gap: 12px; align-items: center;
+}
+.console-tab {
+  cursor: pointer; padding: 2px 0;
+  border-bottom: 2px solid transparent;
+}
+.console-tab.active { color: var(--ed-text); border-bottom-color: var(--indigo); }
+.console-body { padding: 8px 16px; font-size: 12px; line-height: 1.8; }
+.con-err  { color: #f87171; }
+.con-warn { color: #fbbf24; }
+.con-ok   { color: #86efac; }
+.con-info { color: #94a3b8; }
+.con-line { display: flex; gap: 10px; align-items: flex-start; margin-bottom: 2px; }
+.con-icon { flex-shrink: 0; font-size: 11px; }
+.con-loc  { color: #4a5568; font-size: 11px; flex-shrink: 0; }
+
+/* ── Error squiggle list ── */
+.err-list {
+  padding: 8px 14px;
+  display: flex; flex-direction: column; gap: 6px;
+}
+.err-item {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 7px 10px; border-radius: 8px;
+  font-size: 12px; line-height: 1.5;
+}
+.err-item.err  { background: var(--ed-err-bg); color: var(--ed-err-text); border: 1px solid var(--ed-err-ln); }
+.err-item.warn { background: var(--ed-warn-bg); color: var(--ed-warn-text); border: 1px solid var(--ed-warn-ln); }
+.err-item.ok   { background: var(--ed-ok-bg);  color: var(--ed-ok-text); }
+.err-badge { font-size: 11px; font-weight: 700; flex-shrink: 0; }
+
+/* ── Assertion panel ── */
+.assert-panel { padding: 12px 16px; display: flex; flex-direction: column; gap: 7px; }
+.assert-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 7px 12px; border-radius: 8px;
+  font-size: 12px; font-family: inherit;
+}
+.assert-row.pass { background: var(--ed-ok-bg);  color: var(--ed-ok-text); }
+.assert-row.fail { background: var(--ed-err-bg); color: var(--ed-err-text); }
+.assert-row.skip { background: var(--ed-bg3); color: #4a5568; }
+.assert-icon { font-size: 14px; flex-shrink: 0; }
+.assert-code { flex: 1; font-family: inherit; }
+.assert-ms   { color: #4a5568; font-size: 11px; flex-shrink: 0; }
+.assert-row.pass .assert-ms { color: #34d399; }
+.assert-row.fail .assert-ms { color: #f87171; }
+
+/* ── Quiz wrapper card ── */
+.quiz-card {
+  background: white;
+  border: 1.5px solid var(--gray-200);
+  border-radius: 16px; overflow: hidden;
+  margin-bottom: 32px;
+}
+.quiz-card-head {
+  padding: 16px 20px 14px;
+  border-bottom: 1px solid var(--gray-100);
+  display: flex; align-items: flex-start; gap: 12px;
+}
+.quiz-card-head-right { flex: 1; }
+.quiz-type-badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 3px 10px; border-radius: 99px;
+  font-size: 11px; font-weight: 700;
+  margin-bottom: 6px;
+}
+.qb-debug   { background: #7f1d1d; color: #fca5a5; }
+.qb-assert  { background: #1e3a5f; color: #93c5fd; }
+.qb-explain { background: #3b1f6e; color: #c4b5fd; }
+.quiz-title { font-size: 15px; font-weight: 700; color: var(--gray-800); }
+.quiz-desc  { font-size: 13px; color: var(--gray-600); margin-top: 4px; line-height: 1.5; }
+
+/* Task panel below IDE */
+.task-panel {
+  padding: 16px 20px;
+  border-top: 1px solid var(--gray-100);
+  display: flex; align-items: flex-start; gap: 16px;
+}
+.task-instructions {
+  flex: 1; font-size: 13px; color: var(--gray-700); line-height: 1.6;
+}
+.task-instructions strong { color: var(--gray-800); }
+.task-actions { display: flex; gap: 8px; flex-shrink: 0; }
+.btn-primary {
+  padding: 8px 18px; border-radius: 8px;
+  font-size: 13px; font-weight: 600; font-family: inherit;
+  border: none; cursor: pointer; transition: all 0.15s;
+  background: var(--indigo); color: white;
+}
+.btn-primary:hover { background: #3451d1; }
+.btn-secondary {
+  padding: 8px 14px; border-radius: 8px;
+  font-size: 13px; font-weight: 600; font-family: inherit;
+  border: 1.5px solid var(--gray-200); cursor: pointer;
+  background: white; color: var(--gray-600);
+  transition: all 0.15s;
+}
+.btn-secondary:hover { border-color: var(--gray-400); color: var(--gray-800); }
+
+/* ── Single pane layout ── */
+.ide-panes.single { grid-template-columns: 1fr; }
+.ide-panes.thirds { grid-template-columns: 1fr 1fr 1fr; }
+
+/* ── Hint box ── */
+.hint-box {
+  margin: 0 16px 12px;
+  padding: 10px 14px;
+  background: #1a2a4a;
+  border: 1px solid #2d4a7a;
+  border-radius: 8px;
+  font-size: 12px; color: #93c5fd; line-height: 1.6;
+  display: flex; gap: 8px;
+}
+
+/* ── Explain: annotation overlay ── */
+.explain-annotation {
+  background: #1a2433; border-radius: 8px;
+  padding: 8px 12px; margin: 4px 0;
+  font-size: 12px; font-family: sans-serif;
+  color: #94a3b8; line-height: 1.5;
+  border-left: 3px solid var(--violet);
+}
+.explain-annotation strong { color: #c4b5fd; }
+
+/* ── Progress bar ── */
+.ide-progress { padding: 8px 16px; background: var(--ed-bg2); border-top: 1px solid var(--ed-border); }
+.prog-bar-wrap { height: 4px; background: var(--ed-bg3); border-radius: 99px; overflow: hidden; }
+.prog-bar-fill { height: 100%; border-radius: 99px; transition: width 0.4s; }
+.prog-info { display: flex; justify-content: space-between; font-size: 10px; color: #4a5568; margin-top: 4px; }
+
+/* ── Language tab strip ── */
+.lang-strip {
+  display: flex; gap: 4px;
+  background: var(--gray-100);
+  border: 1px solid var(--gray-200);
+  border-radius: 10px; padding: 4px;
+  margin-bottom: 16px; width: fit-content;
+}
+.lang-pill {
+  padding: 4px 14px; border-radius: 7px;
+  font-size: 12px; font-weight: 600; cursor: pointer;
+  color: var(--gray-600); transition: all 0.15s;
+}
+.lang-pill.active { background: white; color: var(--navy); box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>Code-Quiz IDE – Konzept</h1>
+  <p>Integrierte Lernumgebung mit Syntax-Highlighting, Fehlermarkierung und Quiz-Modi</p>
+</div>
+
+<div class="page-body">
+
+  <!-- ── Intro ── -->
+  <div class="s-label">Designkonzept</div>
+  <div class="s-title">Integrierte Browser-IDE für Code-Quizze</div>
+  <div class="s-desc">
+    Die IDE basiert auf einem geteilten Editor-Layout (Split-Pane): links vorgegebener Code mit
+    Syntax-Highlighting und Fehlermarkierungen, rechts der editierbare Bereich des Lernenden.
+    Eine Konsole unterhalb gibt Echtzeit-Feedback zu Syntaxfehlern, Testergebnissen und Hinweisen.
+    Unterstützte Sprachen: PHP, HTML, JavaScript, Java, Python.
+  </div>
+
+  <!-- Language strip -->
+  <div class="lang-strip">
+    <div class="lang-pill active">Python</div>
+    <div class="lang-pill">JavaScript</div>
+    <div class="lang-pill">PHP</div>
+    <div class="lang-pill">Java</div>
+    <div class="lang-pill">HTML</div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       QUIZ 1 – CODE DEBUG (Python)
+       ══════════════════════════════════════════ -->
+  <div class="quiz-card">
+    <div class="quiz-card-head">
+      <div class="quiz-card-head-right">
+        <div class="quiz-type-badge qb-debug">🐛 Code Debug</div>
+        <div class="quiz-title">Fehler in einer Python-Funktion finden und korrigieren</div>
+        <div class="quiz-desc">
+          Die folgende Funktion soll die Gesamtsumme einer Liste berechnen.
+          Sie enthält einen Syntaxfehler und einen logischen Fehler. Finde und korrigiere beide.
+        </div>
+      </div>
+    </div>
+
+    <!-- IDE -->
+    <div class="ide">
+      <!-- Titlebar -->
+      <div class="ide-titlebar">
+        <div class="ide-dots">
+          <div class="ide-dot"></div><div class="ide-dot"></div><div class="ide-dot"></div>
+        </div>
+        <div class="ide-tabs">
+          <div class="ide-tab active">berechnung.py</div>
+        </div>
+        <div class="lang-select-wrap">
+          <span class="lang-badge lang-python">🐍 Python</span>
+        </div>
+      </div>
+
+      <!-- Toolbar -->
+      <div class="ide-toolbar">
+        <div class="ide-toolbar-left">
+          <div class="quiz-mode-chip mode-debug">🐛 Debug-Modus</div>
+          <span style="font-size:11px;color:#4a5568">2 Fehler gefunden</span>
+          <span style="color:#f87171;font-size:11px">● 1 Syntaxfehler</span>
+          <span style="color:#fbbf24;font-size:11px">▲ 1 Logikfehler</span>
+        </div>
+        <div class="ide-toolbar-right">
+          <button class="ide-btn btn-hint">💡 Hinweis</button>
+          <button class="ide-btn btn-reset">↺ Reset</button>
+          <button class="ide-btn btn-run">▶ Ausführen</button>
+        </div>
+      </div>
+
+      <!-- Split pane: given code | editable -->
+      <div class="ide-panes">
+
+        <!-- Left: given buggy code -->
+        <div class="ide-pane">
+          <div class="ide-pane-header">
+            <span>Vorgegebener Code</span>
+            <span class="pane-status status-err">✕ Fehler</span>
+          </div>
+          <div class="code-view">
+
+            <div class="code-line">
+              <span class="ln">1</span>
+              <span class="code-text"><span class="kw">def</span> <span class="fn">berechne_summe</span>(zahlen):</span>
+            </div>
+            <div class="code-line">
+              <span class="ln">2</span>
+              <span class="code-text">    gesamt = <span class="num">0</span></span>
+            </div>
+            <div class="code-line">
+              <span class="ln">3</span>
+              <span class="code-text">    <span class="kw">for</span> zahl <span class="kw">in</span> zahlen:</span>
+            </div>
+            <div class="code-line err-line">
+              <span class="ln">4<span class="ln-icon" title="Syntaxfehler">🔴</span></span>
+              <span class="code-text">        gesamt <span class="err-tok">==</span> gesamt + zahl</span>
+            </div>
+            <div class="code-line warn-line">
+              <span class="ln">5<span class="ln-icon" title="Logikfehler">🟡</span></span>
+              <span class="code-text">    <span class="kw">return</span> <span class="warn-tok">gesamt / len(zahlen)</span></span>
+            </div>
+            <div class="code-line">
+              <span class="ln">6</span>
+              <span class="code-text">&nbsp;</span>
+            </div>
+            <div class="code-line">
+              <span class="ln">7</span>
+              <span class="code-text"><span class="cm"># Test</span></span>
+            </div>
+            <div class="code-line">
+              <span class="ln">8</span>
+              <span class="code-text"><span class="fn">print</span>(berechne_summe([<span class="num">10</span>, <span class="num">20</span>, <span class="num">30</span>]))</span>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Right: editable -->
+        <div class="ide-pane">
+          <div class="ide-pane-header">
+            <span>Deine Korrektur</span>
+            <span class="pane-status status-ok">✓ Keine Fehler</span>
+          </div>
+          <div class="code-editor-wrap">
+            <div class="code-editor-gutter" id="gutter1">
+              <span class="gutter-ln">1</span>
+              <span class="gutter-ln">2</span>
+              <span class="gutter-ln">3</span>
+              <span class="gutter-ln">4</span>
+              <span class="gutter-ln">5</span>
+              <span class="gutter-ln">6</span>
+              <span class="gutter-ln">7</span>
+              <span class="gutter-ln">8</span>
+            </div>
+            <textarea class="code-editor" spellcheck="false"
+              oninput="syncGutter(this,'gutter1')"
+>def berechne_summe(zahlen):
+    gesamt = 0
+    for zahl in zahlen:
+        gesamt = gesamt + zahl
+    return gesamt
+
+# Test
+print(berechne_summe([10, 20, 30]))</textarea>
+          </div>
+        </div>
+
+      </div><!-- /ide-panes -->
+
+      <!-- Hint -->
+      <div class="hint-box">
+        💡 <span><strong>Hinweis:</strong> Zeile 4 – prüfe den Zuweisungsoperator in Python. Zeile 5 – die Aufgabe ist Summierung, nicht Berechnung des Durchschnitts.</span>
+      </div>
+
+      <!-- Console -->
+      <div class="ide-console">
+        <div class="console-bar">
+          <span class="console-tab active">Konsole</span>
+          <span class="console-tab">Fehler (2)</span>
+        </div>
+        <div class="err-list">
+          <div class="err-item err">
+            <span class="err-badge">🔴 Syntax</span>
+            <span>Zeile 4: Zuweisungsoperator <code>==</code> ist falsch – meinst du <code>=</code>?</span>
+          </div>
+          <div class="err-item warn">
+            <span class="err-badge">🟡 Logik</span>
+            <span>Zeile 5: <code>gesamt / len(zahlen)</code> berechnet den Durchschnitt, nicht die Summe.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Progress -->
+      <div class="ide-progress">
+        <div class="prog-bar-wrap">
+          <div class="prog-bar-fill" style="width:0%;background:#ef4444"></div>
+        </div>
+        <div class="prog-info"><span>0 / 2 Fehler behoben</span><span>Debug-Quiz · Frage 1 von 3</span></div>
+      </div>
+
+    </div><!-- /ide -->
+
+    <div class="task-panel">
+      <div class="task-instructions">
+        <strong>Aufgabe:</strong> Korrigiere den Syntaxfehler in Zeile 4 und den Logikfehler in Zeile 5.
+        Klicke anschließend auf „Ausführen", um deine Lösung zu testen.
+        Die Ausgabe muss <code style="background:var(--gray-100);padding:1px 5px;border-radius:4px">60</code> ergeben.
+      </div>
+      <div class="task-actions">
+        <button class="btn-secondary">Musterlösung</button>
+        <button class="btn-primary">Prüfen →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       QUIZ 2 – CODE ASSERT (JavaScript)
+       ══════════════════════════════════════════ -->
+  <div class="quiz-card">
+    <div class="quiz-card-head">
+      <div class="quiz-card-head-right">
+        <div class="quiz-type-badge qb-assert">⚡ Code Assert</div>
+        <div class="quiz-title">Funktion implementieren – alle Tests bestehen</div>
+        <div class="quiz-desc">
+          Implementiere die Funktion <code style="background:var(--gray-100);padding:1px 6px;border-radius:4px">filterPositive(arr)</code>,
+          die aus einem Array nur positive Zahlen zurückgibt. Alle vier Unit-Tests müssen bestehen.
+        </div>
+      </div>
+    </div>
+
+    <div class="ide">
+      <div class="ide-titlebar">
+        <div class="ide-dots">
+          <div class="ide-dot"></div><div class="ide-dot"></div><div class="ide-dot"></div>
+        </div>
+        <div class="ide-tabs">
+          <div class="ide-tab active">filter.js</div>
+          <div class="ide-tab">filter.test.js</div>
+        </div>
+        <div class="lang-select-wrap">
+          <span class="lang-badge lang-js">JS JavaScript</span>
+        </div>
+      </div>
+
+      <div class="ide-toolbar">
+        <div class="ide-toolbar-left">
+          <div class="quiz-mode-chip mode-assert">⚡ Assert-Modus</div>
+          <span style="font-size:11px;color:#4a5568">2 / 4 Tests bestanden</span>
+          <span style="color:#86efac;font-size:11px">✓ 2 pass</span>
+          <span style="color:#f87171;font-size:11px">✕ 2 fail</span>
+        </div>
+        <div class="ide-toolbar-right">
+          <button class="ide-btn btn-hint">💡 Hinweis</button>
+          <button class="ide-btn btn-reset">↺ Reset</button>
+          <button class="ide-btn btn-run">▶ Tests ausführen</button>
+        </div>
+      </div>
+
+      <div class="ide-panes">
+
+        <!-- Left: test spec (read-only) -->
+        <div class="ide-pane">
+          <div class="ide-pane-header">
+            <span>Tests (filter.test.js)</span>
+            <span class="pane-status status-err">2 / 4 ✓</span>
+          </div>
+          <div class="code-view">
+            <div class="code-line">
+              <span class="ln">1</span>
+              <span class="code-text"><span class="cm">// Unit-Tests – nicht bearbeitbar</span></span>
+            </div>
+            <div class="code-line">
+              <span class="ln">2</span>
+              <span class="code-text"><span class="fn">test</span>(<span class="str">'positive Zahlen'</span>, () =&gt; {</span>
+            </div>
+            <div class="code-line">
+              <span class="ln">3</span>
+              <span class="code-text">  <span class="fn">expect</span>(<span class="fn">filterPositive</span>([<span class="num">1</span>,<span class="num">-2</span>,<span class="num">3</span>]))</span>
+            </div>
+            <div class="code-line">
+              <span class="ln">4</span>
+              <span class="code-text">    .toEqual([<span class="num">1</span>, <span class="num">3</span>]);</span>
+            </div>
+            <div class="code-line">
+              <span class="ln">5</span>
+              <span class="code-text">});</span>
+            </div>
+            <div class="code-line">
+              <span class="ln">6</span>
+              <span class="code-text"><span class="fn">test</span>(<span class="str">'leeres Array'</span>, () =&gt; {</span>
+            </div>
+            <div class="code-line">
+              <span class="ln">7</span>
+              <span class="code-text">  <span class="fn">expect</span>(<span class="fn">filterPositive</span>([])).toEqual([]);</span>
+            </div>
+            <div class="code-line">
+              <span class="ln">8</span>
+              <span class="code-text">});</span>
+            </div>
+            <div class="code-line">
+              <span class="ln">9</span>
+              <span class="code-text"><span class="fn">test</span>(<span class="str">'nur negative'</span>, () =&gt; {</span>
+            </div>
+            <div class="code-line">
+              <span class="ln">10</span>
+              <span class="code-text">  <span class="fn">expect</span>(<span class="fn">filterPositive</span>([<span class="num">-1</span>,<span class="num">-5</span>])).toEqual([]);</span>
+            </div>
+            <div class="code-line">
+              <span class="ln">11</span>
+              <span class="code-text">});</span>
+            </div>
+            <div class="code-line">
+              <span class="ln">12</span>
+              <span class="code-text"><span class="fn">test</span>(<span class="str">'Null ausschließen'</span>, () =&gt; {</span>
+            </div>
+            <div class="code-line">
+              <span class="ln">13</span>
+              <span class="code-text">  <span class="fn">expect</span>(<span class="fn">filterPositive</span>([<span class="num">0</span>,<span class="num">1</span>])).toEqual([<span class="num">1</span>]);</span>
+            </div>
+            <div class="code-line">
+              <span class="ln">14</span>
+              <span class="code-text">});</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: editable implementation -->
+        <div class="ide-pane">
+          <div class="ide-pane-header">
+            <span>Deine Implementierung (filter.js)</span>
+            <span class="pane-status status-warn">▲ Unvollständig</span>
+          </div>
+          <div class="code-editor-wrap">
+            <div class="code-editor-gutter" id="gutter2">
+              <span class="gutter-ln">1</span>
+              <span class="gutter-ln">2</span>
+              <span class="gutter-ln">3</span>
+              <span class="gutter-ln">4</span>
+              <span class="gutter-ln">5</span>
+            </div>
+            <textarea class="code-editor" spellcheck="false"
+              oninput="syncGutter(this,'gutter2')"
+>function filterPositive(arr) {
+  return arr.filter(n => n > 0);
+  // Hinweis: Null (0) soll ausgeschlossen sein
+}</textarea>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Assert results -->
+      <div class="ide-console">
+        <div class="console-bar">
+          <span class="console-tab active">Testergebnisse</span>
+          <span class="console-tab">Konsole</span>
+        </div>
+        <div class="assert-panel">
+          <div class="assert-row pass">
+            <span class="assert-icon">✅</span>
+            <span class="assert-code">filterPositive([1, -2, 3]) → [1, 3]</span>
+            <span class="assert-ms">0.3 ms</span>
+          </div>
+          <div class="assert-row pass">
+            <span class="assert-icon">✅</span>
+            <span class="assert-code">filterPositive([]) → []</span>
+            <span class="assert-ms">0.1 ms</span>
+          </div>
+          <div class="assert-row pass">
+            <span class="assert-icon">✅</span>
+            <span class="assert-code">filterPositive([-1, -5]) → []</span>
+            <span class="assert-ms">0.2 ms</span>
+          </div>
+          <div class="assert-row fail">
+            <span class="assert-icon">❌</span>
+            <span class="assert-code">filterPositive([0, 1]) → erwartet [1], erhalten [1] ✓</span>
+            <span class="assert-ms">Fehler</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="ide-progress">
+        <div class="prog-bar-wrap">
+          <div class="prog-bar-fill" style="width:75%;background:var(--amber)"></div>
+        </div>
+        <div class="prog-info"><span>3 / 4 Tests bestanden</span><span>Assert-Quiz · Frage 2 von 3</span></div>
+      </div>
+
+    </div>
+
+    <div class="task-panel">
+      <div class="task-instructions">
+        <strong>Aufgabe:</strong> Passe die Funktion so an, dass alle 4 Tests bestehen.
+        Beachte: Die Zahl <code style="background:var(--gray-100);padding:1px 5px;border-radius:4px">0</code>
+        gilt nicht als positiv und soll aus dem Ergebnis ausgeschlossen werden.
+      </div>
+      <div class="task-actions">
+        <button class="btn-secondary">Musterlösung</button>
+        <button class="btn-primary">▶ Tests ausführen</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       QUIZ 3 – CODE EXPLAIN (PHP)
+       ══════════════════════════════════════════ -->
+  <div class="quiz-card">
+    <div class="quiz-card-head">
+      <div class="quiz-card-head-right">
+        <div class="quiz-type-badge qb-explain">📝 Code Explanation</div>
+        <div class="quiz-title">PHP-Code erklären und annotieren</div>
+        <div class="quiz-desc">
+          Erkläre den folgenden PHP-Code Zeile für Zeile. Klicke auf eine Zeile,
+          um deine Erklärung direkt als Annotation einzutragen.
+        </div>
+      </div>
+    </div>
+
+    <div class="ide">
+      <div class="ide-titlebar">
+        <div class="ide-dots">
+          <div class="ide-dot"></div><div class="ide-dot"></div><div class="ide-dot"></div>
+        </div>
+        <div class="ide-tabs">
+          <div class="ide-tab active">datenbankabfrage.php</div>
+        </div>
+        <div class="lang-select-wrap">
+          <span class="lang-badge lang-php">PHP</span>
+        </div>
+      </div>
+
+      <div class="ide-toolbar">
+        <div class="ide-toolbar-left">
+          <div class="quiz-mode-chip mode-explain">📝 Explain-Modus</div>
+          <span style="font-size:11px;color:#4a5568">3 von 5 Zeilen erklärt</span>
+        </div>
+        <div class="ide-toolbar-right">
+          <button class="ide-btn btn-hint">💡 Musterlösung zeigen</button>
+          <button class="ide-btn btn-submit">✓ Einreichen</button>
+        </div>
+      </div>
+
+      <!-- Single pane: annotated code -->
+      <div class="ide-panes single">
+        <div class="ide-pane" style="border-right:none">
+          <div class="ide-pane-header">
+            <span>PHP-Code mit deinen Annotationen</span>
+            <span class="pane-status" style="color:#c4b5fd">3 / 5 erklärt</span>
+          </div>
+          <div class="code-view" style="padding:10px 0">
+
+            <!-- Line 1 with annotation -->
+            <div class="code-line" style="cursor:pointer;flex-direction:column;align-items:stretch;padding:0">
+              <div style="display:flex;padding:0 16px 0 0">
+                <span class="ln">1</span>
+                <span class="code-text"><span class="op">&lt;?php</span></span>
+              </div>
+              <div style="margin:2px 16px 6px 42px">
+                <div class="explain-annotation">
+                  <strong>Deine Erklärung:</strong> Öffnungs-Tag für PHP-Code – alles danach wird als PHP interpretiert.
+                </div>
+              </div>
+            </div>
+
+            <div class="code-line" style="cursor:pointer;flex-direction:column;align-items:stretch;padding:0">
+              <div style="display:flex;padding:0 16px 0 0">
+                <span class="ln">2</span>
+                <span class="code-text"><span class="tp">$pdo</span> = <span class="kw">new</span> <span class="fn">PDO</span>(<span class="str">'mysql:host=localhost;dbname=shop'</span>, <span class="str">'user'</span>, <span class="str">'pass'</span>);</span>
+              </div>
+              <div style="margin:2px 16px 6px 42px">
+                <div class="explain-annotation">
+                  <strong>Deine Erklärung:</strong> Erstellt eine neue PDO-Datenbankverbindung zu einer MySQL-Datenbank namens „shop".
+                </div>
+              </div>
+            </div>
+
+            <div class="code-line" style="cursor:pointer;flex-direction:column;align-items:stretch;padding:0">
+              <div style="display:flex;padding:0 16px 0 0">
+                <span class="ln">3</span>
+                <span class="code-text"><span class="tp">$stmt</span> = <span class="tp">$pdo</span>-&gt;<span class="fn">prepare</span>(<span class="str">'SELECT * FROM bestellungen WHERE kunde_id = ?'</span>);</span>
+              </div>
+              <div style="margin:2px 16px 6px 42px">
+                <div class="explain-annotation" style="border-left-color:#4a5568;color:#6b7280">
+                  <em>Klicke hier, um diese Zeile zu erklären…</em>
+                </div>
+              </div>
+            </div>
+
+            <div class="code-line" style="cursor:pointer;flex-direction:column;align-items:stretch;padding:0">
+              <div style="display:flex;padding:0 16px 0 0">
+                <span class="ln">4</span>
+                <span class="code-text"><span class="tp">$stmt</span>-&gt;<span class="fn">execute</span>([<span class="tp">$_GET</span>[<span class="str">'id'</span>]]);</span>
+              </div>
+              <div style="margin:2px 16px 6px 42px">
+                <div class="explain-annotation" style="border-left-color:#4a5568;color:#6b7280">
+                  <em>Klicke hier, um diese Zeile zu erklären…</em>
+                </div>
+              </div>
+            </div>
+
+            <div class="code-line" style="cursor:pointer;flex-direction:column;align-items:stretch;padding:0">
+              <div style="display:flex;padding:0 16px 0 0">
+                <span class="ln">5</span>
+                <span class="code-text"><span class="tp">$ergebnisse</span> = <span class="tp">$stmt</span>-&gt;<span class="fn">fetchAll</span>(<span class="fn">PDO</span>::<span class="kw">FETCH_ASSOC</span>);</span>
+              </div>
+              <div style="margin:2px 16px 6px 42px">
+                <div class="explain-annotation">
+                  <strong>Deine Erklärung:</strong> Holt alle Ergebniszeilen als assoziatives Array – Spaltennamen als Schlüssel.
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- Freitext fallback -->
+      <div style="padding:12px 16px;background:var(--ed-bg2);border-top:1px solid var(--ed-border)">
+        <div style="font-size:11px;color:#4a5568;margin-bottom:6px;text-transform:uppercase;letter-spacing:1px;font-weight:700">
+          Gesamterklärung (optional)
+        </div>
+        <textarea class="code-editor" spellcheck="false" style="min-height:56px;background:var(--ed-bg);border:1px solid var(--ed-border);border-radius:8px;padding:8px 12px"
+          placeholder="Beschreibe in 2–3 Sätzen, was dieser Code-Block insgesamt tut und warum Prepared Statements wichtig sind…"></textarea>
+      </div>
+
+      <div class="ide-progress">
+        <div class="prog-bar-wrap">
+          <div class="prog-bar-fill" style="width:60%;background:var(--violet)"></div>
+        </div>
+        <div class="prog-info"><span>3 / 5 Zeilen erklärt</span><span>Explain-Quiz · Frage 1 von 2</span></div>
+      </div>
+
+    </div>
+
+    <div class="task-panel">
+      <div class="task-instructions">
+        <strong>Aufgabe:</strong> Erkläre jede Zeile des PHP-Codes. Klicke auf die grauen
+        Annotationsfelder, um deine Erklärung einzutragen.
+        Achte besonders auf Zeile 4 – warum ist die Verwendung von <code style="background:var(--gray-100);padding:1px 5px;border-radius:4px">$_GET</code>
+        hier sicherheitsrelevant?
+      </div>
+      <div class="task-actions">
+        <button class="btn-secondary">Musterlösung</button>
+        <button class="btn-primary">✓ Einreichen</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       ABSCHNITT: SPRACH-VARIANTEN
+       ══════════════════════════════════════════ -->
+  <div class="divider"></div>
+  <div class="s-label">Syntax-Highlighting</div>
+  <div class="s-title">Sprachbeispiele</div>
+  <div class="s-desc">
+    Alle fünf Sprachen nutzen dasselbe Token-Farbschema (One Dark-Palette).
+    Die Sprachauswahl wechselt das aktive Highlighting-Set ohne Seitenneuladung.
+  </div>
+
+  <!-- 2-column language preview -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+
+    <!-- Java -->
+    <div class="ide" style="margin-bottom:0">
+      <div class="ide-titlebar" style="padding:8px 14px">
+        <div class="ide-dots"><div class="ide-dot"></div><div class="ide-dot"></div><div class="ide-dot"></div></div>
+        <span class="lang-badge lang-java" style="margin-left:10px">☕ Java</span>
+      </div>
+      <div class="code-view" style="padding:8px 0">
+        <div class="code-line"><span class="ln">1</span><span class="code-text"><span class="kw">public class</span> <span class="tp">Berechnung</span> {</span></div>
+        <div class="code-line"><span class="ln">2</span><span class="code-text">  <span class="kw">public static</span> <span class="tp">int</span> <span class="fn">summe</span>(<span class="tp">int</span>[] zahlen) {</span></div>
+        <div class="code-line"><span class="ln">3</span><span class="code-text">    <span class="tp">int</span> gesamt = <span class="num">0</span>;</span></div>
+        <div class="code-line"><span class="ln">4</span><span class="code-text">    <span class="kw">for</span> (<span class="tp">int</span> z : zahlen) {</span></div>
+        <div class="code-line"><span class="ln">5</span><span class="code-text">      gesamt += z;</span></div>
+        <div class="code-line"><span class="ln">6</span><span class="code-text">    }</span></div>
+        <div class="code-line"><span class="ln">7</span><span class="code-text">    <span class="kw">return</span> gesamt;</span></div>
+        <div class="code-line"><span class="ln">8</span><span class="code-text">  }</span></div>
+        <div class="code-line"><span class="ln">9</span><span class="code-text">}</span></div>
+      </div>
+    </div>
+
+    <!-- HTML -->
+    <div class="ide" style="margin-bottom:0">
+      <div class="ide-titlebar" style="padding:8px 14px">
+        <div class="ide-dots"><div class="ide-dot"></div><div class="ide-dot"></div><div class="ide-dot"></div></div>
+        <span class="lang-badge lang-html" style="margin-left:10px">🌐 HTML</span>
+      </div>
+      <div class="code-view" style="padding:8px 0">
+        <div class="code-line"><span class="ln">1</span><span class="code-text"><span class="op">&lt;!</span><span class="attr">DOCTYPE</span> <span class="kw">html</span><span class="op">&gt;</span></span></div>
+        <div class="code-line"><span class="ln">2</span><span class="code-text"><span class="op">&lt;</span><span class="attr">form</span> <span class="fn">method</span>=<span class="str">"post"</span><span class="op">&gt;</span></span></div>
+        <div class="code-line"><span class="ln">3</span><span class="code-text">  <span class="op">&lt;</span><span class="attr">label</span> <span class="fn">for</span>=<span class="str">"name"</span><span class="op">&gt;</span>Name:<span class="op">&lt;/</span><span class="attr">label</span><span class="op">&gt;</span></span></div>
+        <div class="code-line"><span class="ln">4</span><span class="code-text">  <span class="op">&lt;</span><span class="attr">input</span> <span class="fn">type</span>=<span class="str">"text"</span> <span class="fn">id</span>=<span class="str">"name"</span><span class="op">&gt;</span></span></div>
+        <div class="code-line err-line"><span class="ln">5<span class="ln-icon">🔴</span></span><span class="code-text">  <span class="op">&lt;</span><span class="attr">button</span><span class="op">&gt;</span>Senden<span class="err-tok">&lt;button&gt;</span></span></div>
+        <div class="code-line"><span class="ln">6</span><span class="code-text"><span class="op">&lt;/</span><span class="attr">form</span><span class="op">&gt;</span></span></div>
+      </div>
+    </div>
+
+    <!-- Python (clean) -->
+    <div class="ide" style="margin-bottom:0">
+      <div class="ide-titlebar" style="padding:8px 14px">
+        <div class="ide-dots"><div class="ide-dot"></div><div class="ide-dot"></div><div class="ide-dot"></div></div>
+        <span class="lang-badge lang-python" style="margin-left:10px">🐍 Python</span>
+      </div>
+      <div class="code-view" style="padding:8px 0">
+        <div class="code-line"><span class="ln">1</span><span class="code-text"><span class="kw">import</span> <span class="tp">pandas</span> <span class="kw">as</span> pd</span></div>
+        <div class="code-line"><span class="ln">2</span><span class="code-text">&nbsp;</span></div>
+        <div class="code-line"><span class="ln">3</span><span class="code-text">df = pd.<span class="fn">read_csv</span>(<span class="str">'daten.csv'</span>)</span></div>
+        <div class="code-line"><span class="ln">4</span><span class="code-text">umsatz = df.<span class="fn">groupby</span>(<span class="str">'kunde'</span>)[<span class="str">'betrag'</span>]</span></div>
+        <div class="code-line"><span class="ln">5</span><span class="code-text">           .<span class="fn">sum</span>().<span class="fn">reset_index</span>()</span></div>
+        <div class="code-line"><span class="ln">6</span><span class="code-text"><span class="fn">print</span>(umsatz.<span class="fn">head</span>(<span class="num">10</span>))</span></div>
+      </div>
+    </div>
+
+    <!-- JavaScript -->
+    <div class="ide" style="margin-bottom:0">
+      <div class="ide-titlebar" style="padding:8px 14px">
+        <div class="ide-dots"><div class="ide-dot"></div><div class="ide-dot"></div><div class="ide-dot"></div></div>
+        <span class="lang-badge lang-js" style="margin-left:10px">JS JavaScript</span>
+      </div>
+      <div class="code-view" style="padding:8px 0">
+        <div class="code-line"><span class="ln">1</span><span class="code-text"><span class="kw">const</span> fetchData = <span class="kw">async</span> (url) =&gt; {</span></div>
+        <div class="code-line"><span class="ln">2</span><span class="code-text">  <span class="kw">try</span> {</span></div>
+        <div class="code-line"><span class="ln">3</span><span class="code-text">    <span class="kw">const</span> res = <span class="kw">await</span> <span class="fn">fetch</span>(url);</span></div>
+        <div class="code-line"><span class="ln">4</span><span class="code-text">    <span class="kw">const</span> data = <span class="kw">await</span> res.<span class="fn">json</span>();</span></div>
+        <div class="code-line warn-line"><span class="ln">5<span class="ln-icon">🟡</span></span><span class="code-text">    <span class="warn-tok">console.log</span>(data); <span class="cm">// nicht für Produktion</span></span></div>
+        <div class="code-line"><span class="ln">6</span><span class="code-text">    <span class="kw">return</span> data;</span></div>
+        <div class="code-line"><span class="ln">7</span><span class="code-text">  } <span class="kw">catch</span> (e) { <span class="fn">console.error</span>(e); }</span></div>
+        <div class="code-line"><span class="ln">8</span><span class="code-text">};</span></div>
+      </div>
+    </div>
+
+  </div><!-- /grid -->
+
+</div><!-- /page-body -->
+
+<script>
+// Sync gutter line numbers with textarea content
+function syncGutter(ta, gutterId) {
+  const lines = ta.value.split('\n').length;
+  const gutter = document.getElementById(gutterId);
+  const existing = gutter.querySelectorAll('.gutter-ln');
+  // add lines
+  for (let i = existing.length; i < lines; i++) {
+    const s = document.createElement('span');
+    s.className = 'gutter-ln';
+    s.textContent = i + 1;
+    gutter.appendChild(s);
+  }
+  // remove lines
+  for (let i = existing.length; i > lines; i--) {
+    gutter.removeChild(gutter.lastChild);
+  }
+}
+
+// Tab key → insert 2 spaces in editor
+document.querySelectorAll('.code-editor').forEach(ta => {
+  ta.addEventListener('keydown', e => {
+    if (e.key === 'Tab') {
+      e.preventDefault();
+      const start = ta.selectionStart;
+      const end = ta.selectionEnd;
+      ta.value = ta.value.slice(0, start) + '  ' + ta.value.slice(end);
+      ta.selectionStart = ta.selectionEnd = start + 2;
+      syncGutter(ta, ta.getAttribute('oninput').match(/'([^']+)'/)?.[1]);
+    }
+  });
+});
+
+// Language pill switcher (visual only in mockup)
+document.querySelectorAll('.lang-pill').forEach(p => {
+  p.addEventListener('click', () => {
+    p.closest('.lang-strip').querySelectorAll('.lang-pill')
+      .forEach(x => x.classList.remove('active'));
+    p.classList.add('active');
+  });
+});
+</script>
+</body>
+</html>
