@@ -305,7 +305,7 @@ body {
 <!-- ── Header ── -->
 <div class="header">
   <div class="header-left">
-    <button class="back-btn">← Alle Lernenden</button>
+    <button class="back-btn" onclick="window.location.href='lerndaten-kurs.html'">← Zurück zum Kurs</button>
     <div>
       <h1>Mehmet Yilmaz <span>· Fachinformatiker AE, Kohorte 2024-B</span></h1>
     </div>
@@ -325,7 +325,6 @@ body {
 <!-- ── Tabs ── -->
 <div class="tabs-bar">
   <button class="tab-btn active" onclick="switchTab('aktivitaet',this)">📅 Aktivität</button>
-  <button class="tab-btn" onclick="switchTab('fortschritt',this)">📊 Lernfortschritt</button>
   <button class="tab-btn" onclick="switchTab('geschwindigkeit',this)">⏱ Lerngeschwindigkeit</button>
   <button class="tab-btn" onclick="switchTab('erfolg',this)">🎯 Lernerfolg</button>
   <button class="tab-btn" onclick="switchTab('indikatoren',this)">🚨 Problemindikatoren</button>
@@ -419,107 +418,7 @@ body {
 
 
   <!-- ══════════════════════════════════════════ -->
-  <!-- TAB 2: LERNFORTSCHRITT -->
-  <!-- ══════════════════════════════════════════ -->
-  <div id="tab-fortschritt" class="panel-section">
-
-    <!-- Modul-Fortschritt -->
-    <div class="card">
-      <div class="card-header">
-        <div class="card-title">Fortschritt nach Modul</div>
-        <div class="card-note">Klick auf Modul für Kapitel-Drill-down</div>
-      </div>
-      <div id="modul-progress"></div>
-    </div>
-
-    <!-- Kapitel Drill-down -->
-    <div id="drill-modul" class="drill-panel">
-      <button class="drill-close" onclick="closeDrill('drill-modul')">✕</button>
-      <div class="drill-title" id="drill-modul-title">Modul 1 · Grundlagen Netzwerke</div>
-      <div style="margin-bottom:12px;">
-        <div style="display:flex;gap:12px;flex-wrap:wrap;font-size:12px;color:#6b7280;margin-bottom:12px;">
-          <span>✅ Abgeschlossen: <strong>3 / 5 Kapitel</strong></span>
-          <span>⏱ Zeit gesamt: <strong>4h 22m</strong></span>
-          <span>📅 Gestartet: <strong>14.04.2026</strong></span>
-        </div>
-      </div>
-      <table class="data-table">
-        <tr><th>Kapitel</th><th>Status</th><th>Unterkapitel</th><th>Abschl.</th><th>Zeit</th></tr>
-        <tr onclick="openDrill('drill-kapitel')">
-          <td>1.1 · OSI-Referenzmodell</td>
-          <td><span class="chip green">Abgeschlossen</span></td>
-          <td>4 / 4</td><td>17.04.</td><td>1h 12m</td>
-        </tr>
-        <tr onclick="openDrill('drill-kapitel')">
-          <td>1.2 · TCP/IP Stack</td>
-          <td><span class="chip green">Abgeschlossen</span></td>
-          <td>3 / 3</td><td>21.04.</td><td>0h 55m</td>
-        </tr>
-        <tr onclick="openDrill('drill-kapitel')">
-          <td>1.3 · Subnetting</td>
-          <td><span class="chip amber">In Bearbeitung</span></td>
-          <td>2 / 4</td><td>—</td><td>1h 31m</td>
-        </tr>
-        <tr onclick="openDrill('drill-kapitel')">
-          <td>1.4 · Routing</td>
-          <td><span class="chip gray">Nicht gestartet</span></td>
-          <td>0 / 3</td><td>—</td><td>—</td>
-        </tr>
-        <tr onclick="openDrill('drill-kapitel')">
-          <td>1.5 · Switching & VLANs</td>
-          <td><span class="chip gray">Nicht gestartet</span></td>
-          <td>0 / 5</td><td>—</td><td>—</td>
-        </tr>
-      </table>
-    </div>
-
-    <!-- Unterkapitel Drill-down -->
-    <div id="drill-kapitel" class="drill-panel">
-      <button class="drill-close" onclick="closeDrill('drill-kapitel')">✕</button>
-      <div class="drill-title">Kapitel 1.3 · Subnetting — Unterkapitel</div>
-      <table class="data-table">
-        <tr><th>Unterkapitel</th><th>Status</th><th>Besuche</th><th>Zeit</th><th>Quiz-Score</th></tr>
-        <tr>
-          <td>1.3.1 · Was ist ein Subnetz?</td>
-          <td><span class="chip green">Abgeschlossen</span></td>
-          <td>1×</td><td>28 min</td><td><span class="chip green">90%</span></td>
-        </tr>
-        <tr>
-          <td>1.3.2 · CIDR-Notation</td>
-          <td><span class="chip green">Abgeschlossen</span></td>
-          <td>2×</td><td>42 min</td><td><span class="chip amber">58%</span></td>
-        </tr>
-        <tr>
-          <td>1.3.3 · Subnetzmaske berechnen</td>
-          <td><span class="chip amber">In Bearbeitung</span></td>
-          <td>1×</td><td>21 min</td><td>—</td>
-        </tr>
-        <tr>
-          <td>1.3.4 · Praxisübung Subnetting</td>
-          <td><span class="chip gray">Gesperrt</span></td>
-          <td>—</td><td>—</td><td>—</td>
-        </tr>
-      </table>
-    </div>
-
-    <!-- Wiederaufnahmen -->
-    <div class="card" style="margin-top:0">
-      <div class="card-header">
-        <div class="card-title">Wiederaufnahmen nach Pause</div>
-      </div>
-      <table class="data-table">
-        <tr><th>Datum</th><th>Pause seit</th><th>Einstieg in</th><th>Wiederaufnahme-Ort</th></tr>
-        <tr><td>05.05.2026</td><td>2 Tage</td><td>Mo, 09:02</td><td>Modul 2 · Kap 2.1 Unterkapitel 3</td></tr>
-        <tr><td>28.04.2026</td><td>3 Tage</td><td>Mo, 08:47</td><td>Modul 1 · Kap 1.3 Unterkapitel 2</td></tr>
-        <tr><td>14.04.2026</td><td>1 Tag</td><td>Mo, 10:15</td><td>Modul 1 · Kap 1.1 Unterkapitel 1</td></tr>
-      </table>
-    </div>
-
-  </div><!-- /tab-fortschritt -->
-
-
-  <!-- ══════════════════════════════════════════ -->
-  <!-- TAB 3: LERNGESCHWINDIGKEIT -->
+  <!-- TAB 2: LERNGESCHWINDIGKEIT -->
   <!-- ══════════════════════════════════════════ -->
   <div id="tab-geschwindigkeit" class="panel-section">
 
@@ -943,27 +842,6 @@ function openDrill(id) {
 function closeDrill(id) {
   document.getElementById(id).classList.remove('open');
 }
-
-// ── Modul progress rows ──
-const moduls = [
-  { name: 'Modul 1 · Grundlagen Netzwerke', pct: 60, time: '4h 22m', soll:'~8h', color:'#10b981' },
-  { name: 'Modul 2 · TCP/IP & Routing',     pct: 20, time: '1h 48m', soll:'~8h', color:'#f59e0b' },
-  { name: 'Modul 3 · Sicherheit',           pct: 0,  time: '—',      soll:'~8h', color:'#e5e7eb' },
-  { name: 'Modul 4 · Virtualisierung',      pct: 0,  time: '—',      soll:'~8h', color:'#e5e7eb' },
-];
-const mp = document.getElementById('modul-progress');
-moduls.forEach(m => {
-  const pctColor = m.pct >= 80 ? '#059669' : m.pct >= 40 ? '#10b981' : m.pct > 0 ? '#f59e0b' : '#9ca3af';
-  mp.innerHTML += `
-    <div class="prog-row" onclick="openDrill('drill-modul')" style="cursor:pointer;">
-      <div class="prog-label">${m.name}</div>
-      <div class="prog-bar-wrap">
-        <div class="prog-bar-fill" style="width:${m.pct}%;background:${m.color};"></div>
-      </div>
-      <div class="prog-pct" style="color:${pctColor};">${m.pct}%</div>
-      <div class="prog-time">${m.time} / ${m.soll}</div>
-    </div>`;
-});
 
 // ── Heatmap: Kurs 28.04.–16.05.2026, 3 Wochen (15 Werktage + Wochenenden) ──
 // Layout: Zeile = KW, Spalte = Mo Di Mi Do Fr Sa So (7 Spalten)
