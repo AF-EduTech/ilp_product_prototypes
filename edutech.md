@@ -8,6 +8,7 @@ Erwachsenenfortbildung eingesetzt, um Weiterbildungen und Umschulungen als Selbs
 - Lerndatenmessung: Messung von Lernfortschritt. Profiling von Lernenden. Realtime-Bewertung, ob Lernende langsam, normal oder schnell lernen und ob sie Unterstützung durch Lernbegleiter benötigen.
 - Intelligent Learning Assistant: Chatbot der Lernende bei Fragen und Problemen in einem sokratischen Dialog unterstützt. 
 - Learning Management: Synchronisiert Kurstermine, Lernende und Lernbegleiter aus dem Geschäftsbetrieb (Verwaltung von allen Kursen, Kursterminen, Lernenden und Lernbegleitern)
+- ILP Administration: Verwaltet Kurstermine (Datum, Lernbegleiter, Lernende, Unterlagen)
 
 ## Weiterbildungskurs
 - Wird in der Content Factory generiert.

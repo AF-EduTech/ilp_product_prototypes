@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Live mit der Gruppe – Lernbegleiter</title>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background: #f0f2f5;
+        color: #1a1a2e;
+        line-height: 1.5;
+    }
+
+    /* ── Header ── */
+    .header {
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        color: white;
+        padding: 18px 32px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .header-left h1 { font-size: 20px; font-weight: 600; }
+    .header-left span { font-size: 13px; opacity: 0.7; }
+    .header-right { display: flex; align-items: center; gap: 16px; }
+    .live-dot {
+        display: inline-flex; align-items: center; gap: 7px;
+        font-size: 12px; font-weight: 600;
+        background: rgba(239,68,68,0.18); color: #fca5a5;
+        padding: 5px 12px; border-radius: 8px;
+    }
+    .live-dot::before {
+        content: ''; width: 8px; height: 8px; border-radius: 50%;
+        background: #ef4444; animation: pulse 1.6s infinite;
+    }
+    @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.35; } }
+    .avatar {
+        width: 38px; height: 38px; border-radius: 50%;
+        background: #a855f7; display: flex; align-items: center;
+        justify-content: center; font-weight: 600; font-size: 15px; color: white;
+    }
+
+    /* ── Layout ── */
+    .wrap {
+        max-width: 1440px; margin: 0 auto; padding: 22px 24px 40px;
+        display: grid; grid-template-columns: 1fr 380px; gap: 20px;
+    }
+    .col-main { display: flex; flex-direction: column; gap: 20px; }
+
+    .card {
+        background: white; border-radius: 14px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
+    .card-header {
+        padding: 16px 20px; border-bottom: 1px solid #f0f0f4;
+        display: flex; justify-content: space-between; align-items: center;
+    }
+    .card-title { font-size: 15px; font-weight: 600; }
+    .card-sub { font-size: 12px; color: #9ca3af; }
+    .card-body { padding: 20px; }
+
+    /* ── Präsenz-Leiste ── */
+    .presence-strip { display: flex; flex-wrap: wrap; gap: 10px; }
+    .pchip {
+        position: relative; display: flex; align-items: center; gap: 8px;
+        background: #f8f8fb; border: 1px solid #eef0f4; border-radius: 10px;
+        padding: 7px 11px 7px 9px; cursor: pointer; transition: .15s;
+    }
+    .pchip:hover { border-color: #d8dbe3; transform: translateY(-1px); }
+    .pchip.sel { border-color: #7c3aed; background: #faf5ff; box-shadow: 0 0 0 2px #ede9fe; }
+    .pav {
+        position: relative; width: 30px; height: 30px; border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        color: white; font-size: 11px; font-weight: 600; flex-shrink: 0;
+    }
+    .pdot {
+        position: absolute; bottom: -1px; right: -1px; width: 10px; height: 10px;
+        border-radius: 50%; border: 2px solid white;
+    }
+    .pdot.online { background: #22c55e; }
+    .pdot.idle   { background: #f59e0b; }
+    .pdot.off    { background: #cbd5e1; }
+    .pmeta { display: flex; flex-direction: column; line-height: 1.2; }
+    .pname { font-size: 12.5px; font-weight: 600; }
+    .ploc  { font-size: 10.5px; color: #9ca3af; }
+    .pflag { position: absolute; top: -6px; right: -5px; font-size: 12px; }
+
+    /* ── Werkzeug-Kacheln ── */
+    .tools-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+    .tool {
+        border: 1px solid #eef0f4; border-radius: 13px; padding: 18px 16px;
+        cursor: pointer; transition: .15s; background: white; text-align: left;
+    }
+    .tool:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,0,0,0.07); border-color: transparent; }
+    .tool-ic {
+        width: 44px; height: 44px; border-radius: 11px; display: flex;
+        align-items: center; justify-content: center; font-size: 22px; margin-bottom: 12px;
+    }
+    .tool-ic.blue   { background: #eff6ff; }
+    .tool-ic.purple { background: #faf5ff; }
+    .tool-ic.amber  { background: #fffbeb; }
+    .tool-ic.green  { background: #ecfdf5; }
+    .tool-name { font-size: 14px; font-weight: 600; margin-bottom: 3px; }
+    .tool-desc { font-size: 11.5px; color: #9ca3af; line-height: 1.4; }
+
+    /* ── Composer (inline panel) ── */
+    .composer { display: none; margin-top: 4px; border-top: 1px solid #f0f0f4; }
+    .composer.open { display: block; }
+    .composer-inner { padding: 20px; }
+    .comp-head { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+    .comp-head .ic { font-size: 20px; }
+    .comp-head .t { font-size: 15px; font-weight: 600; }
+    .comp-close { margin-left: auto; background: #f3f4f6; border: none; width: 28px; height: 28px;
+        border-radius: 7px; cursor: pointer; color: #6b7280; font-size: 14px; }
+
+    .field { margin-bottom: 16px; }
+    .label { font-size: 12px; font-weight: 600; color: #4b5563; display: block; margin-bottom: 8px; }
+    .seg-row { display: flex; flex-wrap: wrap; gap: 8px; }
+    .seg {
+        border: 1px solid #e5e7eb; background: white; border-radius: 9px;
+        padding: 7px 13px; font-size: 12.5px; cursor: pointer; color: #374151;
+        display: inline-flex; align-items: center; gap: 6px; transition: .12s;
+    }
+    .seg:hover { border-color: #c7cbd4; }
+    .seg.active { border-color: #7c3aed; background: #faf5ff; color: #6d28d9; font-weight: 600; }
+    .seg .cnt { background: #ede9fe; color: #6d28d9; border-radius: 6px; padding: 0 6px; font-size: 11px; }
+
+    .ta, .ti {
+        width: 100%; border: 1px solid #e5e7eb; border-radius: 10px; padding: 11px 13px;
+        font-size: 13.5px; font-family: inherit; resize: vertical; color: #1a1a2e;
+    }
+    .ta:focus, .ti:focus { outline: none; border-color: #a855f7; box-shadow: 0 0 0 3px #f3e8ff; }
+    .chips { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 9px; }
+    .chip {
+        background: #f3f4f6; border: none; border-radius: 7px; padding: 5px 11px;
+        font-size: 11.5px; cursor: pointer; color: #4b5563;
+    }
+    .chip:hover { background: #ede9fe; color: #6d28d9; }
+
+    .comp-foot { display: flex; justify-content: space-between; align-items: center; margin-top: 6px; }
+    .hint { font-size: 11.5px; color: #9ca3af; }
+    .btn {
+        border: none; border-radius: 9px; padding: 10px 18px; font-size: 13px;
+        font-weight: 600; cursor: pointer; transition: .12s;
+    }
+    .btn.primary { background: #7c3aed; color: white; }
+    .btn.primary:hover { background: #6d28d9; }
+    .btn.ghost { background: #f3f4f6; color: #4b5563; }
+    .btn.danger { background: #dc2626; color: white; }
+    .btn.green  { background: #059669; color: white; }
+
+    /* poll-type radios */
+    .opt-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .opt {
+        border: 1px solid #e5e7eb; border-radius: 11px; padding: 12px 14px; cursor: pointer;
+        display: flex; align-items: center; gap: 11px; transition: .12s;
+    }
+    .opt:hover { border-color: #c7cbd4; }
+    .opt.active { border-color: #7c3aed; background: #faf5ff; }
+    .opt .oic { font-size: 18px; }
+    .opt .ot { font-size: 13px; font-weight: 600; }
+    .opt .od { font-size: 11px; color: #9ca3af; }
+
+    .dur-row { display: flex; gap: 8px; }
+    .dur {
+        flex: 1; text-align: center; border: 1px solid #e5e7eb; background: white;
+        border-radius: 9px; padding: 9px 0; font-size: 13px; cursor: pointer; transition: .12s;
+    }
+    .dur.active { border-color: #7c3aed; background: #faf5ff; color: #6d28d9; font-weight: 600; }
+
+    /* ── Right column ── */
+    .feed { max-height: 340px; overflow-y: auto; }
+    .feed-empty { text-align: center; color: #b6bac4; font-size: 12.5px; padding: 30px 10px; }
+    .fitem { display: flex; gap: 11px; padding: 12px 0; border-bottom: 1px solid #f4f4f7; }
+    .fitem:last-child { border-bottom: none; }
+    .fic {
+        width: 32px; height: 32px; border-radius: 9px; flex-shrink: 0;
+        display: flex; align-items: center; justify-content: center; font-size: 15px;
+    }
+    .fic.blue { background: #eff6ff; } .fic.purple { background: #faf5ff; }
+    .fic.amber { background: #fffbeb; } .fic.green { background: #ecfdf5; }
+    .fbody { flex: 1; }
+    .ftitle { font-size: 13px; font-weight: 600; }
+    .ftext { font-size: 12.5px; color: #6b7280; margin-top: 1px; }
+    .ftime { font-size: 11px; color: #b6bac4; margin-top: 3px; }
+    .ftag { display:inline-block; font-size:10.5px; font-weight:600; padding:1px 7px; border-radius:5px; margin-top:5px; }
+    .ftag.aud { background:#ede9fe; color:#6d28d9; }
+
+    /* ── Active poll result ── */
+    .poll-live { display: none; }
+    .poll-live.show { display: block; }
+    .poll-q { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+    .poll-meta { font-size: 11.5px; color: #9ca3af; margin-bottom: 16px; display:flex; justify-content:space-between; }
+    .bar-row { margin-bottom: 13px; }
+    .bar-top { display: flex; justify-content: space-between; font-size: 12.5px; margin-bottom: 5px; }
+    .bar-top .v { font-weight: 600; color: #4b5563; }
+    .bar-track { height: 9px; background: #f1f1f5; border-radius: 6px; overflow: hidden; }
+    .bar-fill { height: 100%; border-radius: 6px; width: 0; transition: width .6s cubic-bezier(.2,.8,.2,1); }
+
+    /* ── Pause banner ── */
+    .pause-banner {
+        display: none; position: fixed; left: 50%; bottom: 26px; transform: translateX(-50%);
+        background: linear-gradient(135deg, #0f766e, #059669); color: white;
+        padding: 14px 22px; border-radius: 14px; box-shadow: 0 12px 32px rgba(5,150,105,.35);
+        align-items: center; gap: 18px; z-index: 60;
+    }
+    .pause-banner.show { display: flex; }
+    .pause-banner .pb-t { font-size: 14px; font-weight: 600; }
+    .pause-banner .pb-s { font-size: 12px; opacity: .85; }
+    .pb-timer { font-size: 26px; font-weight: 700; font-variant-numeric: tabular-nums; }
+    .pb-btn { background: rgba(255,255,255,.18); border: none; color: white; border-radius: 8px;
+        padding: 8px 13px; font-size: 12.5px; font-weight: 600; cursor: pointer; }
+
+    /* ── Toast ── */
+    .toast {
+        position: fixed; top: 22px; left: 50%; transform: translateX(-50%) translateY(-80px);
+        background: #1a1a2e; color: white; padding: 12px 20px; border-radius: 11px;
+        font-size: 13px; font-weight: 500; box-shadow: 0 10px 30px rgba(0,0,0,.25);
+        opacity: 0; transition: .3s; z-index: 90; display: flex; align-items: center; gap: 9px;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+</style>
+</head>
+<body>
+
+<div class="header">
+    <div class="header-left">
+        <h1>Live mit der Gruppe</h1>
+        <span>Projektmanagement mit Scrum · Kurstermin KW 25 · 10 Teilnehmende</span>
+    </div>
+    <div class="header-right">
+        <span class="live-dot">SESSION LÄUFT</span>
+        <div class="avatar">RN</div>
+    </div>
+</div>
+
+<div class="wrap">
+
+    <!-- ===== Linke Spalte ===== -->
+    <div class="col-main">
+
+        <!-- Präsenz -->
+        <div class="card">
+            <div class="card-header">
+                <div>
+                    <div class="card-title">Präsenz &amp; aktuelle Position</div>
+                    <div class="card-sub" id="presence-sub">Tippe Teilnehmende an, um gezielt eine Auswahl anzusprechen</div>
+                </div>
+                <button class="btn ghost" style="padding:7px 13px;font-size:12px;" onclick="clearSel()">Auswahl leeren</button>
+            </div>
+            <div class="card-body">
+                <div class="presence-strip" id="presence"></div>
+            </div>
+        </div>
+
+        <!-- Werkzeuge -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">Live-Werkzeuge</div>
+                <div class="card-sub">Mit der ganzen Gruppe oder einem Segment arbeiten</div>
+            </div>
+            <div class="card-body">
+                <div class="tools-grid">
+                    <div class="tool" onclick="openComposer('broadcast')">
+                        <div class="tool-ic blue">📣</div>
+                        <div class="tool-name">Broadcast</div>
+                        <div class="tool-desc">Nachricht an alle oder ein Segment</div>
+                    </div>
+                    <div class="tool" onclick="openComposer('poll')">
+                        <div class="tool-ic purple">📊</div>
+                        <div class="tool-name">Blitz-Umfrage</div>
+                        <div class="tool-desc">Stimmung &amp; Verständnis live abfragen</div>
+                    </div>
+                    <div class="tool" onclick="openComposer('focus')">
+                        <div class="tool-ic amber">🎯</div>
+                        <div class="tool-name">Fokus setzen</div>
+                        <div class="tool-desc">Gruppe zu einem Inhalt lenken</div>
+                    </div>
+                    <div class="tool" onclick="openComposer('pause')">
+                        <div class="tool-ic green">⏸️</div>
+                        <div class="tool-name">Pause / Sammeln</div>
+                        <div class="tool-desc">Gemeinsame Pause ausrufen</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Composer: Broadcast -->
+            <div class="composer" id="comp-broadcast">
+                <div class="composer-inner">
+                    <div class="comp-head">
+                        <span class="ic">📣</span><span class="t">Broadcast senden</span>
+                        <button class="comp-close" onclick="closeComposer()">✕</button>
+                    </div>
+                    <div class="field">
+                        <span class="label">Empfänger</span>
+                        <div class="seg-row" id="bc-aud"></div>
+                    </div>
+                    <div class="field">
+                        <span class="label">Nachricht</span>
+                        <textarea class="ta" id="bc-msg" rows="3" placeholder="z.B. In 5 Minuten besprechen wir gemeinsam das Sprint Planning – bitte das Quiz in 3.2 noch abschließen."></textarea>
+                        <div class="chips">
+                            <button class="chip" onclick="setBc('In 10 Minuten machen wir eine gemeinsame Zwischensicherung. 👍')">Zwischensicherung</button>
+                            <button class="chip" onclick="setBc('Super Tempo! Wer fertig ist, darf gern den Vertiefungsteil starten.')">Lob &amp; Vertiefung</button>
+                            <button class="chip" onclick="setBc('Kurze Erinnerung: Bitte denkt an die Reflexionsfrage am Kapitelende.')">Erinnerung</button>
+                            <button class="chip" onclick="setBc('Ich bin gleich bei euch – meldet euch im Chat, wenn ihr feststeckt.')">Support angekündigt</button>
+                        </div>
+                    </div>
+                    <div class="comp-foot">
+                        <span class="hint" id="bc-hint">An: alle 10 Teilnehmenden</span>
+                        <button class="btn primary" onclick="sendBroadcast()">Senden →</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Composer: Poll -->
+            <div class="composer" id="comp-poll">
+                <div class="composer-inner">
+                    <div class="comp-head">
+                        <span class="ic">📊</span><span class="t">Blitz-Umfrage starten</span>
+                        <button class="comp-close" onclick="closeComposer()">✕</button>
+                    </div>
+                    <div class="field">
+                        <span class="label">Frage</span>
+                        <input class="ti" id="poll-q" type="text" placeholder="z.B. Wie sicher fühlt ihr euch beim Sprint Planning?">
+                        <div class="chips">
+                            <button class="chip" onclick="setPq('Wie sicher fühlt ihr euch beim Sprint Planning?')">Sicherheit abfragen</button>
+                            <button class="chip" onclick="setPq('Seid ihr mit Unterkapitel 3.2 fertig?')">Fertig-Check</button>
+                            <button class="chip" onclick="setPq('Sollen wir das Thema gemeinsam wiederholen?')">Wiederholen?</button>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <span class="label">Antwort-Format</span>
+                        <div class="opt-row" id="poll-types"></div>
+                    </div>
+                    <div class="comp-foot">
+                        <span class="hint">Ergebnisse erscheinen anonym &amp; in Echtzeit rechts</span>
+                        <button class="btn primary" onclick="startPoll()">Umfrage starten →</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Composer: Focus -->
+            <div class="composer" id="comp-focus">
+                <div class="composer-inner">
+                    <div class="comp-head">
+                        <span class="ic">🎯</span><span class="t">Gemeinsamen Fokus setzen</span>
+                        <button class="comp-close" onclick="closeComposer()">✕</button>
+                    </div>
+                    <div class="field">
+                        <span class="label">Inhalt auswählen</span>
+                        <div class="seg-row" id="focus-list"></div>
+                    </div>
+                    <div class="field">
+                        <span class="label">Hinweis an die Lernenden (optional)</span>
+                        <input class="ti" id="focus-note" type="text" placeholder="z.B. Wir schauen uns das jetzt 5 Minuten gemeinsam an.">
+                    </div>
+                    <div class="comp-foot">
+                        <span class="hint">Lenkt das Lernenden-Dashboard sanft auf diesen Inhalt – Navigation bleibt frei.</span>
+                        <button class="btn primary" onclick="setFocus()">Fokus setzen →</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Composer: Pause -->
+            <div class="composer" id="comp-pause">
+                <div class="composer-inner">
+                    <div class="comp-head">
+                        <span class="ic">⏸️</span><span class="t">Pause / Sammeln ausrufen</span>
+                        <button class="comp-close" onclick="closeComposer()">✕</button>
+                    </div>
+                    <div class="field">
+                        <span class="label">Dauer</span>
+                        <div class="dur-row" id="pause-durs"></div>
+                    </div>
+                    <div class="field">
+                        <span class="label">Nachricht</span>
+                        <input class="ti" id="pause-msg" type="text" value="Kurze Pause – wir sehen uns gleich wieder hier. ☕">
+                    </div>
+                    <div class="comp-foot">
+                        <span class="hint">Alle Lernenden-Dashboards zeigen einen Pause-Banner mit Countdown.</span>
+                        <button class="btn green" onclick="startPause()">Pause starten →</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ===== Rechte Spalte ===== -->
+    <div class="col-main">
+
+        <!-- Live-Umfrage Ergebnis -->
+        <div class="card poll-live" id="pollCard">
+            <div class="card-header">
+                <div class="card-title">📊 Laufende Umfrage</div>
+                <button class="btn ghost" style="padding:6px 12px;font-size:12px;" onclick="closePoll()">Beenden</button>
+            </div>
+            <div class="card-body">
+                <div class="poll-q" id="pl-q">—</div>
+                <div class="poll-meta">
+                    <span id="pl-count">0 / 10 geantwortet</span>
+                    <span id="pl-live">● live</span>
+                </div>
+                <div id="pl-bars"></div>
+            </div>
+        </div>
+
+        <!-- Aktivitäts-Feed -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">Live-Aktivität</div>
+                <div class="card-sub">Heute</div>
+            </div>
+            <div class="card-body">
+                <div class="feed" id="feed">
+                    <div class="feed-empty" id="feed-empty">Noch keine Aktionen.<br>Starte links ein Live-Werkzeug.</div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<!-- Pause Banner -->
+<div class="pause-banner" id="pauseBanner">
+    <span style="font-size:22px;">⏸️</span>
+    <div>
+        <div class="pb-t" id="pb-title">Pause läuft</div>
+        <div class="pb-s" id="pb-msg">—</div>
+    </div>
+    <div class="pb-timer" id="pb-timer">5:00</div>
+    <button class="pb-btn" onclick="extendPause()">+2 min</button>
+    <button class="pb-btn" onclick="endPause()">■ Beenden</button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ── Daten ── */
+const students = [
+    { id:'david',  name:'David R.',  init:'DR', color:'#4361ee', dot:'online', loc:'Modul 3 · 3.2',  status:'fast'   },
+    { id:'greta',  name:'Greta W.',  init:'GW', color:'#f87171', dot:'idle',   loc:'Modul 2 · 2.4',  status:'support'},
+    { id:'ben',    name:'Ben K.',    init:'BK', color:'#60a5fa', dot:'online', loc:'Modul 3 · 3.1',  status:'normal' },
+    { id:'clara',  name:'Clara S.',  init:'CS', color:'#a78bfa', dot:'online', loc:'Modul 3 · 3.2',  status:'normal' },
+    { id:'eva',    name:'Eva L.',    init:'EL', color:'#34d399', dot:'online', loc:'Modul 4 · 4.1',  status:'fast'   },
+    { id:'hans',   name:'Hans P.',   init:'HP', color:'#2dd4bf', dot:'idle',   loc:'Modul 2 · 2.3',  status:'slow'   },
+    { id:'ines',   name:'Ines T.',   init:'IT', color:'#c084fc', dot:'online', loc:'Modul 3 · 3.2',  status:'normal' },
+    { id:'anna',   name:'Anna M.',   init:'AM', color:'#f472b6', dot:'off',    loc:'zuletzt: 2.4',   status:'support'},
+    { id:'farid',  name:'Farid A.',  init:'FA', color:'#fbbf24', dot:'online', loc:'Modul 3 · 3.3',  status:'fast'   },
+    { id:'martin', name:'Martin L.', init:'ML', color:'#6ee7b7', dot:'online', loc:'Modul 2 · 2.4',  status:'slow'   },
+];
+const selected = new Set();
+
+/* ── Präsenz rendern ── */
+function renderPresence(){
+    const flag = s => s.status==='support' ? '<span class="pflag">⚠️</span>' : '';
+    document.getElementById('presence').innerHTML = students.map(s => `
+        <div class="pchip ${selected.has(s.id)?'sel':''}" onclick="toggleSel('${s.id}')">
+            ${flag(s)}
+            <div class="pav" style="background:${s.color}">${s.init}
+                <span class="pdot ${s.dot}"></span>
+            </div>
+            <div class="pmeta"><span class="pname">${s.name}</span><span class="ploc">${s.loc}</span></div>
+        </div>`).join('');
+}
+function toggleSel(id){
+    selected.has(id) ? selected.delete(id) : selected.add(id);
+    renderPresence(); updateAudienceUI();
+    const sub = document.getElementById('presence-sub');
+    sub.textContent = selected.size
+        ? `${selected.size} ausgewählt – Broadcast/​Fokus geht gezielt an diese Auswahl`
+        : 'Tippe Teilnehmende an, um gezielt eine Auswahl anzusprechen';
+}
+function clearSel(){ selected.clear(); renderPresence(); updateAudienceUI();
+    document.getElementById('presence-sub').textContent='Tippe Teilnehmende an, um gezielt eine Auswahl anzusprechen'; }
+
+/* ── Segmente ── */
+const segs = [
+    { key:'all',     label:'Alle',          test:()=>true },
+    { key:'support', label:'⚠ Brauchen Hilfe', test:s=>s.status==='support' },
+    { key:'slow',    label:'Langsam',       test:s=>s.status==='slow' },
+    { key:'fast',    label:'Schnell',       test:s=>s.status==='fast' },
+];
+let bcAud = 'all';
+function renderAud(){
+    document.getElementById('bc-aud').innerHTML = segs.map(sg=>{
+        const n = students.filter(sg.test).length;
+        return `<div class="seg ${bcAud===sg.key&&!selected.size?'active':''}" data-k="${sg.key}" onclick="pickAud('${sg.key}')">${sg.label}<span class="cnt">${n}</span></div>`;
+    }).join('') + (selected.size?`<div class="seg active">Auswahl<span class="cnt">${selected.size}</span></div>`:'');
+}
+function pickAud(k){ bcAud=k; selected.clear(); renderPresence(); renderAud(); updateAudienceUI(); }
+function audienceCount(){ return selected.size ? selected.size : students.filter(segs.find(s=>s.key===bcAud).test).length; }
+function audienceLabel(){
+    if(selected.size) return `${selected.size} ausgewählte`;
+    const sg = segs.find(s=>s.key===bcAud);
+    return sg.key==='all' ? `alle ${students.length}` : `${audienceCount()} (${sg.label.replace('⚠ ','')})`;
+}
+function updateAudienceUI(){
+    renderAud();
+    const h = document.getElementById('bc-hint');
+    if(h) h.textContent = 'An: ' + audienceLabel() + ' Teilnehmende';
+}
+
+/* ── Poll-Typen ── */
+const pollTypes = {
+    yesno:  { ic:'✅', t:'Ja / Nein', d:'Schnelle Entscheidung', opts:[['Ja','#059669'],['Nein','#dc2626']] },
+    mood:   { ic:'🚦', t:'Verständnis-Ampel', d:'Grün · Gelb · Rot', opts:[['🟢 Sicher','#059669'],['🟡 Unsicher','#d97706'],['🔴 Abgehängt','#dc2626']] },
+    scale:  { ic:'📈', t:'Skala 1–5', d:'Selbsteinschätzung', opts:[['1','#dc2626'],['2','#f59e0b'],['3','#eab308'],['4','#84cc16'],['5','#059669']] },
+    done:   { ic:'🏁', t:'Fertig?', d:'Fortschritt im Schritt', opts:[['Fertig','#059669'],['Fast','#d97706'],['Brauche Zeit','#dc2626']] },
+};
+let pollType = 'mood';
+function renderPollTypes(){
+    document.getElementById('poll-types').innerHTML = Object.entries(pollTypes).map(([k,v])=>`
+        <div class="opt ${pollType===k?'active':''}" onclick="pickType('${k}')">
+            <span class="oic">${v.ic}</span>
+            <div><div class="ot">${v.t}</div><div class="od">${v.d}</div></div>
+        </div>`).join('');
+}
+function pickType(k){ pollType=k; renderPollTypes(); }
+function setPq(t){ document.getElementById('poll-q').value=t; }
+
+/* ── Fokus-Inhalte ── */
+const focusItems = [
+    'Modul 3 · 3.2 Sprint Planning','Modul 3 · 3.3 Backlog Refinement',
+    'Modul 2 · 2.4 Rollen im Team','Modul 4 · 4.1 Sprint Durchführung','Quiz: Definition of Done'
+];
+let focusSel = focusItems[0];
+function renderFocus(){
+    document.getElementById('focus-list').innerHTML = focusItems.map(f=>`
+        <div class="seg ${focusSel===f?'active':''}" onclick="pickFocus('${f}')">${f}</div>`).join('');
+}
+function pickFocus(f){ focusSel=f; renderFocus(); }
+
+/* ── Pause-Dauer ── */
+const pauseDurs=[5,10,15]; let pauseDur=10;
+function renderDurs(){
+    document.getElementById('pause-durs').innerHTML = pauseDurs.map(d=>`
+        <div class="dur ${pauseDur===d?'active':''}" onclick="pickDur(${d})">${d} min</div>`).join('');
+}
+function pickDur(d){ pauseDur=d; renderDurs(); }
+
+/* ── Composer öffnen/schließen ── */
+let openC=null;
+function openComposer(which){
+    closeComposer();
+    document.getElementById('comp-'+which).classList.add('open');
+    openC=which;
+    if(which==='broadcast') updateAudienceUI();
+    if(which==='poll') renderPollTypes();
+    if(which==='focus') renderFocus();
+    if(which==='pause') renderDurs();
+    document.getElementById('comp-'+which).scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+function closeComposer(){
+    if(openC){ document.getElementById('comp-'+openC).classList.remove('open'); openC=null; }
+}
+function setBc(t){ document.getElementById('bc-msg').value=t; }
+
+/* ── Feed ── */
+function feedAdd(icon,cls,title,text,tag){
+    document.getElementById('feed-empty')?.remove();
+    const f=document.getElementById('feed');
+    const time=new Date().toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'});
+    const el=document.createElement('div');
+    el.className='fitem';
+    el.innerHTML=`<div class="fic ${cls}">${icon}</div><div class="fbody">
+        <div class="ftitle">${title}</div><div class="ftext">${text}</div>
+        ${tag?`<div><span class="ftag aud">${tag}</span></div>`:''}
+        <div class="ftime">${time}</div></div>`;
+    f.prepend(el);
+}
+
+/* ── Aktionen ── */
+function sendBroadcast(){
+    const msg=document.getElementById('bc-msg').value.trim();
+    if(!msg){ toast('⚠️ Bitte eine Nachricht eingeben'); return; }
+    feedAdd('📣','blue','Broadcast gesendet','„'+msg+'"','An '+audienceLabel());
+    toast('📣 Broadcast an '+audienceLabel()+' Teilnehmende gesendet');
+    document.getElementById('bc-msg').value=''; closeComposer();
+}
+
+let pollTimer=null;
+function startPoll(){
+    const q=document.getElementById('poll-q').value.trim();
+    if(!q){ toast('⚠️ Bitte eine Frage eingeben'); return; }
+    const type=pollTypes[pollType];
+    const total=students.filter(s=>s.dot!=='off').length;
+    document.getElementById('pl-q').textContent=q;
+    document.getElementById('pollCard').classList.add('show');
+    feedAdd('📊','purple','Umfrage gestartet','„'+q+'" · '+type.t,null);
+    closeComposer(); toast('📊 Umfrage läuft – Ergebnisse kommen rein');
+
+    // bars
+    const counts=type.opts.map(()=>0);
+    document.getElementById('pl-bars').innerHTML=type.opts.map((o,i)=>`
+        <div class="bar-row"><div class="bar-top"><span>${o[0]}</span><span class="v" id="bv${i}">0</span></div>
+        <div class="bar-track"><div class="bar-fill" id="bf${i}" style="background:${o[1]}"></div></div></div>`).join('');
+
+    let answered=0;
+    clearInterval(pollTimer);
+    pollTimer=setInterval(()=>{
+        if(answered>=total){ clearInterval(pollTimer); document.getElementById('pl-live').textContent='● abgeschlossen'; return; }
+        answered++;
+        const i=Math.floor(Math.random()*counts.length);
+        counts[i]++;
+        const max=Math.max(...counts,1);
+        counts.forEach((c,j)=>{
+            document.getElementById('bv'+j).textContent=c;
+            document.getElementById('bf'+j).style.width=(c/max*100)+'%';
+        });
+        document.getElementById('pl-count').textContent=answered+' / '+total+' geantwortet';
+    },650);
+}
+function closePoll(){
+    clearInterval(pollTimer);
+    document.getElementById('pollCard').classList.remove('show');
+    feedAdd('📊','purple','Umfrage beendet','Ergebnisse gespeichert',null);
+}
+
+function setFocus(){
+    const note=document.getElementById('focus-note').value.trim();
+    feedAdd('🎯','amber','Fokus gesetzt',focusSel+(note?' · „'+note+'"':''),
+        selected.size?selected.size+' ausgewählte':'alle');
+    toast('🎯 Gruppe auf „'+focusSel+'" gelenkt');
+    closeComposer();
+}
+
+/* ── Pause ── */
+let pbTimer=null,pbLeft=0;
+function startPause(){
+    const msg=document.getElementById('pause-msg').value.trim();
+    pbLeft=pauseDur*60;
+    document.getElementById('pb-msg').textContent=msg;
+    document.getElementById('pauseBanner').classList.add('show');
+    feedAdd('⏸️','green','Pause ausgerufen',pauseDur+' min · „'+msg+'"','alle');
+    toast('⏸️ Pause ('+pauseDur+' min) gestartet');
+    closeComposer(); tickPause();
+    clearInterval(pbTimer); pbTimer=setInterval(tickPause,1000);
+}
+function tickPause(){
+    if(pbLeft<=0){ endPause(); return; }
+    const m=Math.floor(pbLeft/60), s=pbLeft%60;
+    document.getElementById('pb-timer').textContent=m+':'+String(s).padStart(2,'0');
+    pbLeft--;
+}
+function extendPause(){ pbLeft+=120; toast('+2 Minuten'); }
+function endPause(){
+    clearInterval(pbTimer);
+    document.getElementById('pauseBanner').classList.remove('show');
+    feedAdd('▶️','green','Pause beendet','Weiter geht\'s',null);
+}
+
+/* ── Toast ── */
+let toastT=null;
+function toast(msg){
+    const t=document.getElementById('toast');
+    t.textContent=msg; t.classList.add('show');
+    clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('show'),2600);
+}
+
+/* init */
+renderPresence(); renderAud();
+</script>
+</body>
+</html>

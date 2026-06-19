@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ILA · Sokratischer Dialog</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: #f0f2f5;
+  color: #1a1a2e;
+  line-height: 1.55;
+}
+
+/* ── Page Frame ── */
+.page {
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 24px;
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 20px;
+  min-height: 100vh;
+}
+
+/* ── Chat Container ── */
+.chat-card {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ── Chat Header ── */
+.chat-header {
+  background: linear-gradient(135deg, #1a1a2e 0%, #1e3a5f 100%);
+  color: white;
+  padding: 18px 24px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.ila-avatar {
+  width: 44px; height: 44px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #a78bfa 0%, #7c3aed 100%);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px;
+  box-shadow: 0 2px 8px rgba(124,58,237,0.4);
+  flex-shrink: 0;
+}
+.chat-header-info { flex:1; }
+.chat-header-info h2 {
+  font-size: 16px; font-weight: 600;
+  display: flex; align-items: center; gap: 8px;
+}
+.chat-header-info p { font-size: 12px; opacity: 0.65; margin-top: 2px; }
+.online-dot {
+  display: inline-block;
+  width: 8px; height: 8px; border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 0 3px rgba(16,185,129,0.25);
+  animation: pulse-green 2s infinite;
+}
+@keyframes pulse-green {
+  0%,100% { box-shadow: 0 0 0 3px rgba(16,185,129,0.25); }
+  50%     { box-shadow: 0 0 0 6px rgba(16,185,129,0.1); }
+}
+.chat-header-actions { display:flex; gap:8px; }
+.icon-btn {
+  background: rgba(255,255,255,0.1);
+  border: none; color: white;
+  width: 36px; height: 36px; border-radius: 10px;
+  cursor: pointer; font-size: 15px;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.15s;
+}
+.icon-btn:hover { background: rgba(255,255,255,0.2); }
+
+/* ── Context Strip ── */
+.context-strip {
+  background: #f8f9ff;
+  border-bottom: 1px solid #e5e7eb;
+  padding: 10px 24px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+  color: #6b7280;
+}
+.context-icon { font-size: 14px; }
+.context-link {
+  color: #4361ee;
+  font-weight: 600;
+  text-decoration: none;
+}
+.context-link:hover { text-decoration: underline; }
+.context-sep { color: #d1d5db; }
+
+/* ── Chat Body ── */
+.chat-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  background: #fafbff;
+}
+
+/* ── Session intro ── */
+.session-intro {
+  text-align: center;
+  font-size: 11px;
+  color: #9ca3af;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  padding: 8px 0;
+  position: relative;
+}
+.session-intro::before, .session-intro::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: calc(50% - 100px);
+  height: 1px;
+  background: #e5e7eb;
+}
+.session-intro::before { left: 0; }
+.session-intro::after  { right: 0; }
+
+/* ── Message Bubbles ── */
+.msg { display: flex; gap: 10px; align-items: flex-end; max-width: 76%; }
+.msg-avatar {
+  width: 32px; height: 32px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 700; color: white;
+  flex-shrink: 0;
+}
+.msg-avatar.ila {
+  background: linear-gradient(135deg, #a78bfa 0%, #7c3aed 100%);
+  font-size: 16px;
+}
+.msg-avatar.user { background: #4361ee; }
+
+.msg-bubble {
+  padding: 12px 16px;
+  border-radius: 14px;
+  font-size: 14px;
+  color: #1a1a2e;
+  position: relative;
+}
+.msg-time {
+  font-size: 10px;
+  color: #9ca3af;
+  margin-top: 4px;
+}
+
+/* ILA-Nachricht (links) */
+.msg.ila { align-self: flex-start; }
+.msg.ila .msg-bubble {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-bottom-left-radius: 4px;
+}
+
+/* User-Nachricht (rechts) */
+.msg.user { align-self: flex-end; flex-direction: row-reverse; }
+.msg.user .msg-bubble {
+  background: #4361ee;
+  color: white;
+  border-bottom-right-radius: 4px;
+}
+.msg.user .msg-time { text-align: right; color: #9ca3af; }
+
+/* ── Spezielle ILA-Nachrichtentypen ── */
+
+/* Sokratische Frage (Hervorhebung) */
+.msg-bubble.socratic {
+  border-left: 3px solid #7c3aed;
+  background: #faf5ff;
+}
+.socratic-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: #7c3aed;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Lernstrategie */
+.msg-bubble.strategy {
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  border-left: 3px solid #059669;
+}
+.strategy-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: #059669;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.strategy-list {
+  margin-top: 8px;
+  padding-left: 18px;
+  font-size: 13px;
+  color: #065f46;
+}
+.strategy-list li { margin-bottom: 3px; }
+
+/* Referenz auf Content Element */
+.content-ref {
+  margin-top: 10px;
+  background: white;
+  border: 1px solid #c7d2fe;
+  border-radius: 10px;
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: box-shadow 0.15s;
+}
+.content-ref:hover { box-shadow: 0 2px 8px rgba(67,97,238,0.18); }
+.content-ref-icon {
+  width: 32px; height: 32px;
+  border-radius: 8px;
+  background: #eef2ff;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px;
+  flex-shrink: 0;
+}
+.content-ref-info { flex: 1; min-width: 0; }
+.content-ref-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: #1a1a2e;
+}
+.content-ref-path {
+  font-size: 10px;
+  color: #6b7280;
+  margin-top: 1px;
+}
+.content-ref-arrow {
+  color: #4361ee;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+/* ── Hint Reveal ── */
+.hint-toggle {
+  margin-top: 10px;
+  background: white;
+  border: 1px dashed #d1d5db;
+  border-radius: 10px;
+  padding: 10px 12px;
+  cursor: pointer;
+  font-size: 12px;
+  color: #6b7280;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.15s;
+}
+.hint-toggle:hover {
+  border-color: #7c3aed;
+  color: #7c3aed;
+}
+.hint-content {
+  display: none;
+  margin-top: 8px;
+  padding: 10px 12px;
+  background: #fef3c7;
+  border-left: 3px solid #d97706;
+  border-radius: 8px;
+  font-size: 13px;
+  color: #78350f;
+}
+.hint-content.open { display: block; }
+
+/* ── Typing-Indikator ── */
+.typing { display: flex; gap: 4px; padding: 8px 0; }
+.typing-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: #c4b5fd;
+  animation: typing 1.4s infinite;
+}
+.typing-dot:nth-child(2) { animation-delay: 0.2s; }
+.typing-dot:nth-child(3) { animation-delay: 0.4s; }
+@keyframes typing {
+  0%,60%,100% { opacity: 0.3; transform: scale(0.85); }
+  30% { opacity: 1; transform: scale(1); }
+}
+
+/* ── Input Bar ── */
+.chat-input-bar {
+  border-top: 1px solid #e5e7eb;
+  padding: 14px 20px;
+  background: white;
+}
+.quick-replies {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+.quick-reply {
+  background: #f3f4f6;
+  border: 1px solid transparent;
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-size: 12px;
+  color: #4b5563;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.quick-reply:hover {
+  background: white;
+  border-color: #7c3aed;
+  color: #7c3aed;
+}
+.input-row {
+  display: flex;
+  gap: 10px;
+  align-items: flex-end;
+}
+.input-wrap {
+  flex: 1;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 10px 14px;
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  transition: border-color 0.15s;
+}
+.input-wrap:focus-within { border-color: #7c3aed; background: white; }
+.input-wrap textarea {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-family: inherit;
+  font-size: 14px;
+  resize: none;
+  max-height: 100px;
+  min-height: 22px;
+  line-height: 1.5;
+  color: #1a1a2e;
+}
+.input-wrap textarea::placeholder { color: #9ca3af; }
+.input-icons { display: flex; gap: 4px; color: #9ca3af; }
+.input-icons span { cursor: pointer; padding: 2px; font-size: 16px; }
+.input-icons span:hover { color: #7c3aed; }
+.send-btn {
+  background: linear-gradient(135deg, #7c3aed 0%, #a78bfa 100%);
+  color: white;
+  border: none;
+  width: 44px; height: 44px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 18px;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 2px 6px rgba(124,58,237,0.3);
+  transition: transform 0.1s;
+}
+.send-btn:hover { transform: scale(1.05); }
+.send-btn:active { transform: scale(0.95); }
+
+.input-hint {
+  font-size: 10px;
+  color: #9ca3af;
+  margin-top: 6px;
+  text-align: center;
+}
+
+/* ── Side Panel ── */
+.side-panel { display: flex; flex-direction: column; gap: 16px; }
+.side-card {
+  background: white;
+  border-radius: 14px;
+  padding: 18px 20px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+}
+.side-title {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #6b7280;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Aktueller Kontext */
+.ctx-block { font-size: 13px; }
+.ctx-item { padding: 8px 0; border-bottom: 1px solid #f3f4f6; }
+.ctx-item:last-child { border-bottom: none; }
+.ctx-lbl {
+  font-size: 10px;
+  color: #9ca3af;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  font-weight: 500;
+}
+.ctx-val {
+  font-size: 13px;
+  color: #1a1a2e;
+  font-weight: 500;
+  margin-top: 2px;
+}
+
+/* Lernstrategien */
+.strategy-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  border-radius: 10px;
+  background: #f9fafb;
+  margin-bottom: 8px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.strategy-card:hover { background: #f0fdf4; }
+.strategy-card-icon {
+  width: 32px; height: 32px;
+  background: #ecfdf5;
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+/* Privacy Note */
+.privacy-card {
+  background: linear-gradient(135deg, #faf5ff 0%, #f0f9ff 100%);
+  border: 1px solid #ddd6fe;
+}
+.privacy-icon {
+  background: #ede9fe;
+  border-radius: 10px;
+  width: 36px; height: 36px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+.privacy-text { font-size: 12px; color: #4c1d95; line-height: 1.6; }
+.privacy-text strong { color: #6d28d9; }
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <!-- ═════════════════ Chat Card ═════════════════ -->
+  <div class="chat-card">
+
+    <!-- Chat Header -->
+    <div class="chat-header">
+      <div class="ila-avatar">🦉</div>
+      <div class="chat-header-info">
+        <h2>Intelligent Learning Assistant <span class="online-dot"></span></h2>
+        <p>Sokratischer Lernbegleiter · Vertraulich · Antwortet in der Regel sofort</p>
+      </div>
+      <div class="chat-header-actions">
+        <button class="icon-btn" title="Neuer Dialog">↻</button>
+        <button class="icon-btn" title="Schließen">✕</button>
+      </div>
+    </div>
+
+    <!-- Kontext-Strip -->
+    <div class="context-strip">
+      <span class="context-icon">📍</span>
+      <span>Du bist gerade in:</span>
+      <a href="#" class="context-link">Python für Einsteiger</a>
+      <span class="context-sep">·</span>
+      <a href="#" class="context-link">Modul 5: Subnetting & CIDR</a>
+      <span class="context-sep">·</span>
+      <a href="#" class="context-link">Unterkapitel 5.3</a>
+    </div>
+
+    <!-- Chat Body -->
+    <div class="chat-body" id="chat-body">
+
+      <div class="session-intro">Heute · 14:38 Uhr</div>
+
+      <!-- ILA Begrüßung -->
+      <div class="msg ila">
+        <div class="msg-avatar ila">🦉</div>
+        <div>
+          <div class="msg-bubble">
+            Hallo Mehmet, schön dass du da bist. Womit kann ich dir gerade helfen?
+            <div style="margin-top:6px;font-size:12px;color:#6b7280;">
+              💡 Ich gebe dir keine direkten Antworten — aber ich helfe dir, selbst auf die Lösung zu kommen.
+            </div>
+          </div>
+          <div class="msg-time">14:38 Uhr</div>
+        </div>
+      </div>
+
+      <!-- User Frage -->
+      <div class="msg user">
+        <div class="msg-avatar user">MY</div>
+        <div>
+          <div class="msg-bubble">
+            Ich verstehe nicht, warum mein Quiz-Ergebnis bei CIDR-Notation nur 58% war. Die Aufgabe schien doch einfach.
+          </div>
+          <div class="msg-time">14:39 Uhr</div>
+        </div>
+      </div>
+
+      <!-- ILA Sokratische Rückfrage -->
+      <div class="msg ila">
+        <div class="msg-avatar ila">🦉</div>
+        <div>
+          <div class="msg-bubble socratic">
+            <div class="socratic-label">🤔 Sokratische Frage</div>
+            Bevor wir tiefer einsteigen — bei welcher Aufgabe im Quiz hast du dich am unsichersten gefühlt?
+            <br><br>
+            Und was hast du dir bei deiner Antwort gedacht?
+          </div>
+          <div class="msg-time">14:39 Uhr</div>
+        </div>
+      </div>
+
+      <!-- User Antwort -->
+      <div class="msg user">
+        <div class="msg-avatar user">MY</div>
+        <div>
+          <div class="msg-bubble">
+            Bei Frage 3. Da ging es um die Umrechnung von /24 in die Subnetzmaske. Ich habe 255.255.0.0 geantwortet, weil ich dachte 24 Bits = 3 Bytes = 3 mal 255.
+          </div>
+          <div class="msg-time">14:41 Uhr</div>
+        </div>
+      </div>
+
+      <!-- ILA Folgefrage -->
+      <div class="msg ila">
+        <div class="msg-avatar ila">🦉</div>
+        <div>
+          <div class="msg-bubble socratic">
+            <div class="socratic-label">🤔 Sokratische Frage</div>
+            Interessanter Gedanke! Du hast richtig erkannt, dass 24 Bits drei volle Bytes sind. Aber jetzt überlege mal:
+            <br><br>
+            Wenn die ersten 24 Bits zum <strong>Netzwerk-Teil</strong> gehören — was bedeutet das eigentlich für die Subnetzmaske an dieser Stelle?
+            <br><br>
+            Welche Bits sind in der Subnetzmaske <em>1</em> und welche <em>0</em>?
+          </div>
+          <div class="msg-time">14:42 Uhr</div>
+        </div>
+      </div>
+
+      <!-- User Realisation -->
+      <div class="msg user">
+        <div class="msg-avatar user">MY</div>
+        <div>
+          <div class="msg-bubble">
+            Achso… die Netzwerk-Bits müssen 1 sein. Also wenn die ersten 24 Bits Netzwerk sind, dann sind sie alle 1, also 11111111.11111111.11111111.00000000 — das wäre dann 255.255.255.0!
+          </div>
+          <div class="msg-time">14:44 Uhr</div>
+        </div>
+      </div>
+
+      <!-- ILA Bestätigung -->
+      <div class="msg ila">
+        <div class="msg-avatar ila">🦉</div>
+        <div>
+          <div class="msg-bubble">
+            Ganz genau! 🎯 Du hast den Zusammenhang jetzt selbst gefunden.
+            <br><br>
+            Dein ursprünglicher Denkfehler war ein <strong>Mapping-Problem</strong> — du hast die Anzahl der Bytes mit der falschen Wertigkeit verbunden. Das ist eine sehr typische Stolperstelle bei CIDR.
+            <br><br>
+            Möchtest du das nochmal in deinem aktuellen Unterkapitel vertiefen?
+            <div class="content-ref">
+              <div class="content-ref-icon">📖</div>
+              <div class="content-ref-info">
+                <div class="content-ref-title">CIDR-Notation verstehen</div>
+                <div class="content-ref-path">Modul 5 · Kapitel 5.3 · Unterkapitel 5.3.2</div>
+              </div>
+              <div class="content-ref-arrow">→</div>
+            </div>
+          </div>
+          <div class="msg-time">14:45 Uhr</div>
+        </div>
+      </div>
+
+      <!-- User Folgefrage -->
+      <div class="msg user">
+        <div class="msg-avatar user">MY</div>
+        <div>
+          <div class="msg-bubble">
+            Ja, das hilft. Aber ich tue mich generell schwer mit dem Umrechnen ins Binärsystem. Hast du da einen Tipp?
+          </div>
+          <div class="msg-time">14:46 Uhr</div>
+        </div>
+      </div>
+
+      <!-- Typing Indicator (statisch) -->
+      <div class="msg ila">
+        <div class="msg-avatar ila">🦉</div>
+        <div class="msg-bubble" style="padding:14px 18px;">
+          <div class="typing">
+            <div class="typing-dot"></div>
+            <div class="typing-dot"></div>
+            <div class="typing-dot"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ILA Lernstrategie -->
+      <div class="msg ila">
+        <div class="msg-avatar ila">🦉</div>
+        <div>
+          <div class="msg-bubble strategy">
+            <div class="strategy-label">💡 Lernstrategie</div>
+            Statt einer direkten Antwort zeige ich dir <strong>drei Methoden</strong>, mit denen viele Lernende das Umrechnen verinnerlicht haben:
+            <ul class="strategy-list">
+              <li><strong>Wertigkeits-Tabelle aufmalen:</strong> 128, 64, 32, 16, 8, 4, 2, 1 — wenn du die im Kopf hast, geht alles deutlich leichter.</li>
+              <li><strong>Mit kleinen Zahlen üben:</strong> Bevor du mit /24 startest, übe Umrechnen von Zahlen wie 5, 10, 15 in Binär.</li>
+              <li><strong>Subnetting-Kniff:</strong> Du musst eigentlich nur die acht Wertigkeiten pro Byte kennen — der Rest ist Routine.</li>
+            </ul>
+          </div>
+          <div class="msg-time">14:46 Uhr</div>
+        </div>
+      </div>
+
+      <!-- ILA Folgefrage zum Lernen -->
+      <div class="msg ila">
+        <div class="msg-avatar ila">🦉</div>
+        <div>
+          <div class="msg-bubble socratic">
+            <div class="socratic-label">🤔 Sokratische Frage</div>
+            Welche der drei Methoden klingt für dich am machbarsten?
+            <br><br>
+            Und wann hast du dir das letzte Mal 10 Minuten Zeit nur fürs Üben genommen?
+            <div class="hint-toggle" onclick="toggleHint(this)">
+              <span>💭</span> Hilfestellung anzeigen
+            </div>
+            <div class="hint-content">
+              Manche Lernende finden es leichter, Übungen in kurze Einheiten zu zerlegen — z.B. drei Umrechnungen pro Tag statt einer ganzen Übungsstunde am Wochenende.
+            </div>
+          </div>
+          <div class="msg-time">14:47 Uhr</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Input Bar -->
+    <div class="chat-input-bar">
+      <div class="quick-replies">
+        <button class="quick-reply">💡 Erkläre mir das anders</button>
+        <button class="quick-reply">📝 Übung dazu zeigen</button>
+        <button class="quick-reply">🔁 Neuer Versuch beim Quiz</button>
+        <button class="quick-reply">❓ Ich brauche einen Tipp</button>
+      </div>
+      <div class="input-row">
+        <div class="input-wrap">
+          <textarea placeholder="Schreibe deine Antwort oder Frage …"></textarea>
+          <div class="input-icons">
+            <span title="Anhängen">📎</span>
+            <span title="Code-Block">{ }</span>
+          </div>
+        </div>
+        <button class="send-btn">↑</button>
+      </div>
+      <div class="input-hint">
+        Drücke <strong>Enter</strong> zum Senden · <strong>Shift+Enter</strong> für neue Zeile
+      </div>
+    </div>
+
+  </div>
+
+
+  <!-- ═════════════════ Side Panel ═════════════════ -->
+  <div class="side-panel">
+
+    <!-- Aktueller Kontext -->
+    <div class="side-card">
+      <div class="side-title">📍 Aktueller Kontext</div>
+      <div class="ctx-block">
+        <div class="ctx-item">
+          <div class="ctx-lbl">Kurs</div>
+          <div class="ctx-val">Python für Einsteiger</div>
+        </div>
+        <div class="ctx-item">
+          <div class="ctx-lbl">Modul</div>
+          <div class="ctx-val">5 · Subnetting & CIDR</div>
+        </div>
+        <div class="ctx-item">
+          <div class="ctx-lbl">Unterkapitel</div>
+          <div class="ctx-val">5.3 · CIDR-Notation</div>
+        </div>
+        <div class="ctx-item">
+          <div class="ctx-lbl">Letzte Aktivität</div>
+          <div class="ctx-val">Quiz mit 58% abgeschlossen</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Lernstrategien (Vorschau) -->
+    <div class="side-card">
+      <div class="side-title">💡 Empfohlene Lernstrategien</div>
+      <div class="strategy-card">
+        <div class="strategy-card-icon">🔢</div>
+        <div>
+          <div style="font-weight:600;">Wertigkeits-Tabelle</div>
+          <div style="font-size:11px;color:#6b7280;">Visuell die Bit-Werte memorieren</div>
+        </div>
+      </div>
+      <div class="strategy-card">
+        <div class="strategy-card-icon">🧩</div>
+        <div>
+          <div style="font-weight:600;">Kleine Übungseinheiten</div>
+          <div style="font-size:11px;color:#6b7280;">3× tgl. 5 Min statt 1× wöchentlich</div>
+        </div>
+      </div>
+      <div class="strategy-card">
+        <div class="strategy-card-icon">🎯</div>
+        <div>
+          <div style="font-weight:600;">Eselsbrücken nutzen</div>
+          <div style="font-size:11px;color:#6b7280;">128 64 32 16 8 4 2 1 — laut sprechen</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Privacy Notice -->
+    <div class="side-card privacy-card">
+      <div class="privacy-icon">🔒</div>
+      <div class="privacy-text">
+        <strong>Vertraulich:</strong> Dein Lernbegleiter sieht weder unsere Konversation noch deren Inhalt.
+        <br><br>
+        Was du hier eingibst, bleibt zwischen dir und mir — auch deine Schwierigkeiten oder Fragen, die du sonst niemandem stellen würdest.
+      </div>
+    </div>
+
+    <!-- Session-Info -->
+    <div class="side-card">
+      <div class="side-title">⏱ Aktuelle Sitzung</div>
+      <div style="display:flex;justify-content:space-between;font-size:13px;color:#6b7280;padding:4px 0;">
+        <span>Gestartet</span><strong style="color:#1a1a2e;">14:38 Uhr</strong>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:13px;color:#6b7280;padding:4px 0;">
+        <span>Nachrichten</span><strong style="color:#1a1a2e;">8</strong>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:13px;color:#6b7280;padding:4px 0;">
+        <span>Verweise auf Content</span><strong style="color:#1a1a2e;">1</strong>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+function toggleHint(el) {
+  const content = el.nextElementSibling;
+  content.classList.toggle('open');
+  el.innerHTML = content.classList.contains('open')
+    ? '<span>💭</span> Hilfestellung ausblenden'
+    : '<span>💭</span> Hilfestellung anzeigen';
+}
+
+// Scroll-Position ans Ende beim Laden
+document.addEventListener('DOMContentLoaded', () => {
+  const body = document.getElementById('chat-body');
+  body.scrollTop = body.scrollHeight;
+});
+</script>
+</body>
+</html>
