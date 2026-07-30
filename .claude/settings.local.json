@@ -16,7 +16,8 @@
       "WebFetch(domain:ixd.prattsi.org)",
       "WebFetch(domain:www.ispringsolutions.com)",
       "WebFetch(domain:www.eleken.co)",
-      "WebFetch(domain:www.ispring.com)"
+      "WebFetch(domain:www.ispring.com)",
+      "Bash(open Mockups/bild-hotspots.html)"
     ]
   }
 }

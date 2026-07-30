@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bild-Hotspots · Editor &amp; Ausspielung</title>
+<style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+        font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+        background:#f0f2f5; color:#1a1a2e; line-height:1.5; padding:0 0 60px;
+    }
+    .header {
+        background:linear-gradient(135deg,#1a1a2e 0%,#16213e 100%); color:white;
+        padding:20px 32px;
+    }
+    .header h1 { font-size:20px; font-weight:600; }
+    .header span { font-size:13px; opacity:.7; }
+    .wrap { max-width:1140px; margin:0 auto; padding:26px 24px; }
+    .intro { font-size:13.5px; color:#6b7280; margin-bottom:22px; max-width:760px; }
+    .intro b { color:#374151; }
+
+    /* Segmented Modus-Umschalter */
+    .toolbar { display:flex; align-items:center; gap:16px; flex-wrap:wrap; margin-bottom:18px; }
+    .seg { display:inline-flex; background:#e6e9ef; border-radius:12px; padding:4px; }
+    .seg button {
+        border:0; background:transparent; font:inherit; font-size:13px; font-weight:600;
+        color:#6b7280; padding:8px 18px; border-radius:9px; cursor:pointer; transition:.15s;
+        display:inline-flex; align-items:center; gap:7px;
+    }
+    .seg button.active { background:white; color:#1a1a2e; box-shadow:0 1px 3px rgba(0,0,0,.1); }
+
+    .hint { font-size:12.5px; color:#9ca3af; }
+    .hint b { color:#4361ee; }
+    .spacer { flex:1; }
+    .btn {
+        border:0; background:#eef2ff; color:#4361ee; font:inherit; font-size:12.5px; font-weight:600;
+        padding:8px 14px; border-radius:9px; cursor:pointer; display:inline-flex; align-items:center; gap:6px;
+    }
+    .btn:hover { background:#e0e7ff; }
+    .btn.ghost { background:transparent; color:#9ca3af; }
+    .btn.ghost:hover { background:#f3f4f6; color:#ef4444; }
+    .count { font-size:12px; font-weight:700; color:#374151; background:#fff;
+        border:1px solid #e6e9ef; padding:5px 11px; border-radius:20px; }
+
+    /* Bildbühne */
+    .stage-card { background:white; border-radius:16px; box-shadow:0 1px 3px rgba(0,0,0,.06);
+        padding:14px; }
+    .stage {
+        position:relative; width:100%; border-radius:12px; overflow:hidden;
+        background:#f9fafb; user-select:none; touch-action:none;
+    }
+    .stage img { display:block; width:100%; height:auto; pointer-events:none; }
+    .stage.editing { cursor:crosshair; }
+
+    /* Hotspot-Pin */
+    .pin {
+        position:absolute; transform:translate(-50%,-50%); width:28px; height:28px;
+        border-radius:50%; background:#4361ee; color:white; border:3px solid #fff;
+        box-shadow:0 2px 8px rgba(67,97,238,.5); display:flex; align-items:center; justify-content:center;
+        font-size:12px; font-weight:700; cursor:pointer; transition:transform .12s, background .12s;
+        z-index:2;
+    }
+    .pin:hover { transform:translate(-50%,-50%) scale(1.15); background:#3730d8; }
+    .pin.selected { background:#ef4444; box-shadow:0 2px 10px rgba(239,68,68,.55); }
+    .stage.editing .pin { cursor:grab; }
+    .stage.editing .pin:active { cursor:grabbing; }
+
+    /* Tooltip (Ausspielung) */
+    .tip {
+        position:absolute; transform:translate(-50%,calc(-100% - 16px)); z-index:5;
+        background:#1a1a2e; color:#fff; padding:11px 14px; border-radius:11px; width:230px;
+        box-shadow:0 8px 24px rgba(0,0,0,.25); opacity:0; pointer-events:none; transition:opacity .14s;
+    }
+    .tip.show { opacity:1; }
+    .tip::after { content:''; position:absolute; left:50%; bottom:-7px; transform:translateX(-50%);
+        border:7px solid transparent; border-top-color:#1a1a2e; border-bottom:0; }
+    .tip .tt { font-size:13px; font-weight:700; margin-bottom:3px; }
+    .tip .td { font-size:12px; opacity:.85; line-height:1.45; }
+
+    /* Editor-Popup */
+    .editor {
+        position:absolute; z-index:6; width:264px; background:#fff; border-radius:13px;
+        box-shadow:0 10px 30px rgba(0,0,0,.2); border:1px solid #eef0f4; padding:14px;
+        transform:translate(-50%,16px);
+    }
+    .editor label { font-size:10.5px; font-weight:700; color:#9ca3af; text-transform:uppercase;
+        letter-spacing:.4px; display:block; margin-bottom:5px; }
+    .editor input, .editor textarea {
+        width:100%; border:1px solid #e6e9ef; border-radius:9px; padding:8px 10px; font:inherit;
+        font-size:13px; margin-bottom:12px; resize:vertical; background:#f9fafb;
+    }
+    .editor input:focus, .editor textarea:focus { outline:2px solid #c7d2fe; border-color:#4361ee; background:#fff; }
+    .editor textarea { min-height:64px; }
+    .editor .row { display:flex; gap:8px; }
+    .editor .row .btn { flex:1; justify-content:center; }
+    .editor .save { background:#4361ee; color:#fff; }
+    .editor .save:hover { background:#3730d8; }
+
+    /* JSON-Panel */
+    .datapanel { margin-top:20px; }
+    .datapanel summary { font-size:13px; font-weight:600; color:#374151; cursor:pointer;
+        padding:6px 0; list-style:none; display:flex; align-items:center; gap:8px; }
+    .datapanel summary::-webkit-details-marker { display:none; }
+    .datapanel summary::before { content:'▸'; color:#9ca3af; transition:.15s; }
+    .datapanel[open] summary::before { transform:rotate(90deg); }
+    .datapanel pre {
+        background:#1a1a2e; color:#cbd5e1; padding:16px; border-radius:12px; margin-top:10px;
+        font-size:11.5px; line-height:1.55; overflow:auto; max-height:280px;
+        font-family:'SF Mono',Menlo,Consolas,monospace;
+    }
+    .datapanel .k { color:#7dd3fc; } .datapanel .s { color:#86efac; } .datapanel .n { color:#fca5a5; }
+
+    /* Info-Box: Mapping zu Annotorious */
+    .info { margin-top:24px; background:#fff; border-radius:14px; border:1px solid #e6e9ef;
+        padding:20px 22px; }
+    .info h3 { font-size:13px; font-weight:700; color:#374151; margin-bottom:10px;
+        text-transform:uppercase; letter-spacing:.4px; }
+    .info p { font-size:13px; color:#6b7280; margin-bottom:10px; }
+    .info code { background:#eef2ff; color:#4361ee; padding:1px 6px; border-radius:5px;
+        font-size:12px; font-family:'SF Mono',Menlo,monospace; }
+    .info ul { margin:0 0 4px 18px; font-size:13px; color:#6b7280; }
+    .info li { margin-bottom:5px; }
+</style>
+</head>
+<body>
+<div class="header">
+    <h1>Bild-Hotspots</h1>
+    <span>Editor &amp; Ausspielung · interaktives Element</span>
+</div>
+
+<div class="wrap">
+    <p class="intro">
+        Nutzer platzieren im <b>Editor</b> Punkt-Hotspots auf einem Bild und hinterlegen Titel &amp; Text.
+        In der <b>Ausspielung</b> fährt der Lernende über die Hotspots und bekommt den passenden Text angezeigt.
+        Positionen werden <b>prozentual</b> gespeichert &rarr; responsiv &amp; unabhängig von der Anzeigegröße.
+    </p>
+
+    <div class="toolbar">
+        <div class="seg">
+            <button id="mEdit" class="active" onclick="setMode('edit')">✏️ Editor</button>
+            <button id="mView" onclick="setMode('view')">👁 Ausspielung</button>
+        </div>
+        <span class="hint" id="hint"></span>
+        <span class="spacer"></span>
+        <span class="count" id="count">0 Hotspots</span>
+        <button class="btn ghost" id="clearBtn" onclick="clearAll()">🗑 Alle löschen</button>
+    </div>
+
+    <div class="stage-card">
+        <div class="stage editing" id="stage">
+            <img src="../images/sqlserver-dataflow-schema.svg" alt="Datenfluss-Diagramm">
+        </div>
+    </div>
+
+    <details class="datapanel">
+        <summary>Gespeicherte Daten (JSON)</summary>
+        <pre id="json"></pre>
+    </details>
+
+    <div class="info">
+        <h3>So sieht die Produktion mit Annotorious aus</h3>
+        <p>
+            Dieser Mockup nutzt eine schlanke Vanilla-Implementierung, damit er ohne Build-Schritt läuft.
+            Die Interaktion &amp; das Datenmodell sind 1:1 auf <code>@annotorious/react</code> übertragbar:
+        </p>
+        <ul>
+            <li><b>Editor</b> &rarr; <code>&lt;ImageAnnotator tool="point"&gt;</code> um das <code>&lt;img&gt;</code>; Klick erzeugt Annotation, Text ins Body-Feld.</li>
+            <li><b>Ausspielung</b> &rarr; gleiche Komponente read-only, <code>onMouseEnter</code> rendert euren Tooltip.</li>
+            <li><b>Speichern</b> &rarr; <code>anno.getAnnotations()</code> liefert W3C-Web-Annotation-JSON (statt localStorage euer Backend).</li>
+            <li><b>Koordinaten</b> &rarr; beim Speichern in Prozent umrechnen (<code>x / imageWidth</code>), damit Hotspots bei jeder Größe sitzen.</li>
+        </ul>
+    </div>
+</div>
+
+<script>
+const stage = document.getElementById('stage');
+const STORE = 'reza_hotspots_v1';
+let mode = 'edit';
+let hotspots = load();
+let selectedId = null;   // Pin mit offenem Editor
+let dragId = null, dragMoved = false;
+
+function load() {
+    try { const d = JSON.parse(localStorage.getItem(STORE)); if (Array.isArray(d) && d.length) return d; } catch(e){}
+    // Beispiel-Hotspots
+    return [
+        { id: uid(), x: 0.115, y: 0.42, title: 'OLTP-Quellsystem', text: 'Operative Datenbank mit vielen kleinen Schreibvorgängen aus dem Tagesgeschäft.' },
+        { id: uid(), x: 0.42,  y: 0.30, title: 'ETL / Integration', text: 'Extrahieren, Transformieren, Laden – bereinigt und vereinheitlicht die Daten.' },
+        { id: uid(), x: 0.66,  y: 0.55, title: 'Data Warehouse', text: 'Zentrale, für Auswertungen optimierte Ablage der historisierten Daten.' },
+        { id: uid(), x: 0.90,  y: 0.40, title: 'BI & Reporting', text: 'Dashboards und Berichte greifen lesend auf das Warehouse zu.' }
+    ];
+}
+function save() { localStorage.setItem(STORE, JSON.stringify(hotspots)); renderJSON(); }
+function uid() { return 'h_' + Math.random().toString(36).slice(2, 8); }
+
+function setMode(m) {
+    mode = m; selectedId = null;
+    document.getElementById('mEdit').classList.toggle('active', m === 'edit');
+    document.getElementById('mView').classList.toggle('active', m === 'view');
+    stage.classList.toggle('editing', m === 'edit');
+    document.getElementById('clearBtn').style.display = m === 'edit' ? '' : 'none';
+    document.getElementById('hint').innerHTML = m === 'edit'
+        ? 'Klick aufs Bild setzt einen Hotspot · Pin ziehen zum Verschieben · Pin klicken zum Bearbeiten'
+        : '<b>Fahre über die Hotspots</b>, um die Texte zu sehen';
+    render();
+}
+
+function render() {
+    stage.querySelectorAll('.pin,.tip,.editor').forEach(n => n.remove());
+    document.getElementById('count').textContent = hotspots.length + (hotspots.length === 1 ? ' Hotspot' : ' Hotspots');
+
+    hotspots.forEach((h, i) => {
+        const pin = document.createElement('div');
+        pin.className = 'pin' + (h.id === selectedId ? ' selected' : '');
+        pin.style.left = (h.x * 100) + '%';
+        pin.style.top  = (h.y * 100) + '%';
+        pin.textContent = i + 1;
+        pin.dataset.id = h.id;
+
+        if (mode === 'view') {
+            const tip = document.createElement('div');
+            tip.className = 'tip';
+            tip.style.left = (h.x * 100) + '%';
+            tip.style.top  = (h.y * 100) + '%';
+            tip.innerHTML = `<div class="tt"></div><div class="td"></div>`;
+            tip.querySelector('.tt').textContent = h.title || 'Ohne Titel';
+            tip.querySelector('.td').textContent = h.text || '';
+            stage.appendChild(tip);
+            pin.addEventListener('mouseenter', () => tip.classList.add('show'));
+            pin.addEventListener('mouseleave', () => tip.classList.remove('show'));
+            // Touch: Tippen togglet
+            pin.addEventListener('click', () => tip.classList.toggle('show'));
+        } else {
+            pin.addEventListener('pointerdown', startDrag);
+        }
+        stage.appendChild(pin);
+    });
+
+    if (mode === 'edit' && selectedId) openEditor(hotspots.find(h => h.id === selectedId));
+}
+
+/* ---- Editor-Modus: Klick auf Bild = neuer Hotspot ---- */
+stage.addEventListener('click', (e) => {
+    if (mode !== 'edit') return;
+    if (e.target.closest('.pin') || e.target.closest('.editor')) return;
+    const rel = relPos(e);
+    const h = { id: uid(), x: rel.x, y: rel.y, title: '', text: '' };
+    hotspots.push(h); save(); selectedId = h.id; render();
+});
+
+function relPos(e) {
+    const r = stage.getBoundingClientRect();
+    return {
+        x: Math.min(1, Math.max(0, (e.clientX - r.left) / r.width)),
+        y: Math.min(1, Math.max(0, (e.clientY - r.top) / r.height))
+    };
+}
+
+/* ---- Drag zum Verschieben ---- */
+function startDrag(e) {
+    e.preventDefault();
+    dragId = e.currentTarget.dataset.id; dragMoved = false;
+    window.addEventListener('pointermove', onDrag);
+    window.addEventListener('pointerup', endDrag);
+}
+function onDrag(e) {
+    const h = hotspots.find(x => x.id === dragId); if (!h) return;
+    const p = relPos(e);
+    if (Math.abs(p.x - h.x) > 0.003 || Math.abs(p.y - h.y) > 0.003) dragMoved = true;
+    h.x = p.x; h.y = p.y;
+    const pin = stage.querySelector(`.pin[data-id="${dragId}"]`);
+    if (pin) { pin.style.left = (h.x*100)+'%'; pin.style.top = (h.y*100)+'%'; }
+    if (selectedId === dragId) { const ed = stage.querySelector('.editor'); if (ed) positionEditor(ed, h); }
+}
+function endDrag() {
+    window.removeEventListener('pointermove', onDrag);
+    window.removeEventListener('pointerup', endDrag);
+    if (!dragMoved) { selectedId = (selectedId === dragId) ? null : dragId; render(); }
+    else save();
+    dragId = null;
+}
+
+/* ---- Editor-Popup ---- */
+function openEditor(h) {
+    if (!h) return;
+    const ed = document.createElement('div');
+    ed.className = 'editor';
+    ed.innerHTML = `
+        <label>Titel</label>
+        <input id="eTitle" placeholder="z. B. Data Warehouse" value="">
+        <label>Text</label>
+        <textarea id="eText" placeholder="Erklärung, die beim Hover erscheint …"></textarea>
+        <div class="row">
+            <button class="btn ghost" onclick="deleteHotspot('${h.id}')">Löschen</button>
+            <button class="btn save" onclick="closeEditor()">Fertig</button>
+        </div>`;
+    stage.appendChild(ed);
+    positionEditor(ed, h);
+    const t = ed.querySelector('#eTitle'), x = ed.querySelector('#eText');
+    t.value = h.title; x.value = h.text;
+    t.addEventListener('input', () => { h.title = t.value; save(); });
+    x.addEventListener('input', () => { h.text = x.value; save(); });
+    t.focus();
+}
+function positionEditor(ed, h) {
+    let left = h.x * 100; left = Math.min(82, Math.max(18, left));
+    ed.style.left = left + '%';
+    ed.style.top = (h.y * 100) + '%';
+}
+function closeEditor() { selectedId = null; render(); }
+function deleteHotspot(id) { hotspots = hotspots.filter(h => h.id !== id); selectedId = null; save(); render(); }
+function clearAll() {
+    if (!hotspots.length || !confirm('Alle Hotspots löschen?')) return;
+    hotspots = []; selectedId = null; save(); render();
+}
+
+/* ---- JSON-Ansicht ---- */
+function renderJSON() {
+    const pretty = JSON.stringify(hotspots.map(h => ({
+        id: h.id, x: +h.x.toFixed(4), y: +h.y.toFixed(4), title: h.title, text: h.text
+    })), null, 2)
+        .replace(/"(\w+)":/g, '"<span class="k">$1</span>":')
+        .replace(/: "([^"]*)"/g, ': "<span class="s">$1</span>"')
+        .replace(/: (-?[\d.]+)/g, ': <span class="n">$1</span>');
+    document.getElementById('json').innerHTML = pretty;
+}
+
+setMode('edit');
+renderJSON();
+</script>
+</body>
+</html>

@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Icon-Konzepte · Modul starten vs. weitermachen</title>
+<style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+        font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+        background:#f0f2f5; color:#1a1a2e; line-height:1.5; padding:0 0 60px;
+    }
+    .header {
+        background:linear-gradient(135deg,#1a1a2e 0%,#16213e 100%); color:white;
+        padding:20px 32px;
+    }
+    .header h1 { font-size:20px; font-weight:600; }
+    .header span { font-size:13px; opacity:.7; }
+    .wrap { max-width:1140px; margin:0 auto; padding:26px 24px; }
+    .intro { font-size:13.5px; color:#6b7280; margin-bottom:24px; max-width:720px; }
+    .intro b { color:#374151; }
+
+    /* Legende der zwei Aktionen */
+    .legend { display:flex; gap:16px; margin-bottom:26px; flex-wrap:wrap; }
+    .leg {
+        flex:1; min-width:300px; background:white; border-radius:14px; padding:16px 18px;
+        box-shadow:0 1px 3px rgba(0,0,0,.06); display:flex; gap:14px; align-items:center;
+    }
+    .leg .lic { width:46px; height:46px; border-radius:50%; flex-shrink:0;
+        display:flex; align-items:center; justify-content:center; }
+    .leg .lt { font-size:14px; font-weight:700; }
+    .leg .ld { font-size:12px; color:#9ca3af; }
+
+    .section-title { font-size:13px; font-weight:700; color:#374151; margin:6px 0 14px;
+        text-transform:uppercase; letter-spacing:.4px; }
+
+    .grid { display:grid; grid-template-columns:repeat(3,1fr); gap:18px; }
+    .card {
+        background:white; border-radius:16px; box-shadow:0 1px 3px rgba(0,0,0,.06);
+        padding:20px; border:2px solid transparent;
+    }
+    .card.rec { border-color:#4361ee; }
+    .card-top { display:flex; align-items:center; gap:10px; margin-bottom:4px; }
+    .card-name { font-size:14px; font-weight:700; }
+    .rec-tag { font-size:10px; font-weight:700; background:#eef2ff; color:#4361ee;
+        padding:2px 8px; border-radius:6px; letter-spacing:.3px; }
+    .card-desc { font-size:11.5px; color:#9ca3af; margin-bottom:16px; min-height:32px; }
+
+    /* gegenüberstellung start vs weiter */
+    .pair { display:flex; gap:12px; margin-bottom:14px; }
+    .pcell { flex:1; text-align:center; background:#f9fafb; border:1px solid #eef0f4;
+        border-radius:12px; padding:14px 8px 12px; }
+    .pcell .cap { font-size:10.5px; font-weight:600; color:#9ca3af; margin-bottom:10px;
+        text-transform:uppercase; letter-spacing:.3px; }
+    .badge {
+        width:46px; height:46px; border-radius:50%; margin:0 auto 9px;
+        display:flex; align-items:center; justify-content:center; background:#4361ee; color:white;
+    }
+    .badge.emoji { font-size:20px; }
+    .badge svg { width:21px; height:21px; }
+    .plabel { font-size:11.5px; color:#6b7280; }
+
+    /* button row */
+    .lbl { font-size:10.5px; font-weight:600; color:#b6bac4; text-transform:uppercase;
+        letter-spacing:.4px; margin:4px 0 8px; }
+    .btn-enter {
+        display:inline-flex; align-items:center; gap:8px; border:none; cursor:pointer;
+        background:#4361ee; color:white; font-size:12.5px; font-weight:600;
+        padding:9px 15px; border-radius:10px; transition:.15s; margin:0 6px 8px 0;
+    }
+    .btn-enter.ghost { background:#eef2ff; color:#4361ee; }
+    .btn-enter:hover { transform:translateY(-1px); }
+    .btn-enter svg { width:16px; height:16px; }
+
+    .note { font-size:11.5px; color:#6b7280; margin-top:14px; padding-top:12px; border-top:1px solid #f0f0f4; }
+    .note b { color:#374151; }
+
+    /* Kontext-Demo Modulliste */
+    .demo-card { background:white; border-radius:16px; box-shadow:0 1px 3px rgba(0,0,0,.06);
+        padding:22px; margin-top:30px; }
+    .demo-card h3 { font-size:15px; margin-bottom:4px; }
+    .demo-card p { font-size:12.5px; color:#9ca3af; margin-bottom:18px; }
+    .module-row {
+        display:flex; align-items:center; gap:13px; padding:12px 14px;
+        border-radius:12px; border:1px solid #eef0f4; margin-bottom:10px;
+    }
+    .module-row.current { background:#f5f8ff; border-color:#dbe2fb; }
+    .module-icon { width:40px; height:40px; border-radius:50%; flex-shrink:0;
+        display:flex; align-items:center; justify-content:center; }
+    .module-icon svg { width:19px; height:19px; }
+    .module-icon.done { background:#ecfdf5; color:#059669; font-size:17px; }
+    .module-icon.start { background:#4361ee; color:white; }
+    .module-icon.cont  { background:#eef2ff; }
+    .module-icon.locked { background:#f3f4f6; color:#9ca3af; font-size:16px; }
+    .module-info { flex:1; }
+    .module-name { font-size:13.5px; font-weight:600; }
+    .module-detail { font-size:11.5px; color:#9ca3af; }
+    .module-cta { font-size:12px; font-weight:600; color:#4361ee; display:flex; align-items:center; gap:6px; }
+    .module-cta svg { width:15px; height:15px; }
+    .module-cta.muted { color:#c4c9d4; }
+</style>
+</head>
+<body>
+
+<div class="header">
+    <h1>Modul-Einstieg: „Starten" vs. „Weitermachen"</h1>
+    <span>Lernenden-Dashboard · Projektmanagement mit Scrum</span>
+</div>
+
+<div class="wrap">
+    <p class="intro">
+        Zwei unterschiedliche Aktionen brauchen zwei unterscheidbare Icons:
+        <b>Starten</b> = Modul noch bei 0 % (frischer Beginn) · <b>Weitermachen</b> = Modul angefangen, mit Fortschritt.
+        Unten drei Konzept-Paare, danach die Anwendung in der Modulliste.
+    </p>
+
+    <div class="legend">
+        <div class="leg">
+            <div class="lic" style="background:#4361ee;color:white;">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13l11-6.5L8 5.5z"/></svg>
+            </div>
+            <div><div class="lt">Starten</div><div class="ld">0 % · „Jetzt beginnen" – voll gefüllt, einladend</div></div>
+        </div>
+        <div class="leg">
+            <div class="lic" style="background:#eef2ff;">
+                <svg viewBox="0 0 36 36" style="width:30px;height:30px;">
+                    <circle cx="18" cy="18" r="14" fill="none" stroke="#dbe2fb" stroke-width="3.5"/>
+                    <circle cx="18" cy="18" r="14" fill="none" stroke="#4361ee" stroke-width="3.5" stroke-linecap="round"
+                        stroke-dasharray="88" stroke-dashoffset="53" transform="rotate(-90 18 18)"/>
+                    <path d="M15 13.5v9l7-4.5-7-4.5z" fill="#4361ee"/></svg>
+            </div>
+            <div><div class="lt">Weitermachen</div><div class="ld">z.B. 40 % · „Da weiterlernen, wo du warst"</div></div>
+        </div>
+    </div>
+
+    <div class="section-title">Konzept-Paare</div>
+    <div class="grid">
+
+        <!-- Konzept 1: Play vs Play+Ring  (Empfehlung) -->
+        <div class="card rec">
+            <div class="card-top"><div class="card-name">1 · Play &amp; Play-im-Ring</div><span class="rec-tag">EMPFEHLUNG</span></div>
+            <div class="card-desc">Gleiches Grundsymbol (Play), Fortschritt unterscheidet: gefüllt = starten, Ring = weitermachen.</div>
+            <div class="pair">
+                <div class="pcell"><div class="cap">Starten</div>
+                    <div class="badge"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13l11-6.5L8 5.5z"/></svg></div>
+                    <div class="plabel">voll gefüllt</div>
+                </div>
+                <div class="pcell"><div class="cap">Weitermachen</div>
+                    <div class="badge" style="background:#eef2ff;">
+                        <svg viewBox="0 0 36 36" style="width:34px;height:34px;">
+                            <circle cx="18" cy="18" r="14" fill="none" stroke="#dbe2fb" stroke-width="3.5"/>
+                            <circle cx="18" cy="18" r="14" fill="none" stroke="#4361ee" stroke-width="3.5" stroke-linecap="round"
+                                stroke-dasharray="88" stroke-dashoffset="53" transform="rotate(-90 18 18)"/>
+                            <path d="M15 13.5v9l7-4.5-7-4.5z" fill="#4361ee"/></svg>
+                    </div>
+                    <div class="plabel">Ring zeigt 40 %</div>
+                </div>
+            </div>
+            <div class="note"><b>Stärke:</b> eine Symbolfamilie, Fortschritt sofort sichtbar, motivierend. <b>Top-Wahl.</b></div>
+        </div>
+
+        <!-- Konzept 2: Play vs Resume-Pfeil -->
+        <div class="card">
+            <div class="card-top"><div class="card-name">2 · Play &amp; Resume-Pfeil</div></div>
+            <div class="card-desc">Starten = Play, Weitermachen = „Zurück zur Stelle"-Pfeil (rotierender Resume-Pfeil).</div>
+            <div class="pair">
+                <div class="pcell"><div class="cap">Starten</div>
+                    <div class="badge"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13l11-6.5L8 5.5z"/></svg></div>
+                    <div class="plabel">Play</div>
+                </div>
+                <div class="pcell"><div class="cap">Weitermachen</div>
+                    <div class="badge" style="background:#eef2ff;color:#4361ee;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M3 12a9 9 0 109-9 9 9 0 00-6.4 2.7L3 8"/><path d="M3 4v4h4"/><path d="M11 9v4l3 2"/></svg>
+                    </div>
+                    <div class="plabel">Resume + Uhr</div>
+                </div>
+            </div>
+            <div class="note"><b>Stärke:</b> klare Bedeutung „dort weiter, wo du aufgehört hast". <b>Schwäche:</b> zwei verschiedene Symbole zum Lernen.</div>
+        </div>
+
+        <!-- Konzept 3: Play vs Doppelpfeil/Vor -->
+        <div class="card">
+            <div class="card-top"><div class="card-name">3 · Play &amp; Vorspul-Pfeil</div></div>
+            <div class="card-desc">Starten = Play, Weitermachen = Doppel-Play (»), Anlehnung an Medien-Bedienung.</div>
+            <div class="pair">
+                <div class="pcell"><div class="cap">Starten</div>
+                    <div class="badge"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13l11-6.5L8 5.5z"/></svg></div>
+                    <div class="plabel">Play</div>
+                </div>
+                <div class="pcell"><div class="cap">Weitermachen</div>
+                    <div class="badge" style="background:#eef2ff;color:#4361ee;">
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 6v12l8-6-8-6zM13 6v12l8-6-8-6z"/></svg>
+                    </div>
+                    <div class="plabel">Doppel-Play</div>
+                </div>
+            </div>
+            <div class="note"><b>Stärke:</b> kompakt, vertraute Medien-Metapher. <b>Schwäche:</b> „vorspulen" ≠ „weiterlernen", Fortschritt nicht sichtbar.</div>
+        </div>
+
+    </div>
+
+    <!-- Anwendung in der Modulliste -->
+    <div class="demo-card">
+        <h3>Anwendung im Lernenden-Dashboard (Empfehlung: Konzept 1)</h3>
+        <p>Vier Status in einer konsistenten Badge-Spalte – Einstiegs-Geste rechts als Call-to-Action.</p>
+
+        <div class="module-row">
+            <div class="module-icon done">✓</div>
+            <div class="module-info"><div class="module-name">Modul 1: Grundlagen</div><div class="module-detail">3 Kapitel · abgeschlossen</div></div>
+            <div class="module-cta muted">Wiederholen</div>
+        </div>
+
+        <div class="module-row current">
+            <div class="module-icon cont">
+                <svg viewBox="0 0 36 36" style="width:36px;height:36px;">
+                    <circle cx="18" cy="18" r="14" fill="none" stroke="#dbe2fb" stroke-width="3.5"/>
+                    <circle cx="18" cy="18" r="14" fill="none" stroke="#4361ee" stroke-width="3.5" stroke-linecap="round"
+                        stroke-dasharray="88" stroke-dashoffset="53" transform="rotate(-90 18 18)"/>
+                    <path d="M15 13.5v9l7-4.5-7-4.5z" fill="#4361ee"/></svg>
+            </div>
+            <div class="module-info"><div class="module-name">Modul 3: Praxistransfer</div><div class="module-detail">3 Kapitel · 40 % bearbeitet</div></div>
+            <div class="module-cta">Weitermachen
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+            </div>
+        </div>
+
+        <div class="module-row">
+            <div class="module-icon start">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13l11-6.5L8 5.5z"/></svg>
+            </div>
+            <div class="module-info"><div class="module-name">Modul 4: Abschlussprojekt</div><div class="module-detail">3 Kapitel · noch nicht begonnen</div></div>
+            <div class="module-cta">Starten
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+            </div>
+        </div>
+
+        <div class="module-row">
+            <div class="module-icon locked">🔒</div>
+            <div class="module-info"><div class="module-name">Modul 5: Zertifizierung</div><div class="module-detail">2 Kapitel · noch gesperrt</div></div>
+            <div class="module-cta muted">Gesperrt</div>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>

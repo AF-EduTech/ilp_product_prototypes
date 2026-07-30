@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Abschlussquiz · Ausspielung als Modul- & Kursabschluss</title>
+<style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+        font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+        background:#f0f2f5; color:#1a1a2e; line-height:1.5; padding:0 0 80px;
+    }
+    .header {
+        background:linear-gradient(135deg,#1a1a2e 0%,#16213e 100%); color:white;
+        padding:22px 32px;
+    }
+    .header h1 { font-size:21px; font-weight:600; }
+    .header span { font-size:13px; opacity:.7; }
+    .wrap { max-width:1080px; margin:0 auto; padding:30px 24px; }
+    .intro { font-size:14px; color:#6b7280; margin-bottom:26px; max-width:760px; }
+    .intro b { color:#374151; }
+
+    /* Prinzip-Chips */
+    .principles { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:34px; }
+    .principle { background:white; border-radius:10px; padding:9px 14px; box-shadow:0 1px 3px rgba(0,0,0,.06);
+        font-size:12.5px; font-weight:600; color:#374151; display:flex; align-items:center; gap:8px; }
+    .principle .dot { width:8px; height:8px; border-radius:50%; background:#4361ee; }
+
+    .section-title { font-size:12px; font-weight:700; color:#9ca3af; margin:8px 0 4px;
+        text-transform:uppercase; letter-spacing:.5px; }
+    .section-head { font-size:19px; font-weight:700; margin-bottom:6px; }
+    .section-sub { font-size:13.5px; color:#9ca3af; margin-bottom:22px; max-width:720px; }
+    .block { margin-top:52px; }
+
+    /* Phasen-Bogen */
+    .arc { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-bottom:14px; }
+    .arc-step { background:white; border-radius:16px; box-shadow:0 1px 3px rgba(0,0,0,.06); padding:20px; position:relative; }
+    .arc-num { width:30px; height:30px; border-radius:50%; background:#eef2ff; color:#4361ee;
+        font-size:13px; font-weight:700; display:flex; align-items:center; justify-content:center; margin-bottom:12px; }
+    .arc-step h4 { font-size:15px; font-weight:700; margin-bottom:6px; }
+    .arc-step p { font-size:12.5px; color:#6b7280; }
+    .arc-step .arrow { position:absolute; right:-13px; top:50%; transform:translateY(-50%); z-index:2;
+        width:26px; height:26px; border-radius:50%; background:#4361ee; color:white; display:flex;
+        align-items:center; justify-content:center; font-size:14px; box-shadow:0 2px 6px rgba(67,97,238,.35); }
+
+    /* Screen-Frame */
+    .screens { display:grid; grid-template-columns:1fr 1fr; gap:24px; }
+    .screen { }
+    .screen-cap { font-size:12.5px; font-weight:700; color:#374151; margin-bottom:10px; display:flex; align-items:center; gap:8px; }
+    .screen-cap .tag { font-size:10px; font-weight:700; background:#eef2ff; color:#4361ee; padding:2px 8px; border-radius:6px; letter-spacing:.3px; text-transform:uppercase; }
+    .screen-cap .tag.gold { background:#fdf3d7; color:#a06d09; }
+    .frame { border-radius:16px; overflow:hidden; box-shadow:0 8px 30px rgba(20,25,45,.12); border:1px solid #e6e8ee; }
+    .frame-bar { height:30px; background:#e9ebf1; display:flex; align-items:center; gap:6px; padding:0 12px; }
+    .frame-bar .d { width:9px; height:9px; border-radius:50%; background:#c7ccd6; }
+
+    /* ── GATE: Modul (hell) ── */
+    .gate { background:linear-gradient(160deg,#f7f9ff 0%,#eef2ff 100%); padding:40px 34px; text-align:center; }
+    .gate .medal { width:74px; height:74px; border-radius:50%; margin:0 auto 18px;
+        display:flex; align-items:center; justify-content:center; font-size:34px;
+        background:#4361ee; box-shadow:0 8px 24px rgba(67,97,238,.4); }
+    .gate .eyebrow { font-size:11px; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:#4361ee; margin-bottom:8px; }
+    .gate h3 { font-size:22px; font-weight:700; margin-bottom:8px; }
+    .gate .lead { font-size:13.5px; color:#5b6270; max-width:340px; margin:0 auto 20px; }
+    .gate-meta { display:flex; justify-content:center; gap:12px; margin-bottom:22px; flex-wrap:wrap; }
+    .gmeta { background:rgba(255,255,255,.75); border:1px solid #dbe2fb; border-radius:10px; padding:9px 14px; min-width:78px; }
+    .gmeta .v { font-size:16px; font-weight:700; color:#1a1a2e; }
+    .gmeta .l { font-size:10.5px; color:#9ca3af; text-transform:uppercase; letter-spacing:.4px; }
+    .gate .cta { display:inline-flex; align-items:center; gap:8px; background:#4361ee; color:white;
+        border:none; cursor:pointer; font-size:14px; font-weight:600; padding:13px 28px; border-radius:12px;
+        box-shadow:0 6px 18px rgba(67,97,238,.4); }
+    .gate .hint { font-size:11.5px; color:#9ca3af; margin-top:14px; }
+
+    /* ── GATE: Kurs (dunkel/premium) ── */
+    .gate.course { background:radial-gradient(120% 100% at 50% 0%,#233056 0%,#151b30 60%,#0f1424 100%); color:white; }
+    .gate.course .eyebrow { color:#e9c46a; }
+    .gate.course h3 { color:white; }
+    .gate.course .lead { color:#aeb6cc; }
+    .gate.course .medal { background:linear-gradient(150deg,#f4d06f,#e0a52e); box-shadow:0 8px 28px rgba(224,165,46,.5); }
+    .gate.course .gmeta { background:rgba(255,255,255,.06); border-color:rgba(255,255,255,.14); }
+    .gate.course .gmeta .v { color:#fff; }
+    .gate.course .gmeta .l { color:#8b93ab; }
+    .gate.course .cta { background:linear-gradient(150deg,#f4d06f,#e0a52e); color:#3a2b06; box-shadow:0 6px 20px rgba(224,165,46,.45); }
+    .gate.course .hint { color:#8b93ab; }
+    .gate.course .stars { font-size:15px; letter-spacing:3px; color:#e9c46a; margin-bottom:14px; }
+
+    /* ── FOKUS-MODUS (Prüfung) ── */
+    .exam { background:#fbfcfe; }
+    .exam-top { background:#1a1a2e; color:white; padding:12px 18px; display:flex; align-items:center; justify-content:space-between; }
+    .exam-top .mode { font-size:11px; font-weight:700; letter-spacing:.5px; text-transform:uppercase; color:#a8b0c8; display:flex; align-items:center; gap:7px; }
+    .exam-top .mode .lock { color:#e9c46a; }
+    .exam-top .qcount { font-size:12px; font-weight:600; }
+    .exam-prog { height:5px; background:#e5e7eb; }
+    .exam-prog .fill { height:100%; background:linear-gradient(90deg,#4361ee,#5a7bff); width:30%; }
+    .exam-body { padding:26px 26px 24px; }
+    .exam-body .qref { font-size:11px; font-weight:600; color:#4361ee; background:#eef2ff; display:inline-block;
+        padding:3px 10px; border-radius:20px; margin-bottom:14px; }
+    .exam-q { font-size:17px; font-weight:600; line-height:1.45; margin-bottom:18px; }
+    .opt { display:flex; align-items:center; gap:12px; padding:13px 15px; border:1.5px solid #e5e7eb; border-radius:11px;
+        margin-bottom:9px; font-size:14px; color:#374151; cursor:pointer; background:white; transition:.15s; }
+    .opt:hover { border-color:#4361ee; background:#f5f8ff; }
+    .opt.sel { border-color:#4361ee; background:#eef2ff; color:#1a1a2e; font-weight:600; }
+    .opt .k { width:24px; height:24px; border-radius:7px; background:#f3f4f6; color:#6b7280; font-size:12px; font-weight:700;
+        display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .opt.sel .k { background:#4361ee; color:white; }
+    .exam-foot { display:flex; align-items:center; justify-content:space-between; margin-top:20px; }
+    .exam-foot .skip { font-size:12.5px; color:#9ca3af; cursor:pointer; }
+    .exam-foot .next { background:#4361ee; color:white; border:none; cursor:pointer; font-size:13.5px; font-weight:600;
+        padding:11px 22px; border-radius:11px; display:inline-flex; align-items:center; gap:7px; }
+    .dots { display:flex; gap:5px; }
+    .dots i { width:7px; height:7px; border-radius:50%; background:#e0e3ea; display:block; }
+    .dots i.done { background:#4361ee; }
+    .dots i.cur { background:#4361ee; box-shadow:0 0 0 3px #dbe2fb; }
+
+    /* ── ZEREMONIE / ERGEBNIS ── */
+    .cele { position:relative; background:radial-gradient(110% 90% at 50% -10%,#eafaf1 0%,#f7fbf9 45%,#ffffff 100%); padding:36px 30px 30px; text-align:center; overflow:hidden; }
+    .confetti { position:absolute; width:8px; height:12px; border-radius:2px; opacity:.9; }
+    .ring-wrap { position:relative; width:132px; height:132px; margin:6px auto 16px; }
+    .ring-wrap .score { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+    .ring-wrap .score .pct { font-size:32px; font-weight:800; color:#059669; line-height:1; }
+    .ring-wrap .score .of { font-size:11px; color:#9ca3af; margin-top:3px; font-weight:600; }
+    .cele .pass { font-size:11px; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:#059669; margin-bottom:6px; }
+    .cele h3 { font-size:23px; font-weight:800; margin-bottom:6px; }
+    .cele .sub { font-size:13.5px; color:#6b7280; margin-bottom:20px; }
+    .badge-earn { display:inline-flex; align-items:center; gap:11px; background:white; border:1px solid #e6e8ee;
+        border-radius:14px; padding:12px 18px; margin-bottom:22px; box-shadow:0 2px 8px rgba(0,0,0,.05); }
+    .badge-earn .bi { width:42px; height:42px; border-radius:11px; background:linear-gradient(150deg,#4361ee,#5a7bff);
+        display:flex; align-items:center; justify-content:center; font-size:20px; }
+    .badge-earn .bt { text-align:left; }
+    .badge-earn .bt .n { font-size:13.5px; font-weight:700; }
+    .badge-earn .bt .d { font-size:11px; color:#9ca3af; }
+    .review { text-align:left; background:#fbfcfe; border:1px solid #eef0f4; border-radius:12px; padding:14px 16px; margin-bottom:20px; }
+    .review .rt { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.4px; color:#9ca3af; margin-bottom:10px; }
+    .rrow { display:flex; align-items:center; gap:10px; font-size:13px; padding:6px 0; }
+    .rrow .ic { width:20px; height:20px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:11px; flex-shrink:0; }
+    .rrow .ic.ok { background:#ecfdf5; color:#059669; }
+    .rrow .ic.no { background:#fef2f2; color:#dc2626; }
+    .rrow .lnk { margin-left:auto; font-size:11.5px; font-weight:600; color:#4361ee; }
+    .unlock { display:flex; align-items:center; gap:12px; background:#eef2ff; border:1px dashed #b9c6f7; border-radius:12px; padding:13px 16px; margin-bottom:20px; text-align:left; }
+    .unlock .u-ic { width:38px; height:38px; border-radius:50%; background:#4361ee; color:white; display:flex; align-items:center; justify-content:center; font-size:17px; flex-shrink:0; }
+    .unlock .u-t .n { font-size:13px; font-weight:700; }
+    .unlock .u-t .d { font-size:11.5px; color:#6b7280; }
+    .cele .actions { display:flex; gap:10px; justify-content:center; }
+    .cele .actions .primary { background:#4361ee; color:white; border:none; cursor:pointer; font-size:13.5px; font-weight:600; padding:12px 22px; border-radius:11px; }
+    .cele .actions .ghost { background:white; color:#4361ee; border:1px solid #dbe2fb; cursor:pointer; font-size:13.5px; font-weight:600; padding:12px 20px; border-radius:11px; }
+
+    /* Kurs-Zeremonie dunkel */
+    .cele.course { background:radial-gradient(120% 100% at 50% -10%,#233056 0%,#151b30 55%,#0f1424 100%); color:white; }
+    .cele.course .pass { color:#e9c46a; }
+    .cele.course h3 { color:white; }
+    .cele.course .sub { color:#aeb6cc; }
+    .cele.course .ring-wrap .score .pct { color:#e9c46a; }
+    .cele.course .ring-wrap .score .of { color:#8b93ab; }
+    .cele.course .cert { background:rgba(255,255,255,.05); border:1px solid rgba(233,196,106,.35); border-radius:14px; padding:18px; margin-bottom:20px; }
+    .cele.course .cert .ct { font-size:11px; letter-spacing:1px; text-transform:uppercase; color:#e9c46a; margin-bottom:6px; }
+    .cele.course .cert .cn { font-size:16px; font-weight:700; }
+    .cele.course .cert .cby { font-size:11.5px; color:#8b93ab; margin-top:4px; }
+    .cele.course .actions .primary { background:linear-gradient(150deg,#f4d06f,#e0a52e); color:#3a2b06; }
+    .cele.course .actions .ghost { background:transparent; color:#e9c46a; border-color:rgba(233,196,106,.4); }
+
+    /* Vergleichstabelle */
+    .cmp { background:white; border-radius:16px; box-shadow:0 1px 3px rgba(0,0,0,.06); overflow:hidden; }
+    .cmp table { width:100%; border-collapse:collapse; }
+    .cmp th, .cmp td { text-align:left; padding:14px 20px; font-size:13px; border-bottom:1px solid #f0f0f4; vertical-align:top; }
+    .cmp th { background:#fafbfc; font-size:11px; text-transform:uppercase; letter-spacing:.4px; color:#9ca3af; font-weight:700; }
+    .cmp td:first-child { font-weight:600; color:#374151; width:180px; }
+    .cmp .h-mod { color:#4361ee; } .cmp .h-crs { color:#a06d09; }
+    .cmp tr:last-child td { border-bottom:none; }
+
+    .note-strip { margin-top:22px; background:#eef2ff; border:1px solid #dbe2fb; border-radius:12px; padding:16px 20px;
+        font-size:13px; color:#374151; }
+    .note-strip b { color:#1a1a2e; }
+
+    @media(max-width:820px){ .screens,.arc{ grid-template-columns:1fr; } .arc-step .arrow{ display:none; } }
+</style>
+</head>
+<body>
+
+<div class="header">
+    <h1>Abschlussquiz – Ausspielung als Modul- &amp; Kursabschluss</h1>
+    <span>Content Delivery · Lernenden-Ansicht · Konzept-Mockup</span>
+</div>
+
+<div class="wrap">
+    <p class="intro">
+        Zehn generierte Quizfragen in einem Unterkapitel fühlen sich schnell nach <b>„noch mehr Content"</b> an.
+        Damit der Abschluss als <b>Abschluss</b> erlebt wird, bekommt er einen eigenen Bogen aus drei Phasen und
+        bricht bewusst mit dem normalen Lernfluss. <b>Modul</b> = Checkpoint (blau), <b>Kurs</b> = Meilenstein (Gold, feierlich).
+    </p>
+
+    <div class="principles">
+        <div class="principle"><span class="dot"></span>Eigener Startbildschirm statt Kapitel</div>
+        <div class="principle"><span class="dot"></span>Fokus-Modus ohne Ablenkung</div>
+        <div class="principle"><span class="dot"></span>Zeremonielles Ergebnis</div>
+        <div class="principle"><span class="dot"></span>Bezug zu den Kapiteln</div>
+        <div class="principle"><span class="dot"></span>Belohnung &amp; Freischaltung</div>
+        <div class="principle"><span class="dot"></span>Lernen statt Prüfungsangst</div>
+    </div>
+
+    <!-- ═══ DER BOGEN ═══ -->
+    <div class="block">
+        <div class="section-title">Der Abschluss-Bogen</div>
+        <div class="section-head">Drei Phasen statt einer Fragenliste</div>
+        <div class="section-sub">Der Übergang vom Lernen zum Abschluss wird zelebriert – Anfang, fokussierte Mitte und emotionaler Höhepunkt.</div>
+        <div class="arc">
+            <div class="arc-step">
+                <div class="arc-num">1</div>
+                <h4>Einstieg / Gate</h4>
+                <p>Nicht hineinstolpern: ein Schwellen-Screen kündigt den Abschluss an, gibt Kontext (Fragen, Dauer, was auf dem Spiel steht) und macht Lust.</p>
+                <div class="arrow">→</div>
+            </div>
+            <div class="arc-step">
+                <div class="arc-num">2</div>
+                <h4>Fokus-Modus</h4>
+                <p>Sidebar &amp; Ablenkung verschwinden. Eine Frage nach der anderen, klarer Fortschritt <em>3 von 10</em>, jede Frage mit Kapitelbezug.</p>
+                <div class="arrow">→</div>
+            </div>
+            <div class="arc-step">
+                <div class="arc-num">3</div>
+                <h4>Zeremonie</h4>
+                <p>Der Höhepunkt: Score-Ring, Konfetti, Abzeichen, ehrlicher Themen-Rückblick und die sichtbare Freischaltung des nächsten Schritts.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ PHASE 1: GATES ═══ -->
+    <div class="block">
+        <div class="section-title">Phase 1 · Einstieg</div>
+        <div class="section-head">Der Startbildschirm markiert die Schwelle</div>
+        <div class="section-sub">Gleiches Muster, unterschiedliche Inszenierung: Modul einladend in Blau, Kurs feierlich in Gold auf dunklem Grund.</div>
+        <div class="screens">
+            <!-- Modul-Gate -->
+            <div class="screen">
+                <div class="screen-cap"><span class="tag">Modul</span> Modul-Check</div>
+                <div class="frame">
+                    <div class="frame-bar"><span class="d"></span><span class="d"></span><span class="d"></span></div>
+                    <div class="gate">
+                        <div class="medal">🎯</div>
+                        <div class="eyebrow">Modul abgeschlossen</div>
+                        <h3>Bereit für den Modul-Check?</h3>
+                        <div class="lead">Du hast alle Kapitel von <b>„Projektmanagement mit Scrum"</b> durchgearbeitet. Zeit zu prüfen, was sitzt.</div>
+                        <div class="gate-meta">
+                            <div class="gmeta"><div class="v">10</div><div class="l">Fragen</div></div>
+                            <div class="gmeta"><div class="v">~8 min</div><div class="l">Dauer</div></div>
+                            <div class="gmeta"><div class="v">70 %</div><div class="l">zum Bestehen</div></div>
+                        </div>
+                        <button class="cta">Modul-Check starten →</button>
+                        <div class="hint">Kein Stress – du kannst beliebig oft wiederholen.</div>
+                    </div>
+                </div>
+            </div>
+            <!-- Kurs-Gate -->
+            <div class="screen">
+                <div class="screen-cap"><span class="tag gold">Kurs</span> Kursabschluss</div>
+                <div class="frame">
+                    <div class="frame-bar"><span class="d"></span><span class="d"></span><span class="d"></span></div>
+                    <div class="gate course">
+                        <div class="stars">★ ★ ★ ★ ★</div>
+                        <div class="medal">🏆</div>
+                        <div class="eyebrow">Kurs abgeschlossen</div>
+                        <h3>Die Abschlussprüfung</h3>
+                        <div class="lead">Alle Module geschafft. Diese Prüfung bündelt den gesamten Kurs – und schaltet dein Zertifikat frei.</div>
+                        <div class="gate-meta">
+                            <div class="gmeta"><div class="v">10</div><div class="l">Fragen</div></div>
+                            <div class="gmeta"><div class="v">~12 min</div><div class="l">Dauer</div></div>
+                            <div class="gmeta"><div class="v">Zertifikat</div><div class="l">Belohnung</div></div>
+                        </div>
+                        <button class="cta">Abschlussprüfung starten →</button>
+                        <div class="hint">Nimm dir Zeit – dies ist dein großer Moment.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ PHASE 2 & 3 ═══ -->
+    <div class="block">
+        <div class="section-title">Phase 2 &amp; 3 · Fokus &amp; Zeremonie</div>
+        <div class="section-head">Konzentrierte Prüfung, gefeiertes Ergebnis</div>
+        <div class="section-sub">Im Fokus-Modus verschwindet die Kursstruktur. Am Ende steht kein „nächstes Kapitel", sondern eine Belohnung.</div>
+        <div class="screens">
+            <!-- Fokus-Modus -->
+            <div class="screen">
+                <div class="screen-cap"><span class="tag">Phase 2</span> Fokus-Modus</div>
+                <div class="frame">
+                    <div class="frame-bar"><span class="d"></span><span class="d"></span><span class="d"></span></div>
+                    <div class="exam">
+                        <div class="exam-top">
+                            <div class="mode"><span class="lock">🔒</span> Fokus-Modus</div>
+                            <div class="qcount">Frage 3 von 10</div>
+                        </div>
+                        <div class="exam-prog"><div class="fill"></div></div>
+                        <div class="exam-body">
+                            <div class="qref">Bezug: Kapitel 2 · Sprint-Planung</div>
+                            <div class="exam-q">Wer entscheidet im Scrum-Framework, wie viele Backlog-Items in einen Sprint aufgenommen werden?</div>
+                            <div class="opt"><span class="k">A</span> Der Product Owner allein</div>
+                            <div class="opt sel"><span class="k">B</span> Das Entwicklungsteam, basierend auf seiner Kapazität</div>
+                            <div class="opt"><span class="k">C</span> Der Scrum Master</div>
+                            <div class="opt"><span class="k">D</span> Die Stakeholder im Review</div>
+                            <div class="exam-foot">
+                                <div class="dots">
+                                    <i class="done"></i><i class="done"></i><i class="cur"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+                                </div>
+                                <button class="next">Weiter →</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Zeremonie -->
+            <div class="screen">
+                <div class="screen-cap"><span class="tag">Phase 3</span> Zeremonie (Modul)</div>
+                <div class="frame">
+                    <div class="frame-bar"><span class="d"></span><span class="d"></span><span class="d"></span></div>
+                    <div class="cele" id="celeMod">
+                        <div class="ring-wrap">
+                            <svg width="132" height="132" viewBox="0 0 132 132">
+                                <circle cx="66" cy="66" r="58" fill="none" stroke="#e6f4ec" stroke-width="11"/>
+                                <circle cx="66" cy="66" r="58" fill="none" stroke="#059669" stroke-width="11" stroke-linecap="round"
+                                    stroke-dasharray="364" stroke-dashoffset="47" transform="rotate(-90 66 66)"/>
+                            </svg>
+                            <div class="score"><div class="pct">87 %</div><div class="of">9 / 10 richtig</div></div>
+                        </div>
+                        <div class="pass">Bestanden</div>
+                        <h3>Modul gemeistert! 🎉</h3>
+                        <div class="sub">Stark – dein Wissen zu Scrum sitzt.</div>
+                        <div class="badge-earn">
+                            <div class="bi">🎖️</div>
+                            <div class="bt"><div class="n">Abzeichen „Scrum-Basics"</div><div class="d">Zu deinem Profil hinzugefügt</div></div>
+                        </div>
+                        <div class="review">
+                            <div class="rt">Themen-Rückblick</div>
+                            <div class="rrow"><span class="ic ok">✓</span> Rollen &amp; Verantwortlichkeiten</div>
+                            <div class="rrow"><span class="ic ok">✓</span> Sprint-Planung</div>
+                            <div class="rrow"><span class="ic no">!</span> Velocity &amp; Schätzung <span class="lnk">Kapitel 3 wiederholen →</span></div>
+                        </div>
+                        <div class="unlock">
+                            <div class="u-ic">🔓</div>
+                            <div class="u-t"><div class="n">Modul 4 „Praxistransfer" freigeschaltet</div><div class="d">Dein nächster Schritt wartet</div></div>
+                        </div>
+                        <div class="actions">
+                            <button class="primary">Weiter zu Modul 4 →</button>
+                            <button class="ghost">Wiederholen</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Kurs-Zeremonie volle Breite -->
+        <div style="margin-top:24px;">
+            <div class="screen-cap"><span class="tag gold">Phase 3</span> Zeremonie (Kurs) – der große Moment</div>
+            <div class="frame">
+                <div class="frame-bar"><span class="d"></span><span class="d"></span><span class="d"></span></div>
+                <div class="cele course" style="padding-bottom:34px;" id="celeCrs">
+                    <div class="ring-wrap">
+                        <svg width="132" height="132" viewBox="0 0 132 132">
+                            <circle cx="66" cy="66" r="58" fill="none" stroke="rgba(233,196,106,.18)" stroke-width="11"/>
+                            <circle cx="66" cy="66" r="58" fill="none" stroke="#e9c46a" stroke-width="11" stroke-linecap="round"
+                                stroke-dasharray="364" stroke-dashoffset="36" transform="rotate(-90 66 66)"/>
+                        </svg>
+                        <div class="score"><div class="pct">90 %</div><div class="of">9 / 10 richtig</div></div>
+                    </div>
+                    <div class="pass">Kurs bestanden</div>
+                    <h3>Du hast es geschafft! 🏆</h3>
+                    <div class="sub">Der komplette Kurs „Projektmanagement mit Scrum" liegt hinter dir.</div>
+                    <div class="cert">
+                        <div class="ct">Zertifikat freigeschaltet</div>
+                        <div class="cn">Zertifizierte:r Scrum-Praktiker:in</div>
+                        <div class="cby">Ausgestellt am 30.07.2026 · verifizierbar &amp; teilbar</div>
+                    </div>
+                    <div class="actions">
+                        <button class="primary">🏅 Zertifikat ansehen</button>
+                        <button class="ghost">Auf LinkedIn teilen</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ VERGLEICH ═══ -->
+    <div class="block">
+        <div class="section-title">Modul vs. Kurs</div>
+        <div class="section-head">Bewusste Eskalation der Inszenierung</div>
+        <div class="section-sub">Beide nutzen denselben Bogen – aber der Kursabschluss ist sichtbar größer, seltener und feierlicher.</div>
+        <div class="cmp">
+            <table>
+                <tr><th>Dimension</th><th class="h-mod">Modulabschluss</th><th class="h-crs">Kursabschluss</th></tr>
+                <tr><td>Framing</td><td>„Modul-Check" – ein Checkpoint auf dem Weg</td><td>„Abschlussprüfung" – der Meilenstein</td></tr>
+                <tr><td>Farbwelt</td><td>Akzent-Blau, heller Hintergrund</td><td>Premium-Gold auf dunklem Vollbild</td></tr>
+                <tr><td>Ton</td><td>Motivierend, leicht, ermutigend</td><td>Feierlich, „Du hast es geschafft"</td></tr>
+                <tr><td>Belohnung</td><td>Modul-Abzeichen · nächstes Modul frei</td><td>Zertifikat · Kurs-Trophäe · Teilen-Funktion</td></tr>
+                <tr><td>Nach dem Bestehen</td><td>Themen-Rückblick + Weiter-Button</td><td>Zertifikat, Konfetti-Feier, Abschluss-Screen</td></tr>
+                <tr><td>Wiederholung</td><td>Jederzeit, ohne Hürde</td><td>Möglich, Bestnote wird gewertet</td></tr>
+            </table>
+        </div>
+
+        <div class="note-strip">
+            <b>Wichtiges Prinzip – lernen statt prüfen:</b> Fehlantworten sind keine Sackgasse. Jedes verpasste Thema
+            verlinkt zurück ins passende Kapitel, sodass der Abschluss zugleich ein persönlicher Lernkompass wird.
+            Das nimmt die Prüfungsangst und macht das Wiederholen sinnvoll statt frustrierend.
+        </div>
+    </div>
+</div>
+
+<script>
+// Leichte Konfetti-Animation in den Zeremonie-Screens
+function confetti(container, colors){
+    for(let i=0;i<26;i++){
+        const c=document.createElement('div');
+        c.className='confetti';
+        c.style.left=Math.random()*100+'%';
+        c.style.top='-14px';
+        c.style.background=colors[i%colors.length];
+        c.style.transform='rotate('+(Math.random()*360)+'deg)';
+        container.appendChild(c);
+        const fall=1600+Math.random()*1400, delay=Math.random()*1200, drift=(Math.random()-.5)*70;
+        c.animate([
+            {transform:'translate(0,0) rotate(0deg)',opacity:1},
+            {transform:'translate('+drift+'px,'+(container.offsetHeight+30)+'px) rotate('+(360+Math.random()*360)+'deg)',opacity:.2}
+        ],{duration:fall,delay:delay,iterations:Infinity,easing:'cubic-bezier(.3,.6,.7,1)'});
+    }
+}
+confetti(document.getElementById('celeMod'),['#4361ee','#059669','#f4d06f','#5a7bff']);
+confetti(document.getElementById('celeCrs'),['#e9c46a','#f4d06f','#ffffff','#c9a24a']);
+</script>
+</body>
+</html>
