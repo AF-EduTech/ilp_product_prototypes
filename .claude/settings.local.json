@@ -17,7 +17,10 @@
       "WebFetch(domain:www.ispringsolutions.com)",
       "WebFetch(domain:www.eleken.co)",
       "WebFetch(domain:www.ispring.com)",
-      "Bash(open Mockups/bild-hotspots.html)"
+      "Bash(open Mockups/bild-hotspots.html)",
+      "Bash(rm -f *.png)",
+      "Bash(qlmanage -t -s 880 -o . \"/Users/consu/Claude Projects/Reza/images/tafel-ablauf-illustration.svg\")",
+      "Bash(qlmanage -t -s 1000 -o . \"/Users/consu/Claude Projects/Reza/images/tafel-ablauf-illustration.svg\")"
     ]
   }
 }
