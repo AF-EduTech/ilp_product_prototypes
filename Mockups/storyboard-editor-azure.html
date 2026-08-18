@@ -1,0 +1,1307 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Storyboard-Editor – Bild aus Azure Storage</title>
+<link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #f0f2f5;
+    color: #1a1a2e;
+    padding: 24px 32px 48px;
+}
+
+/* ── Topbar ── */
+.topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: #6b7280;
+}
+
+.breadcrumb .sep { color: #d1d5db; }
+.breadcrumb .current { color: #1a1a2e; font-weight: 600; }
+
+.crumb-title {
+    font-size: 20px;
+    font-weight: 700;
+    margin-top: 4px;
+}
+
+.topbar-actions { display: flex; align-items: center; gap: 8px; }
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+    background: white;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 500;
+    color: #4b5563;
+    cursor: pointer;
+    transition: all .15s;
+}
+.btn:hover { border-color: #4361ee; color: #4361ee; }
+.btn.primary { background: #4361ee; color: white; border-color: #4361ee; }
+.btn.primary:hover { background: #3a50d9; }
+.btn.primary:disabled,
+.btn:disabled { opacity: .45; cursor: not-allowed; }
+.btn.primary:disabled:hover { background: #4361ee; }
+.btn.ghost { border-color: transparent; background: transparent; }
+
+.status-badge {
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 9px;
+    border-radius: 99px;
+    background: #fef3c7;
+    color: #92400e;
+    letter-spacing: .02em;
+}
+
+/* ── Layout ── */
+.layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 380px;
+    gap: 20px;
+    align-items: start;
+}
+
+@media (max-width: 1180px) {
+    .layout { grid-template-columns: minmax(0, 1fr); }
+}
+
+.card {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 14px;
+    overflow: hidden;
+}
+
+.card-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 18px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.card-title {
+    font-size: 14px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.card-sub { font-size: 12px; color: #6b7280; }
+
+.chip {
+    font-size: 11px;
+    font-weight: 600;
+    color: #4b5563;
+    background: #f3f4f6;
+    padding: 2px 8px;
+    border-radius: 99px;
+}
+
+/* ── Quill overrides ── */
+.ql-toolbar.ql-snow {
+    border: none;
+    border-bottom: 1px solid #e5e7eb;
+    padding: 10px 14px;
+    background: #fafbfc;
+}
+.ql-container.ql-snow { border: none; font-family: inherit; }
+.ql-editor {
+    min-height: 620px;
+    padding: 28px 32px 60px;
+    font-size: 15px;
+    line-height: 1.65;
+    color: #1a1a2e;
+}
+.ql-editor h2 { font-size: 22px; font-weight: 700; margin: 26px 0 10px; }
+.ql-editor h3 { font-size: 17px; font-weight: 700; margin: 22px 0 8px; }
+.ql-editor p { margin-bottom: 12px; }
+.ql-editor blockquote {
+    border-left: 3px solid #4361ee;
+    background: #f5f7ff;
+    padding: 10px 16px;
+    margin: 16px 0;
+    color: #3a3a52;
+}
+.ql-snow .ql-toolbar button:hover .ql-stroke,
+.ql-snow.ql-toolbar button:hover .ql-stroke { stroke: #4361ee; }
+.ql-snow.ql-toolbar button.ql-active .ql-stroke { stroke: #4361ee; }
+
+/* Custom toolbar button */
+.ql-snow.ql-toolbar button.ql-mediaLibrary {
+    width: auto;
+    padding: 0 10px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #4361ee;
+    border: 1px solid #dbe1ff;
+    border-radius: 6px;
+    background: #f5f7ff;
+    height: 24px;
+}
+.ql-snow.ql-toolbar button.ql-mediaLibrary:hover { background: #e8edff; }
+
+/* ── Custom Blot: storyboardImage ── */
+.ql-editor figure.sb-image {
+    margin: 22px 0;
+    border-radius: 12px;
+    position: relative;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: border-color .15s;
+}
+.ql-editor figure.sb-image:hover { border-color: #c7d2fe; }
+.ql-editor figure.sb-image img {
+    display: block;
+    width: 100%;
+    max-height: 420px;
+    object-fit: contain;
+    border-radius: 10px;
+    background: #f4efea;
+}
+.ql-editor figure.sb-image[data-size="half"] { width: 55%; }
+.ql-editor figure.sb-image figcaption {
+    font-size: 12.5px;
+    color: #6b7280;
+    padding: 8px 2px 0;
+    line-height: 1.5;
+}
+.ql-editor figure.sb-image::after {
+    content: attr(data-blob-id);
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    font-size: 10px;
+    font-weight: 600;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    color: white;
+    background: rgba(20, 57, 91, .78);
+    padding: 3px 7px;
+    border-radius: 5px;
+    opacity: 0;
+    transition: opacity .15s;
+    pointer-events: none;
+}
+.ql-editor figure.sb-image:hover::after { opacity: 1; }
+.ql-editor figure.sb-image.missing-alt { border-color: #fca5a5; }
+.ql-editor figure.sb-image.missing-alt::before {
+    content: "⚠ Alt-Text fehlt";
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    font-size: 10px;
+    font-weight: 700;
+    color: white;
+    background: #ef4444;
+    padding: 3px 7px;
+    border-radius: 5px;
+}
+
+/* ── Side panels ── */
+.side-col { display: flex; flex-direction: column; gap: 20px; }
+
+.metric-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    background: #e5e7eb;
+    border-bottom: 1px solid #e5e7eb;
+}
+.metric {
+    background: white;
+    padding: 12px 16px;
+}
+.metric-label {
+    font-size: 10.5px;
+    font-weight: 600;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    margin-bottom: 3px;
+}
+.metric-value { font-size: 17px; font-weight: 700; }
+.metric-value.good { color: #059669; }
+.metric-value.bad { color: #dc2626; }
+.metric-note { font-size: 11px; color: #9ca3af; margin-top: 1px; }
+
+.delta-view {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 11px;
+    line-height: 1.6;
+    padding: 14px 16px;
+    max-height: 300px;
+    overflow: auto;
+    background: #fbfcfd;
+    white-space: pre-wrap;
+    word-break: break-word;
+    color: #4b5563;
+}
+.delta-view .k { color: #7c3aed; }
+.delta-view .s { color: #059669; }
+.delta-view .blob { color: #dc2626; font-weight: 700; }
+
+.net-log {
+    max-height: 320px;
+    overflow: auto;
+    padding: 6px 0;
+}
+.net-entry {
+    display: grid;
+    grid-template-columns: 46px 1fr;
+    gap: 10px;
+    padding: 9px 16px;
+    border-bottom: 1px solid #f3f4f6;
+    font-size: 12px;
+}
+.net-entry:last-child { border-bottom: none; }
+.net-method {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 0;
+    text-align: center;
+    border-radius: 4px;
+    height: fit-content;
+}
+.m-post { background: #dbeafe; color: #1d4ed8; }
+.m-put  { background: #dcfce7; color: #15803d; }
+.m-get  { background: #f3f4f6; color: #4b5563; }
+.m-warn { background: #fee2e2; color: #b91c1c; }
+.net-url {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 11px;
+    color: #1a1a2e;
+    word-break: break-all;
+    line-height: 1.45;
+}
+.net-meta { font-size: 11px; color: #9ca3af; margin-top: 3px; }
+.net-empty { padding: 24px 16px; font-size: 12.5px; color: #9ca3af; text-align: center; }
+
+/* ── Modal ── */
+.overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, .45);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 32px;
+    z-index: 50;
+}
+.overlay.open { display: flex; }
+
+.modal {
+    background: white;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 860px;
+    max-height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+.modal.narrow { max-width: 480px; }
+
+.modal-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 22px;
+    border-bottom: 1px solid #e5e7eb;
+}
+.modal-title { font-size: 16px; font-weight: 700; }
+.modal-sub { font-size: 12px; color: #6b7280; margin-top: 2px; }
+.close-x {
+    border: none;
+    background: transparent;
+    font-size: 20px;
+    color: #9ca3af;
+    cursor: pointer;
+    line-height: 1;
+    padding: 4px 6px;
+}
+.close-x:hover { color: #1a1a2e; }
+
+.tabs {
+    display: flex;
+    gap: 4px;
+    padding: 12px 22px 0;
+    border-bottom: 1px solid #e5e7eb;
+}
+.tab {
+    padding: 8px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #6b7280;
+    border: none;
+    background: transparent;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    font-family: inherit;
+}
+.tab.active { color: #4361ee; border-bottom-color: #4361ee; }
+
+.modal-body { padding: 20px 22px; overflow: auto; flex: 1; }
+
+.container-path {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 11.5px;
+    color: #4b5563;
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 8px 12px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.container-path .lock { font-size: 12px; }
+.container-path .tag {
+    margin-left: auto;
+    font-family: inherit;
+    font-size: 10px;
+    font-weight: 700;
+    color: #92400e;
+    background: #fef3c7;
+    padding: 2px 7px;
+    border-radius: 99px;
+    letter-spacing: .02em;
+}
+
+.asset-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 14px;
+}
+.asset {
+    border: 2px solid #e5e7eb;
+    border-radius: 10px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all .15s;
+    background: white;
+    text-align: left;
+    padding: 0;
+    font-family: inherit;
+}
+.asset:hover { border-color: #c7d2fe; }
+.asset.selected { border-color: #4361ee; box-shadow: 0 0 0 3px rgba(67,97,238,.14); }
+.asset img { display: block; width: 100%; aspect-ratio: 400/260; object-fit: cover; }
+.asset-meta { padding: 8px 10px; border-top: 1px solid #f3f4f6; }
+.asset-name {
+    font-size: 12px;
+    font-weight: 600;
+    color: #1a1a2e;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.asset-info { font-size: 11px; color: #9ca3af; margin-top: 2px; }
+
+/* Upload tab */
+.dropzone {
+    border: 2px dashed #d1d5db;
+    border-radius: 12px;
+    padding: 40px 24px;
+    text-align: center;
+    background: #fafbfc;
+    cursor: pointer;
+    transition: all .15s;
+}
+.dropzone:hover, .dropzone.drag { border-color: #4361ee; background: #f5f7ff; }
+.dropzone-icon { font-size: 30px; margin-bottom: 10px; }
+.dropzone-title { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+.dropzone-sub { font-size: 12px; color: #6b7280; }
+
+.upload-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    margin-top: 14px;
+}
+.upload-thumb {
+    width: 52px; height: 40px;
+    border-radius: 6px;
+    background: #f4efea;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+.upload-info { flex: 1; min-width: 0; }
+.upload-name { font-size: 12.5px; font-weight: 600; }
+.upload-stage { font-size: 11.5px; color: #6b7280; margin-top: 2px; }
+.bar { height: 4px; background: #f3f4f6; border-radius: 99px; margin-top: 6px; overflow: hidden; }
+.bar span { display: block; height: 100%; background: #4361ee; width: 0; transition: width .3s; }
+.bar span.done { background: #10b981; }
+
+/* Settings form */
+.field { margin-bottom: 16px; }
+.field-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12.5px;
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+.req { color: #dc2626; }
+.field-hint { font-size: 11.5px; color: #6b7280; margin-top: 5px; line-height: 1.5; }
+.input, .textarea {
+    width: 100%;
+    padding: 9px 12px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 13px;
+    color: #1a1a2e;
+    outline: none;
+    resize: vertical;
+}
+.input:focus, .textarea:focus { border-color: #4361ee; box-shadow: 0 0 0 3px rgba(67,97,238,.1); }
+.input:disabled { background: #f9fafb; color: #9ca3af; }
+
+.checkline {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 12.5px;
+    color: #4b5563;
+    cursor: pointer;
+    line-height: 1.5;
+}
+.checkline input { margin-top: 2px; }
+
+.seg { display: flex; gap: 6px; }
+.seg button {
+    flex: 1;
+    padding: 8px;
+    border: 1px solid #e5e7eb;
+    background: white;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 12.5px;
+    font-weight: 500;
+    color: #4b5563;
+    cursor: pointer;
+}
+.seg button.active { border-color: #4361ee; background: #f5f7ff; color: #4361ee; font-weight: 600; }
+
+.preview-box {
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 10px;
+    margin-bottom: 16px;
+    background: #fafbfc;
+}
+.preview-box img { display: block; width: 100%; border-radius: 6px; }
+.preview-blob {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 11px;
+    color: #6b7280;
+    margin-top: 8px;
+    word-break: break-all;
+}
+
+.modal-foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 22px;
+    border-top: 1px solid #e5e7eb;
+    background: #fafbfc;
+}
+.foot-note { font-size: 11.5px; color: #9ca3af; }
+.foot-actions { display: flex; gap: 8px; }
+
+.a11y-warn {
+    display: none;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 12px;
+    color: #92400e;
+    background: #fffbeb;
+    border: 1px solid #fde68a;
+    border-radius: 8px;
+    padding: 9px 12px;
+    margin-bottom: 16px;
+    line-height: 1.5;
+}
+.a11y-warn.show { display: flex; }
+
+/* Toast */
+.toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: #14395b;
+    color: white;
+    font-size: 13px;
+    padding: 11px 18px;
+    border-radius: 10px;
+    opacity: 0;
+    transition: all .25s;
+    z-index: 90;
+    pointer-events: none;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+.cdn-warn {
+    display: none;
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #991b1b;
+    border-radius: 10px;
+    padding: 14px 18px;
+    font-size: 13px;
+    line-height: 1.6;
+    margin-bottom: 20px;
+}
+</style>
+</head>
+<body>
+
+<div class="cdn-warn" id="cdnWarn">
+    <strong>Quill konnte nicht geladen werden.</strong><br>
+    Dieses Mockup lädt Quill 2.0 vom CDN (jsdelivr) – bitte mit Internetverbindung öffnen.
+</div>
+
+<div class="topbar">
+    <div>
+        <div class="breadcrumb">
+            <span>SQL Server Grundlagen</span>
+            <span class="sep">›</span>
+            <span>Modul 3 – Backup &amp; Recovery</span>
+            <span class="sep">›</span>
+            <span class="current">Lerneinheit 2</span>
+        </div>
+        <div class="crumb-title">Storyboard bearbeiten</div>
+    </div>
+    <div class="topbar-actions">
+        <span class="status-badge">IN BEARBEITUNG</span>
+        <button class="btn">Vorschau</button>
+        <button class="btn primary" onclick="toast('Storyboard gespeichert – Delta an /api/storyboards/4711 übertragen')">Speichern</button>
+    </div>
+</div>
+
+<div class="layout">
+    <!-- ── Editor ── -->
+    <div class="card">
+        <div class="card-head">
+            <div>
+                <div class="card-title">Content-Element · Text &amp; Bild</div>
+                <div class="card-sub">Quill 2.0 mit Custom Blot <code>storyboardImage</code></div>
+            </div>
+            <span class="chip" id="wordCount">0 Wörter</span>
+        </div>
+        <div id="toolbar">
+            <span class="ql-formats">
+                <select class="ql-header">
+                    <option value="2">Überschrift</option>
+                    <option value="3">Zwischenüberschrift</option>
+                    <option selected>Fließtext</option>
+                </select>
+            </span>
+            <span class="ql-formats">
+                <button class="ql-bold"></button>
+                <button class="ql-italic"></button>
+                <button class="ql-link"></button>
+            </span>
+            <span class="ql-formats">
+                <button class="ql-list" value="ordered"></button>
+                <button class="ql-list" value="bullet"></button>
+                <button class="ql-blockquote"></button>
+            </span>
+            <span class="ql-formats">
+                <button class="ql-mediaLibrary">Bild einfügen</button>
+            </span>
+            <span class="ql-formats">
+                <button class="ql-clean"></button>
+            </span>
+        </div>
+        <div id="editor"></div>
+    </div>
+
+    <!-- ── Side ── -->
+    <div class="side-col">
+        <div class="card">
+            <div class="card-head">
+                <div class="card-title">Storyboard-Delta</div>
+                <button class="btn ghost" style="font-size:12px;padding:4px 8px" onclick="toast('Delta in die Zwischenablage kopiert')">Kopieren</button>
+            </div>
+            <div class="metric-row">
+                <div class="metric">
+                    <div class="metric-label">Delta-Größe</div>
+                    <div class="metric-value good" id="mDelta">–</div>
+                    <div class="metric-note">was in der DB landet</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-label">Mit Base64</div>
+                    <div class="metric-value bad" id="mBase64">–</div>
+                    <div class="metric-note">Quill-Standardverhalten</div>
+                </div>
+            </div>
+            <div class="delta-view" id="deltaView"></div>
+        </div>
+
+        <div class="card">
+            <div class="card-head">
+                <div>
+                    <div class="card-title">Azure-Requests</div>
+                    <div class="card-sub">simuliert</div>
+                </div>
+                <button class="btn ghost" style="font-size:12px;padding:4px 8px" onclick="clearLog()">Leeren</button>
+            </div>
+            <div class="net-log" id="netLog">
+                <div class="net-empty">Noch keine Requests – füge ein Bild ein.</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ── Medienbibliothek ── -->
+<div class="overlay" id="libraryOverlay">
+    <div class="modal">
+        <div class="modal-head">
+            <div>
+                <div class="modal-title">Bild einfügen</div>
+                <div class="modal-sub">Assets aus dem Azure Blob Storage dieses Kurses</div>
+            </div>
+            <button class="close-x" onclick="closeLibrary()">✕</button>
+        </div>
+        <div class="tabs">
+            <button class="tab active" data-tab="browse" onclick="switchTab('browse')">Medienbibliothek</button>
+            <button class="tab" data-tab="upload" onclick="switchTab('upload')">Hochladen</button>
+        </div>
+
+        <div class="modal-body">
+            <div class="container-path">
+                <span class="lock">🔒</span>
+                <span>ilpmedia.blob.core.windows.net / kurse / sql-server-grundlagen /</span>
+                <span class="tag">PRIVAT</span>
+            </div>
+
+            <div id="tabBrowse">
+                <div class="asset-grid" id="assetGrid"></div>
+            </div>
+
+            <div id="tabUpload" style="display:none">
+                <div class="dropzone" id="dropzone">
+                    <div class="dropzone-icon">☁️</div>
+                    <div class="dropzone-title">Datei hier ablegen oder klicken</div>
+                    <div class="dropzone-sub">PNG, JPG, SVG oder WebP · max. 10 MB</div>
+                </div>
+                <div id="uploadList"></div>
+            </div>
+        </div>
+
+        <div class="modal-foot">
+            <div class="foot-note" id="libFootNote">Auswahl über die Kachel</div>
+            <div class="foot-actions">
+                <button class="btn" onclick="closeLibrary()">Abbrechen</button>
+                <button class="btn primary" id="libNext" disabled onclick="goToSettings()">Weiter</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ── Bildeinstellungen ── -->
+<div class="overlay" id="settingsOverlay">
+    <div class="modal narrow">
+        <div class="modal-head">
+            <div>
+                <div class="modal-title" id="setTitle">Bildeinstellungen</div>
+                <div class="modal-sub">Diese Angaben werden im Delta gespeichert</div>
+            </div>
+            <button class="close-x" onclick="closeSettings()">✕</button>
+        </div>
+        <div class="modal-body">
+            <div class="preview-box">
+                <img id="setPreview" alt="">
+                <div class="preview-blob" id="setBlobId"></div>
+            </div>
+
+            <div class="a11y-warn" id="a11yWarn">
+                <span>⚠</span>
+                <span>Ohne Alt-Text ist das Bild für Screenreader-Nutzende verloren. Rein
+                dekorative Bilder bitte unten als solche markieren.</span>
+            </div>
+
+            <div class="field">
+                <div class="field-label">Alt-Text <span class="req">*</span></div>
+                <textarea class="textarea" id="setAlt" rows="2"
+                    placeholder="Was zeigt das Bild inhaltlich?"></textarea>
+                <div class="field-hint">Beschreibt den Informationsgehalt – nicht das Aussehen.</div>
+            </div>
+
+            <div class="field">
+                <label class="checkline">
+                    <input type="checkbox" id="setDecorative">
+                    <span>Rein dekoratives Bild (wird mit <code>alt=""</code> ausgespielt und von
+                    Screenreadern übersprungen)</span>
+                </label>
+            </div>
+
+            <div class="field">
+                <div class="field-label">Bildunterschrift</div>
+                <input class="input" id="setCaption" placeholder="Optional – erscheint unter dem Bild">
+            </div>
+
+            <div class="field">
+                <div class="field-label">Darstellung</div>
+                <div class="seg" id="setSize">
+                    <button class="active" data-size="full">Volle Breite</button>
+                    <button data-size="half">Halbe Breite</button>
+                </div>
+            </div>
+        </div>
+        <div class="modal-foot">
+            <div class="foot-note">Gespeichert wird die Blob-Referenz, nicht die SAS-URL</div>
+            <div class="foot-actions">
+                <button class="btn" onclick="closeSettings()">Abbrechen</button>
+                <button class="btn primary" id="setSubmit" disabled onclick="applySettings()">Einfügen</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
+<script>
+/* ══════════════════════════════════════════════════════════════
+   Fake Azure Blob Storage
+   In der echten Anwendung liefert das Backend diese Liste aus
+   dem Container und signiert die URLs per User-Delegation-SAS.
+   ══════════════════════════════════════════════════════════════ */
+
+const fmtBytes = b => b < 1024 ? b + ' B'
+    : b < 1048576 ? (b/1024).toFixed(1).replace('.', ',') + ' KB'
+    : (b/1048576).toFixed(1).replace('.', ',') + ' MB';
+
+const PALETTE = { creme:'#F4EFEA', peri:'#8F94D9', koralle:'#EE5A63', petrol:'#12B4CB', blau:'#14395B', beige:'#E8D9CB' };
+
+function svgAsset(inner) {
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 260">
+        <rect width="400" height="260" fill="${PALETTE.creme}"/>
+        <g stroke="#111" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" fill="none">${inner}</g>
+    </svg>`;
+    return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+}
+
+const BLOBS = {
+    'img-oltp-olap': {
+        name: 'oltp-olap-vergleich.svg', size: 184320, dims: '1600 × 1040',
+        uploaded: '12.06.2026', by: 'M. Sarrazin',
+        src: svgAsset(`
+            <rect x="40" y="70" width="130" height="120" rx="14" fill="${PALETTE.peri}"/>
+            <rect x="230" y="70" width="130" height="120" rx="14" fill="${PALETTE.petrol}"/>
+            <path d="M180 130 h40"/><path d="M205 118 l15 12 -15 12"/>
+            <path d="M62 100 h86 M62 122 h86 M62 144 h56"/>
+            <path d="M252 100 h86 M252 122 h60 M252 144 h86"/>
+            <path d="M60 215 h70" stroke="${PALETTE.beige}"/>
+            <path d="M250 215 h70" stroke="${PALETTE.beige}"/>`)
+    },
+    'img-backup-zyklus': {
+        name: 'backup-recovery-zyklus.svg', size: 212992, dims: '1600 × 1040',
+        uploaded: '14.06.2026', by: 'M. Sarrazin',
+        src: svgAsset(`
+            <ellipse cx="95" cy="90" rx="52" ry="20" fill="white"/>
+            <path d="M43 90 v70 a52 20 0 0 0 104 0 v-70" fill="white"/>
+            <ellipse cx="95" cy="90" rx="52" ry="20" fill="none"/>
+            <ellipse cx="305" cy="90" rx="52" ry="20" fill="${PALETTE.petrol}"/>
+            <path d="M253 90 v70 a52 20 0 0 0 104 0 v-70" fill="${PALETTE.petrol}"/>
+            <ellipse cx="305" cy="90" rx="52" ry="20" fill="none"/>
+            <path d="M160 120 h80"/><path d="M225 108 l15 12 -15 12"/>
+            <path d="M240 190 h-80" stroke="${PALETTE.koralle}"/>
+            <path d="M175 178 l-15 12 15 12" stroke="${PALETTE.koralle}"/>`)
+    },
+    'img-recovery-model': {
+        name: 'recovery-modelle.png', size: 341504, dims: '1400 × 910',
+        uploaded: '15.06.2026', by: 'T. Öztürk',
+        src: svgAsset(`
+            <rect x="35" y="55" width="100" height="150" rx="12" fill="white"/>
+            <rect x="150" y="55" width="100" height="150" rx="12" fill="${PALETTE.beige}"/>
+            <rect x="265" y="55" width="100" height="150" rx="12" fill="${PALETTE.koralle}"/>
+            <circle cx="85" cy="105" r="22" fill="${PALETTE.peri}"/>
+            <circle cx="200" cy="105" r="22" fill="${PALETTE.petrol}"/>
+            <circle cx="315" cy="105" r="22" fill="white"/>
+            <path d="M55 155 h60 M55 178 h40"/>
+            <path d="M170 155 h60 M170 178 h40"/>
+            <path d="M285 155 h60 M285 178 h40"/>`)
+    },
+    'img-index-baum': {
+        name: 'index-b-baum.svg', size: 96256, dims: '1200 × 780',
+        uploaded: '02.06.2026', by: 'T. Öztürk',
+        src: svgAsset(`
+            <rect x="160" y="35" width="80" height="42" rx="10" fill="${PALETTE.peri}"/>
+            <path d="M180 77 L110 120 M220 77 L290 120"/>
+            <rect x="60" y="120" width="80" height="42" rx="10" fill="${PALETTE.petrol}"/>
+            <rect x="255" y="120" width="80" height="42" rx="10" fill="${PALETTE.petrol}"/>
+            <path d="M80 162 L55 200 M120 162 L145 200 M275 162 L250 200 M315 162 L340 200"/>
+            <rect x="25" y="200" width="60" height="34" rx="8" fill="white"/>
+            <rect x="115" y="200" width="60" height="34" rx="8" fill="white"/>
+            <rect x="220" y="200" width="60" height="34" rx="8" fill="white"/>
+            <rect x="310" y="200" width="60" height="34" rx="8" fill="white"/>`)
+    },
+    'img-tafel-ablauf': {
+        name: 'tafel-ablauf-illustration.svg', size: 268288, dims: '880 × 660',
+        uploaded: '06.08.2026', by: 'R. Nazarian',
+        src: svgAsset(`
+            <rect x="180" y="40" width="185" height="125" rx="12" fill="${PALETTE.peri}"/>
+            <path d="M205 75 h130 M205 100 h100 M205 125 h130" stroke="white"/>
+            <circle cx="105" cy="95" r="34" fill="#FAF5F1"/>
+            <path d="M78 82 a30 30 0 0 1 54 0 a17 17 0 0 0 -54 0" fill="#111"/>
+            <circle cx="94" cy="98" r="4" fill="#111" stroke="none"/>
+            <circle cx="118" cy="98" r="4" fill="#111" stroke="none"/>
+            <path d="M105 129 v55" stroke-width="34"/>
+            <path d="M105 129 v55" stroke="${PALETTE.koralle}" stroke-width="24"/>
+            <path d="M118 150 L165 118" stroke-width="30"/>
+            <path d="M118 150 L165 118" stroke="${PALETTE.koralle}" stroke-width="20"/>
+            <path d="M90 195 v45 M120 195 v45" stroke-width="26"/>`)
+    },
+    'img-log-shipping': {
+        name: 'log-shipping-schema.png', size: 407552, dims: '1600 × 1040',
+        uploaded: '16.06.2026', by: 'M. Sarrazin',
+        src: svgAsset(`
+            <rect x="30" y="95" width="95" height="80" rx="12" fill="${PALETTE.petrol}"/>
+            <rect x="275" y="95" width="95" height="80" rx="12" fill="${PALETTE.beige}"/>
+            <rect x="155" y="110" width="90" height="50" rx="10" fill="white"/>
+            <path d="M125 135 h28 M247 135 h26"/>
+            <path d="M138 125 l12 10 -12 10 M258 125 l12 10 -12 10"/>
+            <path d="M175 127 h50 M175 143 h32"/>
+            <path d="M78 60 v-22" stroke="${PALETTE.koralle}"/>
+            <circle cx="78" cy="30" r="10" fill="${PALETTE.koralle}"/>
+            <path d="M60 210 h280" stroke="${PALETTE.beige}"/>`)
+    }
+};
+
+/* ══════════════════════════════════════════════════════════════
+   Netzwerk-Log (simuliert)
+   ══════════════════════════════════════════════════════════════ */
+
+const netLog = document.getElementById('netLog');
+let logCount = 0;
+
+function logNet(method, url, meta) {
+    if (logCount === 0) netLog.innerHTML = '';
+    logCount++;
+    const cls = { POST:'m-post', PUT:'m-put', GET:'m-get', '⚠':'m-warn' }[method] || 'm-get';
+    const el = document.createElement('div');
+    el.className = 'net-entry';
+    el.innerHTML = `<div class="net-method ${cls}">${method}</div>
+        <div><div class="net-url">${url}</div><div class="net-meta">${meta}</div></div>`;
+    netLog.prepend(el);
+}
+
+function clearLog() {
+    logCount = 0;
+    netLog.innerHTML = '<div class="net-empty">Noch keine Requests – füge ein Bild ein.</div>';
+}
+
+const fakeSas = () => 'sv=2024-11-04&se=' + new Date(Date.now() + 36e5).toISOString().slice(0,16)
+    + 'Z&sr=b&sp=' + '&sig=' + Math.random().toString(36).slice(2,10) + '…';
+
+/* Read-SAS auflösen – im Prototyp aus dem lokalen Katalog.
+   Echte Implementierung: GET /api/media/:blobId/url                         */
+const urlCache = new Map();
+function resolveBlobUrl(blobId) {
+    const blob = BLOBS[blobId];
+    if (!blob) return '';
+    if (!urlCache.has(blobId)) {
+        urlCache.set(blobId, blob.src);
+        logNet('GET', `/api/media/${blobId}/url`,
+            `200 · Read-SAS, gültig 60 min · ${blob.name}`);
+    }
+    return urlCache.get(blobId);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   Custom Blot: storyboardImage
+   Speichert die Blob-Referenz statt einer ablaufenden SAS-URL.
+   ══════════════════════════════════════════════════════════════ */
+
+if (typeof Quill === 'undefined') {
+    document.getElementById('cdnWarn').style.display = 'block';
+} else {
+
+const BlockEmbed = Quill.import('blots/block/embed');
+const Delta = Quill.import('delta');
+
+class StoryboardImage extends BlockEmbed {
+    static blotName = 'storyboardImage';
+    static tagName = 'figure';
+    static className = 'sb-image';
+
+    static create(value) {
+        const node = super.create();
+        node.setAttribute('contenteditable', 'false');
+        node.setAttribute('data-blob-id', value.blobId);
+        node.setAttribute('data-size', value.size || 'full');
+        if (value.decorative) node.setAttribute('data-decorative', 'true');
+
+        const img = document.createElement('img');
+        img.src = resolveBlobUrl(value.blobId);
+        img.alt = value.decorative ? '' : (value.alt || '');
+        node.appendChild(img);
+
+        if (value.caption) {
+            const cap = document.createElement('figcaption');
+            cap.textContent = value.caption;
+            node.appendChild(cap);
+        }
+        if (!value.decorative && !value.alt) node.classList.add('missing-alt');
+        return node;
+    }
+
+    static value(node) {
+        const cap = node.querySelector('figcaption');
+        const out = {
+            blobId: node.getAttribute('data-blob-id'),
+            size: node.getAttribute('data-size') || 'full'
+        };
+        if (node.hasAttribute('data-decorative')) out.decorative = true;
+        else out.alt = node.querySelector('img')?.getAttribute('alt') || '';
+        if (cap) out.caption = cap.textContent;
+        return out;
+    }
+}
+Quill.register(StoryboardImage);
+
+/* ══════════════════════════════════════════════════════════════
+   Editor
+   ══════════════════════════════════════════════════════════════ */
+
+const quill = new Quill('#editor', {
+    theme: 'snow',
+    placeholder: 'Storyboard schreiben …',
+    modules: {
+        toolbar: {
+            container: '#toolbar',
+            handlers: { mediaLibrary: openLibrary }
+        }
+    }
+});
+window.quill = quill;
+
+/* Base64-Einbettung unterbinden: Quill würde eingefügte oder
+   gedroppte Bilder sonst als Data-URL ins Delta schreiben.      */
+quill.clipboard.addMatcher('IMG', () => {
+    logNet('⚠', 'Eingefügtes Bild verworfen',
+        'Base64-Einbettung ist deaktiviert – bitte über die Medienbibliothek einfügen');
+    toast('Bilder bitte über „Bild einfügen" aus der Medienbibliothek');
+    return new Delta();
+});
+
+quill.root.addEventListener('drop', e => {
+    if (e.dataTransfer?.files?.length) {
+        e.preventDefault();
+        openLibrary();
+        switchTab('upload');
+        simulateUpload(e.dataTransfer.files[0].name);
+    }
+});
+
+/* Klick auf ein Bild öffnet dessen Einstellungen */
+quill.root.addEventListener('click', e => {
+    const fig = e.target.closest('figure.sb-image');
+    if (fig) editExisting(fig);
+});
+
+/* ── Startinhalt ── */
+quill.setContents([
+    { insert: 'Wiederherstellungsmodelle verstehen' }, { insert: '\n', attributes: { header: 2 } },
+    { insert: 'Bevor Sie eine Sicherungsstrategie festlegen, müssen Sie entscheiden, wie viel Datenverlust im Ernstfall tolerierbar ist. Diese Entscheidung bestimmt das Wiederherstellungsmodell der Datenbank – und damit, welche Sicherungsarten Ihnen überhaupt zur Verfügung stehen.\n' },
+    { insert: { storyboardImage: {
+        blobId: 'img-recovery-model',
+        alt: 'Gegenüberstellung der drei Wiederherstellungsmodelle Einfach, Vollständig und Massenprotokolliert mit ihren jeweils zulässigen Sicherungsarten',
+        caption: 'Die drei Wiederherstellungsmodelle im Vergleich',
+        size: 'full'
+    } } },
+    { insert: 'Der entscheidende Unterschied\n' , attributes: { header: 3 } },
+    { insert: 'Im einfachen Wiederherstellungsmodell wird das Transaktionsprotokoll automatisch abgeschnitten. Das hält die Protokolldatei klein, macht aber eine Wiederherstellung zu einem beliebigen Zeitpunkt unmöglich.\n' },
+    { insert: 'Faustregel: Sobald ein Produktivsystem an der Datenbank hängt, ist das vollständige Wiederherstellungsmodell der Ausgangspunkt.\n', attributes: { blockquote: true } },
+    { insert: '\n' }
+]);
+
+/* ══════════════════════════════════════════════════════════════
+   Delta-Inspektor
+   ══════════════════════════════════════════════════════════════ */
+
+function renderDelta() {
+    const contents = quill.getContents();
+    const json = JSON.stringify(contents, null, 1);
+
+    document.getElementById('deltaView').innerHTML = json
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+        .replace(/"(blobId)": "([^"]*)"/g, '"<span class="k">$1</span>": "<span class="blob">$2</span>"')
+        .replace(/"(storyboardImage)"/g, '"<span class="k">$1</span>"');
+
+    const deltaBytes = new Blob([json]).size;
+    document.getElementById('mDelta').textContent = fmtBytes(deltaBytes);
+
+    /* Was dasselbe Storyboard mit Quills Standard-Bildverhalten wiegen würde */
+    let base64Bytes = deltaBytes;
+    contents.ops.forEach(op => {
+        const v = op.insert?.storyboardImage;
+        if (v && BLOBS[v.blobId]) base64Bytes += Math.round(BLOBS[v.blobId].size * 1.37);
+    });
+    document.getElementById('mBase64').textContent = fmtBytes(base64Bytes);
+
+    const text = quill.getText().trim();
+    document.getElementById('wordCount').textContent =
+        (text ? text.split(/\s+/).length : 0) + ' Wörter';
+}
+
+quill.on('text-change', renderDelta);
+renderDelta();
+}
+
+/* ══════════════════════════════════════════════════════════════
+   Medienbibliothek
+   ══════════════════════════════════════════════════════════════ */
+
+let selectedBlobId = null;
+let editingNode = null;
+
+function renderAssets() {
+    document.getElementById('assetGrid').innerHTML = Object.entries(BLOBS).map(([id, b]) => `
+        <button class="asset" data-id="${id}" onclick="selectAsset('${id}')">
+            <img src="${b.src}" alt="">
+            <div class="asset-meta">
+                <div class="asset-name">${b.name}</div>
+                <div class="asset-info">${b.dims} · ${fmtBytes(b.size)} · ${b.by}</div>
+            </div>
+        </button>`).join('');
+}
+
+function selectAsset(id) {
+    selectedBlobId = id;
+    document.querySelectorAll('.asset').forEach(a =>
+        a.classList.toggle('selected', a.dataset.id === id));
+    document.getElementById('libNext').disabled = false;
+    document.getElementById('libFootNote').textContent = BLOBS[id].name + ' ausgewählt';
+}
+
+function openLibrary() {
+    selectedBlobId = null;
+    editingNode = null;
+    document.getElementById('libNext').disabled = true;
+    document.getElementById('libFootNote').textContent = 'Auswahl über die Kachel';
+    document.querySelectorAll('.asset').forEach(a => a.classList.remove('selected'));
+    switchTab('browse');
+    document.getElementById('libraryOverlay').classList.add('open');
+    logNet('GET', '/api/media?courseId=sql-server-grundlagen',
+        `200 · ${Object.keys(BLOBS).length} Blobs im Container gelistet`);
+}
+
+function closeLibrary() { document.getElementById('libraryOverlay').classList.remove('open'); }
+
+function switchTab(tab) {
+    document.querySelectorAll('.tab').forEach(t =>
+        t.classList.toggle('active', t.dataset.tab === tab));
+    document.getElementById('tabBrowse').style.display = tab === 'browse' ? '' : 'none';
+    document.getElementById('tabUpload').style.display = tab === 'upload' ? '' : 'none';
+}
+
+/* ── Upload-Simulation: SAS holen → PUT auf den Blob ── */
+
+const dropzone = document.getElementById('dropzone');
+dropzone.addEventListener('click', () => simulateUpload('neues-schaubild.png'));
+dropzone.addEventListener('dragover', e => { e.preventDefault(); dropzone.classList.add('drag'); });
+dropzone.addEventListener('dragleave', () => dropzone.classList.remove('drag'));
+dropzone.addEventListener('drop', e => {
+    e.preventDefault();
+    dropzone.classList.remove('drag');
+    simulateUpload(e.dataTransfer.files[0]?.name || 'neues-schaubild.png');
+});
+
+function simulateUpload(filename) {
+    const id = 'img-upload-' + Math.random().toString(36).slice(2, 6);
+    const size = 120000 + Math.floor(Math.random() * 260000);
+
+    BLOBS[id] = {
+        name: filename, size, dims: '1600 × 1040',
+        uploaded: 'gerade eben', by: 'R. Nazarian',
+        src: svgAsset(`
+            <rect x="70" y="60" width="260" height="140" rx="16" fill="${PALETTE.beige}"/>
+            <circle cx="140" cy="110" r="24" fill="${PALETTE.koralle}"/>
+            <path d="M95 185 L165 130 L215 175 L265 140 L305 185 Z" fill="${PALETTE.petrol}"/>`)
+    };
+
+    const row = document.createElement('div');
+    row.className = 'upload-row';
+    row.innerHTML = `
+        <img class="upload-thumb" src="${BLOBS[id].src}" alt="">
+        <div class="upload-info">
+            <div class="upload-name">${filename}</div>
+            <div class="upload-stage">SAS-Token wird angefordert …</div>
+            <div class="bar"><span></span></div>
+        </div>`;
+    document.getElementById('uploadList').prepend(row);
+
+    const stage = row.querySelector('.upload-stage');
+    const bar = row.querySelector('.bar span');
+
+    logNet('POST', '/api/media/sas',
+        `200 · Write-SAS für kurse/sql-server-grundlagen/${filename}, gültig 15 min`);
+
+    setTimeout(() => {
+        stage.textContent = 'Upload zu Azure Blob Storage …';
+        bar.style.width = '55%';
+        logNet('PUT', `https://ilpmedia.blob.core.windows.net/kurse/sql-server-grundlagen/${filename}?${fakeSas()}`,
+            `x-ms-blob-type: BlockBlob · ${fmtBytes(size)}`);
+    }, 450);
+
+    setTimeout(() => {
+        bar.style.width = '100%';
+        bar.classList.add('done');
+        stage.textContent = `201 Created · ${fmtBytes(size)} · blobId ${id}`;
+        renderAssets();
+        selectAsset(id);
+        switchTab('browse');
+    }, 1300);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   Bildeinstellungen – Alt-Text ist Pflicht
+   ══════════════════════════════════════════════════════════════ */
+
+let currentSize = 'full';
+
+function goToSettings() {
+    closeLibrary();
+    openSettings({ blobId: selectedBlobId, alt: '', caption: '', size: 'full' }, 'Bild einfügen', 'Einfügen');
+}
+
+function editExisting(node) {
+    const blot = Quill.find(node);
+    if (!blot) return;
+    editingNode = node;
+    const v = StoryboardImageValue(node);
+    selectedBlobId = v.blobId;
+    openSettings(v, 'Bild bearbeiten', 'Übernehmen');
+}
+
+/* Werte aus dem DOM lesen (entspricht dem static value() des Blots) */
+function StoryboardImageValue(node) {
+    const cap = node.querySelector('figcaption');
+    return {
+        blobId: node.getAttribute('data-blob-id'),
+        size: node.getAttribute('data-size') || 'full',
+        decorative: node.hasAttribute('data-decorative'),
+        alt: node.querySelector('img')?.getAttribute('alt') || '',
+        caption: cap ? cap.textContent : ''
+    };
+}
+
+function openSettings(v, title, submitLabel) {
+    document.getElementById('setTitle').textContent = title;
+    document.getElementById('setSubmit').textContent = submitLabel;
+    document.getElementById('setPreview').src = BLOBS[v.blobId].src;
+    document.getElementById('setBlobId').textContent =
+        `blobId: ${v.blobId} · ${BLOBS[v.blobId].name}`;
+    document.getElementById('setAlt').value = v.alt || '';
+    document.getElementById('setCaption').value = v.caption || '';
+    document.getElementById('setDecorative').checked = !!v.decorative;
+    currentSize = v.size || 'full';
+    document.querySelectorAll('#setSize button').forEach(b =>
+        b.classList.toggle('active', b.dataset.size === currentSize));
+    validateSettings();
+    document.getElementById('settingsOverlay').classList.add('open');
+    setTimeout(() => document.getElementById('setAlt').focus(), 50);
+}
+
+function closeSettings() {
+    document.getElementById('settingsOverlay').classList.remove('open');
+    editingNode = null;
+}
+
+document.querySelectorAll('#setSize button').forEach(b =>
+    b.addEventListener('click', () => {
+        currentSize = b.dataset.size;
+        document.querySelectorAll('#setSize button').forEach(x =>
+            x.classList.toggle('active', x === b));
+    }));
+
+document.getElementById('setAlt').addEventListener('input', validateSettings);
+document.getElementById('setDecorative').addEventListener('change', validateSettings);
+
+function validateSettings() {
+    const alt = document.getElementById('setAlt').value.trim();
+    const dec = document.getElementById('setDecorative').checked;
+    document.getElementById('setAlt').disabled = dec;
+    document.getElementById('setSubmit').disabled = !dec && alt.length === 0;
+    document.getElementById('a11yWarn').classList.toggle('show', !dec && alt.length === 0);
+}
+
+function applySettings() {
+    const dec = document.getElementById('setDecorative').checked;
+    const value = {
+        blobId: selectedBlobId,
+        size: currentSize,
+        caption: document.getElementById('setCaption').value.trim() || undefined
+    };
+    if (dec) value.decorative = true;
+    else value.alt = document.getElementById('setAlt').value.trim();
+
+    if (editingNode) {
+        const blot = Quill.find(editingNode);
+        const index = quill.getIndex(blot);
+        quill.deleteText(index, 1, 'user');
+        quill.insertEmbed(index, 'storyboardImage', value, 'user');
+    } else {
+        const range = quill.getSelection(true) || { index: quill.getLength() - 1 };
+        quill.insertEmbed(range.index, 'storyboardImage', value, 'user');
+        quill.setSelection(range.index + 1, 0);
+    }
+    closeSettings();
+    toast('Bild eingefügt – im Delta steht nur die Blob-Referenz');
+}
+
+/* ══════════════════════════════════════════════════════════════ */
+
+let toastTimer;
+function toast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') { closeLibrary(); closeSettings(); }
+});
+
+renderAssets();
+</script>
+</body>
+</html>
