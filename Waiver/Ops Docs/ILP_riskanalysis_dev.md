@@ -1,4 +1,8 @@
-# Risikobewertung
+# Risikobewertung Entwicklungsprozess ILP
+
+- Autor: Reza Nazarian
+- Version: 1.0
+- Datum: 07.09.2026
 
 ## Zusammenfassung
 
@@ -6,7 +10,7 @@ Ein etablierter Entwicklungsprozess und der gezielte Einsatz erprobter, passende
 
 ## Truck-Factor
 
-Grün
+**Grün**
 
 **Erläuterung**
 
@@ -17,7 +21,7 @@ Grün
 
 ## Wissens-/Dokumentationslücken
 
-Grün
+**Grün**
 
 **Erläuterung**
 
@@ -26,7 +30,7 @@ Grün
 
 ## Abhängigkeit von Drittanbietern
 
-Gelb
+**Gelb**
 
 **Erläuterung**
 
@@ -35,17 +39,17 @@ Gelb
 
 ## Testabdeckung / Regressionssicherheit
 
-Grün
+**Grün**
 
 **Erläuterung**
 
-- Umfassende Unit-Tests vor jedem Commit. Quality Gate für jedes Deployment.
-- Automatisierte Sicherheitstests Quality Gate für jedes Deployment.
+- Umfassende Unit-Tests vor jedem Commit sind Quality Gate für jedes Deployment.
+- Automatisierte Sicherheitstests sind Quality Gate für jedes Deployment.
 - Automatisierte End-To-End Playwright-Tests für Content Delivery und Content Factory.
 
 ## Deploy- und Rollback-Fähigkeit
 
-Grün
+**Grün**
 
 **Erläuterung**
 
@@ -54,7 +58,7 @@ Grün
 
 ## Technische Schulden
 
-Grün
+**Grün**
 
 **Erläuterung**
 
@@ -62,7 +66,7 @@ Grün
 
 ## Datenschutz-/Sicherheitsrisiko im Entwicklungsalltag
 
-Grün
+**Grün**
 
 **Erläuterung**
 
@@ -71,7 +75,7 @@ Grün
 
 ## Skalierungs-/Lastrisiko
 
-Grün
+**Grün**
 
 **Erläuterung**
 
