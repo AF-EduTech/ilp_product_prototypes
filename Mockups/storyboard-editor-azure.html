@@ -166,7 +166,8 @@ body {
 
 /* ── Custom Blot: storyboardImage ── */
 .ql-editor figure.sb-image {
-    margin: 22px 0;
+    margin: 22px auto;
+    width: 100%;
     border-radius: 12px;
     position: relative;
     cursor: pointer;
@@ -177,12 +178,10 @@ body {
 .ql-editor figure.sb-image img {
     display: block;
     width: 100%;
-    max-height: 420px;
-    object-fit: contain;
+    height: auto;
     border-radius: 10px;
     background: #f4efea;
 }
-.ql-editor figure.sb-image[data-size="half"] { width: 55%; }
 .ql-editor figure.sb-image figcaption {
     font-size: 12.5px;
     color: #6b7280;
@@ -555,6 +554,82 @@ body {
 }
 .a11y-warn.show { display: flex; }
 
+/* ── Resize-Overlay ── */
+.ql-container.ql-snow { position: relative; }
+
+.rz-frame {
+    position: absolute;
+    border: 2px solid #4361ee;
+    border-radius: 12px;
+    pointer-events: none;
+    z-index: 20;
+    display: none;
+}
+.rz-frame.on { display: block; }
+
+.rz-handle {
+    position: absolute;
+    width: 13px;
+    height: 13px;
+    background: white;
+    border: 2px solid #4361ee;
+    border-radius: 3px;
+    pointer-events: auto;
+}
+.rz-handle:hover { background: #4361ee; }
+.rz-nw { top: -8px;    left: -8px;    cursor: nwse-resize; }
+.rz-ne { top: -8px;    right: -8px;   cursor: nesw-resize; }
+.rz-sw { bottom: -8px; left: -8px;    cursor: nesw-resize; }
+.rz-se { bottom: -8px; right: -8px;   cursor: nwse-resize; }
+.rz-w  { top: 50%; left: -8px;  margin-top: -6px; cursor: ew-resize; }
+.rz-e  { top: 50%; right: -8px; margin-top: -6px; cursor: ew-resize; }
+
+.rz-bar {
+    position: absolute;
+    top: -40px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    background: #14395b;
+    padding: 5px 6px;
+    border-radius: 10px;
+    pointer-events: auto;
+    white-space: nowrap;
+}
+.rz-bar button {
+    border: none;
+    background: transparent;
+    color: #cbd5e1;
+    font-family: inherit;
+    font-size: 11.5px;
+    font-weight: 600;
+    padding: 4px 8px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+.rz-bar button:hover { background: rgba(255,255,255,.14); color: white; }
+.rz-bar button.on { background: #4361ee; color: white; }
+.rz-bar .div { width: 1px; height: 16px; background: rgba(255,255,255,.2); margin: 0 3px; }
+
+.rz-readout {
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    background: rgba(20, 57, 91, .85);
+    color: white;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 6px;
+    opacity: 0;
+    transition: opacity .12s;
+}
+.rz-frame.dragging .rz-readout { opacity: 1; }
+body.rz-active { user-select: none; cursor: ew-resize; }
+
 /* Toast */
 .toast {
     position: fixed;
@@ -775,11 +850,15 @@ body {
             </div>
 
             <div class="field">
-                <div class="field-label">Darstellung</div>
+                <div class="field-label">Breite</div>
                 <div class="seg" id="setSize">
-                    <button class="active" data-size="full">Volle Breite</button>
-                    <button data-size="half">Halbe Breite</button>
+                    <button class="active" data-w="100">100 %</button>
+                    <button data-w="66">66 %</button>
+                    <button data-w="50">50 %</button>
+                    <button data-w="33">33 %</button>
                 </div>
+                <div class="field-hint">Prozent der Textspaltenbreite. Im Editor lässt sich das
+                Bild auch direkt an den Ecken ziehen.</div>
             </div>
         </div>
         <div class="modal-foot">
@@ -801,6 +880,13 @@ body {
    In der echten Anwendung liefert das Backend diese Liste aus
    dem Container und signiert die URLs per User-Delegation-SAS.
    ══════════════════════════════════════════════════════════════ */
+
+/* Zustand der Bildauswahl – muss vor der Editor-Initialisierung
+   stehen, weil setContents() schon ein text-change ausloest.    */
+const SNAP = [25, 33, 50, 66, 75, 100];
+const MIN_W = 20;
+let selectedFig = null;
+let rzFrame = null;
 
 const fmtBytes = b => b < 1024 ? b + ' B'
     : b < 1048576 ? (b/1024).toFixed(1).replace('.', ',') + ' KB'
@@ -964,7 +1050,9 @@ class StoryboardImage extends BlockEmbed {
         const node = super.create();
         node.setAttribute('contenteditable', 'false');
         node.setAttribute('data-blob-id', value.blobId);
-        node.setAttribute('data-size', value.size || 'full');
+        const width = value.width || (value.size === 'half' ? 55 : 100);
+        node.setAttribute('data-width', width);
+        node.style.width = width + '%';
         if (value.decorative) node.setAttribute('data-decorative', 'true');
 
         const img = document.createElement('img');
@@ -983,10 +1071,9 @@ class StoryboardImage extends BlockEmbed {
 
     static value(node) {
         const cap = node.querySelector('figcaption');
-        const out = {
-            blobId: node.getAttribute('data-blob-id'),
-            size: node.getAttribute('data-size') || 'full'
-        };
+        const width = parseInt(node.getAttribute('data-width'), 10) || 100;
+        const out = { blobId: node.getAttribute('data-blob-id') };
+        if (width !== 100) out.width = width;
         if (node.hasAttribute('data-decorative')) out.decorative = true;
         else out.alt = node.querySelector('img')?.getAttribute('alt') || '';
         if (cap) out.caption = cap.textContent;
@@ -1032,8 +1119,13 @@ quill.root.addEventListener('drop', e => {
 /* Klick auf ein Bild öffnet dessen Einstellungen */
 quill.root.addEventListener('click', e => {
     const fig = e.target.closest('figure.sb-image');
+    if (fig) selectImage(fig); else deselectImage();
+});
+quill.root.addEventListener('dblclick', e => {
+    const fig = e.target.closest('figure.sb-image');
     if (fig) editExisting(fig);
 });
+quill.on('text-change', () => positionFrame());
 
 /* ── Startinhalt ── */
 quill.setContents([
@@ -1043,7 +1135,7 @@ quill.setContents([
         blobId: 'img-recovery-model',
         alt: 'Gegenüberstellung der drei Wiederherstellungsmodelle Einfach, Vollständig und Massenprotokolliert mit ihren jeweils zulässigen Sicherungsarten',
         caption: 'Die drei Wiederherstellungsmodelle im Vergleich',
-        size: 'full'
+        width: 66
     } } },
     { insert: 'Der entscheidende Unterschied\n' , attributes: { header: 3 } },
     { insert: 'Im einfachen Wiederherstellungsmodell wird das Transaktionsprotokoll automatisch abgeschnitten. Das hält die Protokolldatei klein, macht aber eine Wiederherstellung zu einem beliebigen Zeitpunkt unmöglich.\n' },
@@ -1194,11 +1286,11 @@ function simulateUpload(filename) {
    Bildeinstellungen – Alt-Text ist Pflicht
    ══════════════════════════════════════════════════════════════ */
 
-let currentSize = 'full';
+let currentWidth = 100;
 
 function goToSettings() {
     closeLibrary();
-    openSettings({ blobId: selectedBlobId, alt: '', caption: '', size: 'full' }, 'Bild einfügen', 'Einfügen');
+    openSettings({ blobId: selectedBlobId, alt: '', caption: '', width: 100 }, 'Bild einfügen', 'Einfügen');
 }
 
 function editExisting(node) {
@@ -1215,7 +1307,7 @@ function StoryboardImageValue(node) {
     const cap = node.querySelector('figcaption');
     return {
         blobId: node.getAttribute('data-blob-id'),
-        size: node.getAttribute('data-size') || 'full',
+        width: parseInt(node.getAttribute('data-width'), 10) || 100,
         decorative: node.hasAttribute('data-decorative'),
         alt: node.querySelector('img')?.getAttribute('alt') || '',
         caption: cap ? cap.textContent : ''
@@ -1231,9 +1323,9 @@ function openSettings(v, title, submitLabel) {
     document.getElementById('setAlt').value = v.alt || '';
     document.getElementById('setCaption').value = v.caption || '';
     document.getElementById('setDecorative').checked = !!v.decorative;
-    currentSize = v.size || 'full';
+    currentWidth = v.width || 100;
     document.querySelectorAll('#setSize button').forEach(b =>
-        b.classList.toggle('active', b.dataset.size === currentSize));
+        b.classList.toggle('active', +b.dataset.w === currentWidth));
     validateSettings();
     document.getElementById('settingsOverlay').classList.add('open');
     setTimeout(() => document.getElementById('setAlt').focus(), 50);
@@ -1246,7 +1338,7 @@ function closeSettings() {
 
 document.querySelectorAll('#setSize button').forEach(b =>
     b.addEventListener('click', () => {
-        currentSize = b.dataset.size;
+        currentWidth = +b.dataset.w;
         document.querySelectorAll('#setSize button').forEach(x =>
             x.classList.toggle('active', x === b));
     }));
@@ -1266,12 +1358,13 @@ function applySettings() {
     const dec = document.getElementById('setDecorative').checked;
     const value = {
         blobId: selectedBlobId,
-        size: currentSize,
+        width: currentWidth === 100 ? undefined : currentWidth,
         caption: document.getElementById('setCaption').value.trim() || undefined
     };
     if (dec) value.decorative = true;
     else value.alt = document.getElementById('setAlt').value.trim();
 
+    const before = figureSnapshot();
     if (editingNode) {
         const blot = Quill.find(editingNode);
         const index = quill.getIndex(blot);
@@ -1283,7 +1376,180 @@ function applySettings() {
         quill.setSelection(range.index + 1, 0);
     }
     closeSettings();
-    toast('Bild eingefügt – im Delta steht nur die Blob-Referenz');
+    const node = newFigureSince(before);
+    if (node) selectImage(node);
+    toast('Bild eingefügt – Größe an den Ecken anpassbar');
+}
+
+/* ══════════════════════════════════════════════════════════════ */
+
+/* ══════════════════════════════════════════════════════════════
+   Bildgröße im Editor
+   Die Breite wird als Prozent der Textspalte gespeichert, nicht
+   in Pixeln: dasselbe Storyboard wird später in unterschiedlich
+   breiten Ausspielungen gerendert.
+   ══════════════════════════════════════════════════════════════ */
+
+function buildFrame() {
+    rzFrame = document.createElement('div');
+    rzFrame.className = 'rz-frame';
+    rzFrame.innerHTML = `
+        <div class="rz-bar">
+            ${[33, 50, 66, 100].map(w =>
+                `<button data-preset="${w}">${w} %</button>`).join('')}
+            <span class="div"></span>
+            <button data-act="settings" title="Alt-Text und Bildunterschrift">⚙</button>
+            <button data-act="delete" title="Bild entfernen">🗑</button>
+        </div>
+        <div class="rz-handle rz-nw" data-dir="w"></div>
+        <div class="rz-handle rz-ne" data-dir="e"></div>
+        <div class="rz-handle rz-sw" data-dir="w"></div>
+        <div class="rz-handle rz-se" data-dir="e"></div>
+        <div class="rz-handle rz-w"  data-dir="w"></div>
+        <div class="rz-handle rz-e"  data-dir="e"></div>
+        <div class="rz-readout">100 %</div>`;
+    document.querySelector('.ql-container').appendChild(rzFrame);
+
+    rzFrame.querySelectorAll('.rz-handle').forEach(h =>
+        h.addEventListener('mousedown', e => startDrag(e, h.dataset.dir)));
+
+    rzFrame.querySelector('.rz-bar').addEventListener('click', e => {
+        const btn = e.target.closest('button');
+        if (!btn || !selectedFig) return;
+        if (btn.dataset.preset) {
+            applyWidth(selectedFig, +btn.dataset.preset);
+            commitWidth(selectedFig, +btn.dataset.preset);
+        } else if (btn.dataset.act === 'settings') {
+            editExisting(selectedFig);
+        } else if (btn.dataset.act === 'delete') {
+            const blot = Quill.find(selectedFig);
+            quill.deleteText(quill.getIndex(blot), 1, 'user');
+            deselectImage();
+            toast('Bild entfernt – der Blob in Azure bleibt erhalten');
+        }
+    });
+}
+
+/* Welche figure ist neu? Quill splittet beim Einfügen eines
+   BlockEmbeds den umgebenden Block, Delta-Indizes verschieben
+   sich dabei – ein Vorher-Nachher-Vergleich der Knoten ist
+   unabhängig davon.                                             */
+function figureSnapshot() {
+    return new Set(quill.root.querySelectorAll('figure.sb-image'));
+}
+function newFigureSince(before) {
+    return [...quill.root.querySelectorAll('figure.sb-image')]
+        .find(f => !before.has(f)) || null;
+}
+
+function currentWidthOf(fig) {
+    return parseInt(fig.getAttribute('data-width'), 10) || 100;
+}
+
+function applyWidth(fig, w) {
+    fig.style.width = w + '%';
+    fig.setAttribute('data-width', w);
+    positionFrame();
+    if (rzFrame) rzFrame.querySelector('.rz-readout').textContent = w + ' %';
+    rzFrame?.querySelectorAll('[data-preset]').forEach(b =>
+        b.classList.toggle('on', +b.dataset.preset === w));
+}
+
+function selectImage(fig) {
+    selectedFig = fig;
+    if (!rzFrame) buildFrame();
+    rzFrame.classList.add('on');
+    applyWidth(fig, currentWidthOf(fig));
+}
+
+function deselectImage() {
+    selectedFig = null;
+    rzFrame?.classList.remove('on');
+}
+
+function positionFrame() {
+    if (!selectedFig || !rzFrame) return;
+    if (!selectedFig.isConnected) return deselectImage();
+    const c = document.querySelector('.ql-container').getBoundingClientRect();
+    const f = selectedFig.getBoundingClientRect();
+    Object.assign(rzFrame.style, {
+        left:   (f.left - c.left) + 'px',
+        top:    (f.top  - c.top)  + 'px',
+        width:  f.width  + 'px',
+        height: f.height + 'px'
+    });
+}
+
+window.addEventListener('resize', positionFrame);
+window.addEventListener('scroll', positionFrame, true);
+
+document.addEventListener('mousedown', e => {
+    if (!selectedFig) return;
+    if (e.target.closest('figure.sb-image') || e.target.closest('.rz-frame')) return;
+    deselectImage();
+});
+
+/* ── Ziehen ──
+   Das Bild ist zentriert, eine Kante bewegt sich also nur um die
+   halbe Breitenänderung – daher der Faktor 2, damit der Griff
+   unter dem Zeiger bleibt.                                      */
+
+function startDrag(e, dir) {
+    e.preventDefault();
+    if (!selectedFig) return;
+
+    const startX = e.clientX;
+    const startPx = selectedFig.getBoundingClientRect().width;
+    const style = getComputedStyle(quill.root);
+    const contentPx = quill.root.clientWidth
+        - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight);
+    const startW = currentWidthOf(selectedFig);
+    let w = startW;
+
+    rzFrame.classList.add('dragging');
+    document.body.classList.add('rz-active');
+
+    const onMove = ev => {
+        const dx = (ev.clientX - startX) * (dir === 'e' ? 1 : -1);
+        let pct = Math.round((startPx + dx * 2) / contentPx * 100);
+        const hit = SNAP.find(s => Math.abs(pct - s) <= 2);
+        if (hit) pct = hit;
+        w = Math.max(MIN_W, Math.min(100, pct));
+        applyWidth(selectedFig, w);
+    };
+
+    const onUp = () => {
+        document.removeEventListener('mousemove', onMove);
+        document.removeEventListener('mouseup', onUp);
+        rzFrame.classList.remove('dragging');
+        document.body.classList.remove('rz-active');
+        if (w !== startW) commitWidth(selectedFig, w);
+    };
+
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup', onUp);
+}
+
+/* Erst beim Loslassen wandert die Breite ins Delta – sonst
+   entstünde pro Mausbewegung ein eigener Undo-Schritt.          */
+function commitWidth(fig, w) {
+    const blot = Quill.find(fig);
+    if (!blot) return;
+    const index = quill.getIndex(blot);
+    const before = figureSnapshot();
+
+    const v = StoryboardImageValue(fig);
+    const value = { blobId: v.blobId };
+    if (w !== 100) value.width = w;
+    if (v.decorative) value.decorative = true; else value.alt = v.alt;
+    if (v.caption) value.caption = v.caption;
+    if (v.generated) value.generated = v.generated;
+
+    quill.deleteText(index, 1, 'user');
+    quill.insertEmbed(index, 'storyboardImage', value, 'user');
+
+    const again = newFigureSince(before);
+    if (again) selectImage(again); else deselectImage();
 }
 
 /* ══════════════════════════════════════════════════════════════ */
