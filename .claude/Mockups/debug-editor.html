@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Debug-Editor – Mockup</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Manrope:wght@500;600;700;800&display=swap">
+
+<style>
+  :root {
+    --bg: #eef1f6;
+    --surface: #ffffff;
+    --surface-2: #f5f7fb;
+    --border: #d9e0ea;
+    --ink: #161c27;
+    --ink-dim: #5c6779;
+    --accent: #2f6fed;
+    --accent-ink: #ffffff;
+    --error: #c8392f;
+    --error-bg: #fbeae8;
+    --error-border: #f0c4bf;
+    --success: #147a4d;
+    --success-bg: #e6f6ee;
+    --success-border: #bfe6d2;
+    --chrome: #171e2c;
+    --chrome-ink: #aab4c6;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0d1320;
+      --surface: #141c2b;
+      --surface-2: #101726;
+      --border: #263049;
+      --ink: #e8edf6;
+      --ink-dim: #94a1b8;
+      --accent: #7ea1ff;
+      --accent-ink: #0d1320;
+      --error: #ff8079;
+      --error-bg: rgba(255, 128, 121, 0.12);
+      --error-border: rgba(255, 128, 121, 0.32);
+      --success: #4bdb96;
+      --success-bg: rgba(75, 219, 150, 0.12);
+      --success-border: rgba(75, 219, 150, 0.32);
+      --chrome: #0a0f19;
+      --chrome-ink: #8493ac;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0d1320;
+    --surface: #141c2b;
+    --surface-2: #101726;
+    --border: #263049;
+    --ink: #e8edf6;
+    --ink-dim: #94a1b8;
+    --accent: #7ea1ff;
+    --accent-ink: #0d1320;
+    --error: #ff8079;
+    --error-bg: rgba(255, 128, 121, 0.12);
+    --error-border: rgba(255, 128, 121, 0.32);
+    --success: #4bdb96;
+    --success-bg: rgba(75, 219, 150, 0.12);
+    --success-border: rgba(75, 219, 150, 0.32);
+    --chrome: #0a0f19;
+    --chrome-ink: #8493ac;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    padding: 28px 16px 48px;
+  }
+  .page { max-width: 1180px; margin: 0 auto; display: flex; flex-direction: column; gap: 18px; }
+
+  h1, h2, h3, .eyebrow, button, .lang-select, .tab-label {
+    font-family: "Manrope", -apple-system, sans-serif;
+  }
+
+  .topbar { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 10px 24px; }
+  .eyebrow { font-size: 12.5px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: var(--ink-dim); }
+  h1 { font-size: 22px; font-weight: 800; margin: 4px 0 0; letter-spacing: -0.01em; text-wrap: balance; }
+  .progress { display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--ink-dim); }
+  .progress .bar { width: 92px; height: 5px; border-radius: 3px; background: var(--border); overflow: hidden; }
+  .progress .bar span { display: block; height: 100%; width: 50%; background: var(--accent); border-radius: 3px; }
+
+  .grid { display: grid; grid-template-columns: minmax(240px, 320px) 1fr; gap: 18px; align-items: start; }
+  @media (max-width: 760px) { .grid { grid-template-columns: 1fr; } }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+  }
+
+  .task { padding: 20px 20px 22px; display: flex; flex-direction: column; gap: 16px; }
+  .task h2 { font-size: 15px; font-weight: 700; margin: 0 0 6px; }
+  .task p { font-size: 13.5px; line-height: 1.6; color: var(--ink-dim); margin: 0; }
+  .task-lang { font-size: 13px; font-weight: 700; color: var(--accent); }
+
+  .stack-trace {
+    background: var(--error-bg);
+    border: 1px solid var(--error-border);
+    border-radius: 10px;
+    padding: 12px 14px;
+  }
+  .stack-trace .label { font-size: 11px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--error); margin-bottom: 6px; display: block; }
+  .stack-trace code {
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-size: 12.5px;
+    line-height: 1.55;
+    color: var(--ink);
+    white-space: pre-wrap;
+    word-break: break-word;
+    display: block;
+  }
+
+  .tips { display: flex; flex-direction: column; gap: 8px; margin: 0; padding: 0; list-style: none; }
+  .tips li { font-size: 12.5px; color: var(--ink-dim); line-height: 1.5; padding-left: 16px; position: relative; }
+  .tips li::before { content: ""; position: absolute; left: 0; top: 7px; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+  .tips kbd {
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-size: 11px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-bottom-width: 2px;
+    border-radius: 4px;
+    padding: 1px 5px;
+    color: var(--ink);
+  }
+
+  .editor-card { display: flex; flex-direction: column; background: var(--chrome); }
+  .editor-toolbar {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    padding: 10px 8px 0 14px;
+    flex-wrap: wrap;
+  }
+  .tabs { display: flex; align-items: flex-end; gap: 2px; }
+  .tab-label {
+    font-size: 12.5px; font-weight: 600; color: var(--ink);
+    background: var(--surface-2);
+    border: 1px solid var(--border); border-bottom: none;
+    border-radius: 8px 8px 0 0;
+    padding: 7px 14px 8px;
+    display: flex; align-items: center; gap: 7px;
+  }
+  .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); flex: none; }
+  .toolbar-actions { display: flex; gap: 8px; padding-bottom: 8px; }
+
+  select.lang-select {
+    font-size: 12.5px; font-weight: 700; color: var(--ink);
+    background: var(--surface-2); border: 1px solid var(--border);
+    border-radius: 7px; padding: 7px 10px; cursor: pointer;
+  }
+  button {
+    font-size: 12.5px; font-weight: 700; border-radius: 7px; padding: 7px 13px;
+    border: 1px solid var(--border); background: var(--surface-2); color: var(--ink);
+    cursor: pointer; transition: filter 0.15s ease;
+  }
+  button:hover { filter: brightness(1.08); }
+  button:focus-visible, select:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  button.primary { background: var(--accent); color: var(--accent-ink); border-color: transparent; }
+
+  .cm-mount { padding: 10px 10px 4px; }
+  .CodeMirror {
+    height: 300px;
+    border-radius: 9px;
+    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+  }
+
+  .result-bar {
+    margin: 0 10px 12px; padding: 10px 13px; border-radius: 9px;
+    font-size: 12.5px; font-weight: 600; display: flex; align-items: center; gap: 9px;
+    background: var(--surface-2); color: var(--chrome-ink); border: 1px solid rgba(255,255,255,0.08);
+  }
+  .result-bar .indicator { width: 8px; height: 8px; border-radius: 50%; background: var(--chrome-ink); flex: none; }
+  .result-bar.pending .indicator { background: #d4a94a; }
+  .result-bar.error { background: rgba(255,128,121,0.12); color: #ff9d97; border-color: rgba(255,128,121,0.3); }
+  .result-bar.error .indicator { background: var(--error); }
+  .result-bar.success { background: rgba(75,219,150,0.12); color: #74e8b3; border-color: rgba(75,219,150,0.3); }
+  .result-bar.success .indicator { background: var(--success); }
+
+  .legend { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  @media (max-width: 760px) { .legend { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 460px) { .legend { grid-template-columns: 1fr; } }
+  .legend .feat { padding: 13px 14px; display: flex; flex-direction: column; gap: 5px; }
+  .feat .bar { width: 22px; height: 3px; border-radius: 2px; background: var(--accent); margin-bottom: 3px; }
+  .feat h3 { font-size: 12.5px; font-weight: 700; margin: 0; }
+  .feat p { font-size: 11.5px; color: var(--ink-dim); margin: 0; line-height: 1.5; }
+
+  /* CodeMirror core (inlined from cdnjs codemirror 5.65.16) */
+  .CodeMirror{font-family:monospace;height:300px;color:#000;direction:ltr}.CodeMirror-lines{padding:4px 0}.CodeMirror pre.CodeMirror-line,.CodeMirror pre.CodeMirror-line-like{padding:0 4px}.CodeMirror-gutter-filler,.CodeMirror-scrollbar-filler{background-color:#fff}.CodeMirror-gutters{border-right:1px solid #ddd;background-color:#f7f7f7;white-space:nowrap}.CodeMirror-linenumber{padding:0 3px 0 5px;min-width:20px;text-align:right;color:#999;white-space:nowrap}.CodeMirror-guttermarker{color:#000}.CodeMirror-guttermarker-subtle{color:#999}.CodeMirror-cursor{border-left:1px solid #000;border-right:none;width:0}.CodeMirror div.CodeMirror-secondarycursor{border-left:1px solid silver}.cm-fat-cursor .CodeMirror-cursor{width:auto;border:0!important;background:#7e7}.cm-fat-cursor div.CodeMirror-cursors{z-index:1}.cm-fat-cursor .CodeMirror-line::selection,.cm-fat-cursor .CodeMirror-line>span::selection,.cm-fat-cursor .CodeMirror-line>span>span::selection{background:0 0}.cm-fat-cursor .CodeMirror-line::-moz-selection,.cm-fat-cursor .CodeMirror-line>span::-moz-selection,.cm-fat-cursor .CodeMirror-line>span>span::-moz-selection{background:0 0}.cm-fat-cursor{caret-color:transparent}@-moz-keyframes blink{50%{background-color:transparent}}@-webkit-keyframes blink{50%{background-color:transparent}}@keyframes blink{50%{background-color:transparent}}.cm-tab{display:inline-block;text-decoration:inherit}.CodeMirror-rulers{position:absolute;left:0;right:0;top:-50px;bottom:0;overflow:hidden}.CodeMirror-ruler{border-left:1px solid #ccc;top:0;bottom:0;position:absolute}.cm-s-default .cm-header{color:#00f}.cm-s-default .cm-quote{color:#090}.cm-negative{color:#d44}.cm-positive{color:#292}.cm-header,.cm-strong{font-weight:700}.cm-em{font-style:italic}.cm-link{text-decoration:underline}.cm-strikethrough{text-decoration:line-through}.cm-s-default .cm-keyword{color:#708}.cm-s-default .cm-atom{color:#219}.cm-s-default .cm-number{color:#164}.cm-s-default .cm-def{color:#00f}.cm-s-default .cm-variable-2{color:#05a}.cm-s-default .cm-type,.cm-s-default .cm-variable-3{color:#085}.cm-s-default .cm-comment{color:#a50}.cm-s-default .cm-string{color:#a11}.cm-s-default .cm-string-2{color:#f50}.cm-s-default .cm-meta{color:#555}.cm-s-default .cm-qualifier{color:#555}.cm-s-default .cm-builtin{color:#30a}.cm-s-default .cm-bracket{color:#997}.cm-s-default .cm-tag{color:#170}.cm-s-default .cm-attribute{color:#00c}.cm-s-default .cm-hr{color:#999}.cm-s-default .cm-link{color:#00c}.cm-s-default .cm-error{color:red}.cm-invalidchar{color:red}.CodeMirror-composing{border-bottom:2px solid}div.CodeMirror span.CodeMirror-matchingbracket{color:#0b0}div.CodeMirror span.CodeMirror-nonmatchingbracket{color:#a22}.CodeMirror-matchingtag{background:rgba(255,150,0,.3)}.CodeMirror-activeline-background{background:#e8f2ff}.CodeMirror{position:relative;overflow:hidden;background:#fff}.CodeMirror-scroll{overflow:scroll!important;margin-bottom:-50px;margin-right:-50px;padding-bottom:50px;height:100%;outline:0;position:relative;z-index:0}.CodeMirror-sizer{position:relative;border-right:50px solid transparent}.CodeMirror-gutter-filler,.CodeMirror-hscrollbar,.CodeMirror-scrollbar-filler,.CodeMirror-vscrollbar{position:absolute;z-index:6;display:none;outline:0}.CodeMirror-vscrollbar{right:0;top:0;overflow-x:hidden;overflow-y:scroll}.CodeMirror-hscrollbar{bottom:0;left:0;overflow-y:hidden;overflow-x:scroll}.CodeMirror-scrollbar-filler{right:0;bottom:0}.CodeMirror-gutter-filler{left:0;bottom:0}.CodeMirror-gutters{position:absolute;left:0;top:0;min-height:100%;z-index:3}.CodeMirror-gutter{white-space:normal;height:100%;display:inline-block;vertical-align:top;margin-bottom:-50px}.CodeMirror-gutter-wrapper{position:absolute;z-index:4;background:0 0!important;border:none!important}.CodeMirror-gutter-background{position:absolute;top:0;bottom:0;z-index:4}.CodeMirror-gutter-elt{position:absolute;cursor:default;z-index:4}.CodeMirror-gutter-wrapper ::selection{background-color:transparent}.CodeMirror-gutter-wrapper ::-moz-selection{background-color:transparent}.CodeMirror-lines{cursor:text;min-height:1px}.CodeMirror pre.CodeMirror-line,.CodeMirror pre.CodeMirror-line-like{-moz-border-radius:0;-webkit-border-radius:0;border-radius:0;border-width:0;background:0 0;font-family:inherit;font-size:inherit;margin:0;white-space:pre;word-wrap:normal;line-height:inherit;color:inherit;z-index:2;position:relative;overflow:visible;-webkit-tap-highlight-color:transparent;-webkit-font-variant-ligatures:contextual;font-variant-ligatures:contextual}.CodeMirror-wrap pre.CodeMirror-line,.CodeMirror-wrap pre.CodeMirror-line-like{word-wrap:break-word;white-space:pre-wrap;word-break:normal}.CodeMirror-linebackground{position:absolute;left:0;right:0;top:0;bottom:0;z-index:0}.CodeMirror-linewidget{position:relative;z-index:2;padding:.1px}.CodeMirror-rtl pre{direction:rtl}.CodeMirror-code{outline:0}.CodeMirror-gutter,.CodeMirror-gutters,.CodeMirror-linenumber,.CodeMirror-scroll,.CodeMirror-sizer{-moz-box-sizing:content-box;box-sizing:content-box}.CodeMirror-measure{position:absolute;width:100%;height:0;overflow:hidden;visibility:hidden}.CodeMirror-cursor{position:absolute;pointer-events:none}.CodeMirror-measure pre{position:static}div.CodeMirror-cursors{visibility:hidden;position:relative;z-index:3}div.CodeMirror-dragcursors{visibility:visible}.CodeMirror-focused div.CodeMirror-cursors{visibility:visible}.CodeMirror-selected{background:#d9d9d9}.CodeMirror-focused .CodeMirror-selected{background:#d7d4f0}.CodeMirror-crosshair{cursor:crosshair}.CodeMirror-line::selection,.CodeMirror-line>span::selection,.CodeMirror-line>span>span::selection{background:#d7d4f0}.CodeMirror-line::-moz-selection,.CodeMirror-line>span::-moz-selection,.CodeMirror-line>span>span::-moz-selection{background:#d7d4f0}.cm-searching{background-color:#ffa;background-color:rgba(255,255,0,.4)}.cm-force-border{padding-right:.1px}@media print{.CodeMirror div.CodeMirror-cursors{visibility:hidden}}.cm-tab-wrap-hack:after{content:''}span.CodeMirror-selectedtext{background:0 0}
+  .CodeMirror-hints{position:absolute;z-index:10;overflow:hidden;list-style:none;margin:0;padding:2px;box-shadow:2px 3px 5px rgba(0,0,0,.2);border-radius:6px;border:1px solid silver;background:#fff;font-size:90%;font-family:monospace;max-height:20em;overflow-y:auto;box-sizing:border-box}.CodeMirror-hint{margin:0;padding:0 4px;border-radius:2px;white-space:pre;color:#000;cursor:pointer}li.CodeMirror-hint-active{background:#08f;color:#fff}
+  .CodeMirror-lint-markers{width:16px}.CodeMirror-lint-tooltip{background-color:#ffd;border:1px solid #000;border-radius:4px;color:#000;font-family:monospace;font-size:10pt;overflow:hidden;padding:2px 5px;position:fixed;white-space:pre-wrap;z-index:100;max-width:600px;opacity:0;transition:opacity .4s}.CodeMirror-lint-mark{background-position:left bottom;background-repeat:repeat-x}.CodeMirror-lint-mark-error{background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAADCAYAAAC09K7GAAAAAXNSR0IArs4c6QAAAAZiS0dEAP8A/wD/oL2nkwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAAd0SU1FB9sJDw4cOCW1/KIAAAAZdEVYdENvbW1lbnQAQ3JlYXRlZCB3aXRoIEdJTVBXgQ4XAAAAHElEQVQI12NggIL/DAz/GdA5/xkY/qPKMDAwAADLZwf5rvm+LQAAAABJRU5ErkJggg==)}.CodeMirror-lint-marker{background-position:center center;background-repeat:no-repeat;cursor:pointer;display:inline-block;height:16px;width:16px;vertical-align:middle;position:relative}.CodeMirror-lint-message{padding-left:18px;background-position:top left;background-repeat:no-repeat}.CodeMirror-lint-marker-error,.CodeMirror-lint-message-error{background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAAHlBMVEW7AAC7AACxAAC7AAC7AAAAAAC4AAC5AAD///+7AAAUdclpAAAABnRSTlMXnORSiwCK0ZKSAAAATUlEQVR42mWPOQ7AQAgDuQLx/z8csYRmPRIFIwRGnosRrpamvkKi0FTIiMASR3hhKW+hAN6/tIWhu9PDWiTGNEkTtIOucA5Oyr9ckPgAWm0GPBog6v4AAAAASUVORK5CYII=)}.CodeMirror-lint-line-error{background-color:rgba(200,57,47,.12)}
+
+  /* fixed dark "console" theme for the editor content, independent of page theme */
+  .cm-s-quizdark.CodeMirror { background: #131a27; color: #d7deeb; }
+  .cm-s-quizdark .CodeMirror-gutters { background: #131a27; border-right: 1px solid rgba(255,255,255,0.07); }
+  .cm-s-quizdark .CodeMirror-linenumber { color: #4c5a72; }
+  .cm-s-quizdark .CodeMirror-cursor { border-left: 1.5px solid #ffd479; }
+  .cm-s-quizdark .CodeMirror-selected { background: rgba(126,161,255,0.22); }
+  .cm-s-quizdark .CodeMirror-activeline-background { background: rgba(255,255,255,0.04); }
+  .cm-s-quizdark div.CodeMirror span.CodeMirror-matchingbracket { color: #ffd479; background: rgba(255,212,121,0.16); border-radius: 3px; }
+  .cm-s-quizdark .cm-keyword { color: #7ea1ff; }
+  .cm-s-quizdark .cm-atom { color: #ff9d81; }
+  .cm-s-quizdark .cm-number { color: #f7b26a; }
+  .cm-s-quizdark .cm-def { color: #8ad6ff; }
+  .cm-s-quizdark .cm-variable { color: #d7deeb; }
+  .cm-s-quizdark .cm-variable-2 { color: #8ad6ff; }
+  .cm-s-quizdark .cm-variable-3, .cm-s-quizdark .cm-type { color: #7ee6b8; }
+  .cm-s-quizdark .cm-property { color: #d7deeb; }
+  .cm-s-quizdark .cm-comment { color: #5c6a84; font-style: italic; }
+  .cm-s-quizdark .cm-string, .cm-s-quizdark .cm-string-2 { color: #b7e19b; }
+  .cm-s-quizdark .cm-meta { color: #94a1b8; }
+  .cm-s-quizdark .cm-qualifier { color: #94a1b8; }
+  .cm-s-quizdark .cm-builtin { color: #7ea1ff; }
+  .cm-s-quizdark .cm-bracket { color: #8493ac; }
+  .cm-s-quizdark .cm-tag { color: #ff9d97; }
+  .cm-s-quizdark .cm-attribute { color: #ffd479; }
+  .cm-s-quizdark .cm-error { color: #ff8079; }
+  .cm-s-quizdark .CodeMirror-lint-mark-error { background-image: none; border-bottom: 2px wavy #ff8079; text-decoration: underline wavy #ff8079; text-underline-offset: 3px; }
+  .cm-s-quizdark .CodeMirror-lint-line-error { background-color: rgba(255,128,121,0.1); }
+  .cm-s-quizdark .CodeMirror-lint-marker-error { filter: brightness(1) saturate(3) hue-rotate(-10deg); }
+  .CodeMirror-lint-tooltip { background: #1c2536; border: 1px solid #ff8079; color: #ffd9d6; border-radius: 7px; font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 12px; padding: 7px 10px; }
+  .cm-s-quizdark + .CodeMirror-hints, .CodeMirror-hints { background: #1c2536; border: 1px solid #2c3850; color: #d7deeb; font-family: "JetBrains Mono", ui-monospace, monospace; border-radius: 8px; padding: 4px; }
+  .CodeMirror-hint { color: #d7deeb; padding: 3px 8px; border-radius: 4px; }
+  li.CodeMirror-hint-active { background: #2f6fed; color: #fff; }
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <div class="topbar">
+    <div>
+      <div class="eyebrow">Quiz &middot; Backend-Grundlagen &middot; Aufgabe 6 von 12</div>
+      <h1 id="taskTitle">Debug-Aufgabe: Fehler im Code finden und beheben</h1>
+    </div>
+    <div class="progress">
+      <span>6 / 12 gel&ouml;st</span>
+      <span class="bar"><span></span></span>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="card task">
+      <div>
+        <span class="task-lang" id="taskLangLabel">Python</span>
+        <h2 style="margin-top:8px;">Aufgabenstellung</h2>
+        <p id="taskDescription"></p>
+      </div>
+
+      <div class="stack-trace">
+        <span class="label">Gelieferte Fehlermeldung</span>
+        <code id="errorMessage"></code>
+      </div>
+
+      <div>
+        <h2>Tipps zum Editor</h2>
+        <ul class="tips">
+          <li>Klammern und Anf&uuml;hrungszeichen werden automatisch geschlossen.</li>
+          <li>Vorschl&auml;ge f&uuml;r Variablen &amp; Schl&uuml;sselw&ouml;rter: <kbd>Strg</kbd> + <kbd>Leertaste</kbd></li>
+          <li>Fehlerhafte Bezeichner werden rot unterschl&auml;ngelt &mdash; Maus dar&uuml;ber zeigt die Meldung.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card editor-card">
+      <div class="editor-toolbar">
+        <div class="tabs">
+          <span class="tab-label"><span class="dot"></span><span id="fileName">loesung.py</span></span>
+        </div>
+        <div class="toolbar-actions">
+          <select id="langSelect" class="lang-select" aria-label="Sprache w&auml;hlen">
+            <option value="python">Python</option>
+            <option value="java">Java</option>
+            <option value="typescript">TypeScript</option>
+            <option value="html">HTML</option>
+            <option value="sql">SQL</option>
+          </select>
+          <button id="resetBtn" type="button">Zur&uuml;cksetzen</button>
+          <button id="checkBtn" type="button" class="primary">Code pr&uuml;fen</button>
+        </div>
+      </div>
+      <div class="cm-mount"><textarea id="editor"></textarea></div>
+      <div class="result-bar pending" id="resultBar">
+        <span class="indicator"></span>
+        <span id="resultText">Noch nicht gepr&uuml;ft &mdash; behebe den Fehler und klicke auf &bdquo;Code pr&uuml;fen&ldquo;.</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="legend">
+    <div class="card feat"><span class="bar"></span><h3>Syntax-Highlighting</h3><p>Passt sich automatisch der gew&auml;hlten Sprache an &mdash; Python, Java, TypeScript, HTML, SQL.</p></div>
+    <div class="card feat"><span class="bar"></span><h3>Klammern &amp; Einr&uuml;ckung</h3><p>Klammern und Anf&uuml;hrungszeichen schlie&szlig;en automatisch, Einr&uuml;ckung folgt der Sprache.</p></div>
+    <div class="card feat"><span class="bar"></span><h3>Autovervollst&auml;ndigung</h3><p>Schl&auml;gt Schl&uuml;sselw&ouml;rter und bereits verwendete Variablennamen w&auml;hrend des Tippens vor.</p></div>
+    <div class="card feat"><span class="bar"></span><h3>Live-Fehleranzeige</h3><p>Falsch geschriebene Bezeichner werden sofort im Editor markiert, mit Tooltip zur Ursache.</p></div>
+  </div>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/xml/xml.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/css/css.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/javascript/javascript.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/htmlmixed/htmlmixed.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/sql/sql.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/matchbrackets.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/closebrackets.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/selection/active-line.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/hint/show-hint.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/lint/lint.min.js"></script>
+
+<script>
+(function () {
+  "use strict";
+
+  function escapeRegExp(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); }
+
+  var demos = {
+    python: {
+      label: "Python",
+      fileName: "loesung.py",
+      mode: "python",
+      indentUnit: 4,
+      description: "Die Funktion berechnet den Gesamtpreis inklusive Versandkosten. Beim Aufruf schlägt die Ausgabe jedoch fehl. Finde die Ursache und behebe sie.",
+      errorMessage: "Traceback (most recent call last):\n  Zeile 11, in <module>\nNameError: name 'ergbnis' is not defined",
+      buggyToken: "ergbnis",
+      buggyCode:
+        "versand = 4.95\n\n" +
+        "def gesamtpreis(preis, menge):\n" +
+        "    zwischensumme = preis * menge\n" +
+        "    return zwischensumme + versand\n\n" +
+        "preis = 12.50\n" +
+        "menge = 3\n" +
+        "ergebnis = gesamtpreis(preis, menge)\n\n" +
+        "print(f\"Gesamtpreis: {ergbnis:.2f} €\")\n",
+      keywords: ["def","return","print","if","elif","else","for","while","import","from","as","class","try","except","finally","with","lambda","True","False","None","and","or","not","in","is","pass","break","continue","yield"]
+    },
+    java: {
+      label: "Java",
+      fileName: "Auswertung.java",
+      mode: "text/x-java",
+      indentUnit: 4,
+      description: "Die Klasse gibt die Bestehensquote und die Anzahl bestandener Prüfungen aus. Der zweite Ausdruck lässt sich nicht kompilieren.",
+      errorMessage: "Auswertung.java:8: error: cannot find symbol\n    symbol:   variable bestandn\n    location: class Auswertung",
+      buggyToken: "bestandn",
+      buggyCode:
+        "public class Auswertung {\n" +
+        "    public static void main(String[] args) {\n" +
+        "        int gesamtAnzahl = 30;\n" +
+        "        int bestanden = 24;\n" +
+        "        double quote = (double) bestanden / gesamtAnzahl * 100;\n\n" +
+        "        System.out.println(\"Bestehensquote: \" + quote + \"%\");\n" +
+        "        System.out.println(\"Bestanden: \" + bestandn + \" von \" + gesamtAnzahl);\n" +
+        "    }\n" +
+        "}\n",
+      keywords: ["public","private","protected","class","static","void","int","double","float","long","short","boolean","char","String","if","else","for","while","do","switch","case","break","continue","return","new","this","import","try","catch","finally","interface","extends","implements","final","true","false","null"]
+    },
+    typescript: {
+      label: "TypeScript",
+      fileName: "bewertung.ts",
+      mode: "text/typescript",
+      indentUnit: 2,
+      description: "Die Funktion bewertet einen Teilnehmer anhand seiner Punktzahl. Der Compiler meldet einen Fehler beim Funktionsaufruf.",
+      errorMessage: "bewertung.ts:12:20 - error TS2552: Cannot find name 'teilnehmner'. Did you mean 'teilnehmer'?",
+      buggyToken: "teilnehmner",
+      buggyCode:
+        "interface Teilnehmer {\n" +
+        "  name: string;\n" +
+        "  punkte: number;\n" +
+        "}\n\n" +
+        "function bewertung(t: Teilnehmer): string {\n" +
+        "  const bestanden = t.punkte >= 50;\n" +
+        "  return `${t.name}: ${bestanden ? \"bestanden\" : \"nicht bestanden\"}`;\n" +
+        "}\n\n" +
+        "const teilnehmer: Teilnehmer = { name: \"Mira\", punkte: 62 };\n\n" +
+        "console.log(bewertung(teilnehmner));\n",
+      keywords: ["interface","type","function","const","let","var","return","if","else","for","while","class","extends","implements","import","export","public","private","protected","readonly","string","number","boolean","void","any","true","false","null","undefined","new","this","async","await"]
+    },
+    html: {
+      label: "HTML",
+      fileName: "formular.html",
+      mode: "text/html",
+      indentUnit: 2,
+      description: "Das Formular soll beim Klick auf die Beschriftung das Eingabefeld fokussieren. Der Accessibility-Check der Quiz-Plattform meldet einen Fehler.",
+      errorMessage: "a11y-check: <label for=\"benutzername\"> referenziert kein Element mit id=\"benutzername\"",
+      buggyToken: "benutzer_name",
+      buggyCode:
+        "<form>\n" +
+        "  <label for=\"benutzername\">Benutzername</label>\n" +
+        "  <input id=\"benutzer_name\" type=\"text\" name=\"benutzername\">\n\n" +
+        "  <button type=\"submit\">Absenden</button>\n" +
+        "</form>\n",
+      keywords: ["form","label","input","button","select","option","textarea","table","thead","tbody","tr","td","th","ul","li","a","img","div","span","href","src","id","name","type","class","value","placeholder","required","for"]
+    },
+    sql: {
+      label: "SQL",
+      fileName: "abfrage.sql",
+      mode: "text/x-sql",
+      indentUnit: 2,
+      description: "Die Abfrage soll die fünf umsatzstärksten Kund*innen abgeschlossener Bestellungen listen. Die Datenbank lehnt die Sortierung ab.",
+      errorMessage: "ERROR 1054 (42S22): Unknown column 'umsatz' in 'order clause'",
+      buggyToken: "umsatz DESC",
+      buggyCode:
+        "SELECT\n" +
+        "  kunde_id,\n" +
+        "  SUM(betrag) AS gesamtumsatz\n" +
+        "FROM bestellungen\n" +
+        "WHERE status = 'abgeschlossen'\n" +
+        "GROUP BY kunde_id\n" +
+        "ORDER BY umsatz DESC\n" +
+        "LIMIT 5;\n",
+      keywords: ["SELECT","FROM","WHERE","GROUP BY","ORDER BY","HAVING","LIMIT","AS","JOIN","LEFT JOIN","INNER JOIN","ON","AND","OR","NOT","IN","LIKE","INSERT INTO","VALUES","UPDATE","SET","DELETE FROM","DISTINCT","COUNT","SUM","AVG","MIN","MAX","NULL","BETWEEN"]
+    }
+  };
+
+  var currentLang = "python";
+
+  var taskTitleEl = document.getElementById("taskTitle");
+  var taskLangLabelEl = document.getElementById("taskLangLabel");
+  var taskDescriptionEl = document.getElementById("taskDescription");
+  var errorMessageEl = document.getElementById("errorMessage");
+  var fileNameEl = document.getElementById("fileName");
+  var resultBarEl = document.getElementById("resultBar");
+  var resultTextEl = document.getElementById("resultText");
+  var langSelectEl = document.getElementById("langSelect");
+
+  function customLinter(text, options, cmInstance) {
+    var demo = demos[currentLang];
+    var found = [];
+    var re = new RegExp("\\b" + escapeRegExp(demo.buggyToken) + "\\b", "g");
+    var m;
+    while ((m = re.exec(text))) {
+      var from = cmInstance.posFromIndex(m.index);
+      var to = cmInstance.posFromIndex(m.index + m[0].length);
+      found.push({ message: "Nicht gefunden: „" + m[0] + "“ — siehe gelieferte Fehlermeldung.", severity: "error", from: from, to: to });
+    }
+    return found;
+  }
+
+  function customHint(cmInstance) {
+    var cur = cmInstance.getCursor();
+    var token = cmInstance.getTokenAt(cur);
+    var start = token.start;
+    var end = cur.ch;
+    var word = cmInstance.getRange(CodeMirror.Pos(cur.line, start), CodeMirror.Pos(cur.line, end));
+    if (!/[A-Za-z_]/.test(word)) return null;
+
+    var text = cmInstance.getValue();
+    var seen = {};
+    var idRe = /[A-Za-z_][A-Za-z0-9_]*/g;
+    var mm;
+    while ((mm = idRe.exec(text))) seen[mm[0]] = true;
+
+    var demo = demos[currentLang];
+    var pool = {};
+    demo.keywords.forEach(function (k) { pool[k] = true; });
+    Object.keys(seen).forEach(function (k) { pool[k] = true; });
+
+    var lowerWord = word.toLowerCase();
+    var list = Object.keys(pool).filter(function (w) {
+      return w.toLowerCase().indexOf(lowerWord) === 0 && w !== word;
+    }).sort(function (a, b) { return a.length - b.length || a.localeCompare(b); });
+
+    if (!list.length) return null;
+    return { list: list, from: CodeMirror.Pos(cur.line, start), to: CodeMirror.Pos(cur.line, end) };
+  }
+
+  var cm = CodeMirror.fromTextArea(document.getElementById("editor"), {
+    mode: demos[currentLang].mode,
+    theme: "quizdark",
+    lineNumbers: true,
+    indentUnit: 4,
+    tabSize: 4,
+    indentWithTabs: false,
+    smartIndent: true,
+    matchBrackets: true,
+    autoCloseBrackets: true,
+    styleActiveLine: true,
+    gutters: ["CodeMirror-linenumbers", "CodeMirror-lint-markers"],
+    lint: { getAnnotations: customLinter, async: false, delay: 250 },
+    extraKeys: {
+      "Ctrl-Space": function (c) { c.showHint({ hint: customHint, completeSingle: false }); }
+    }
+  });
+
+  cm.on("inputRead", function (c, change) {
+    if (change.origin !== "+input") return;
+    var ch = change.text[0];
+    if (ch && /[A-Za-z_]/.test(ch)) {
+      c.showHint({ hint: customHint, completeSingle: false });
+    }
+  });
+
+  function renderDemo(key) {
+    currentLang = key;
+    var demo = demos[key];
+    taskTitleEl.textContent = "Debug-Aufgabe: " + demo.label + "-Code korrigieren";
+    taskLangLabelEl.textContent = demo.label;
+    taskDescriptionEl.textContent = demo.description;
+    errorMessageEl.textContent = demo.errorMessage;
+    fileNameEl.textContent = demo.fileName;
+    langSelectEl.value = key;
+
+    cm.setOption("mode", demo.mode);
+    cm.setOption("indentUnit", demo.indentUnit);
+    cm.setOption("tabSize", demo.indentUnit);
+    cm.setValue(demo.buggyCode);
+    cm.clearHistory();
+    cm.focus();
+
+    resultBarEl.className = "result-bar pending";
+    resultTextEl.textContent = "Noch nicht geprüft — behebe den Fehler und klicke auf „Code prüfen“.";
+  }
+
+  document.getElementById("checkBtn").addEventListener("click", function () {
+    var demo = demos[currentLang];
+    var text = cm.getValue();
+    var stillBuggy = new RegExp("\\b" + escapeRegExp(demo.buggyToken) + "\\b").test(text);
+    if (stillBuggy) {
+      resultBarEl.className = "result-bar error";
+      resultTextEl.textContent = "Test fehlgeschlagen — der gemeldete Fehler besteht weiterhin.";
+    } else {
+      resultBarEl.className = "result-bar success";
+      resultTextEl.textContent = "Test bestanden — der Fehler wurde behoben.";
+    }
+  });
+
+  document.getElementById("resetBtn").addEventListener("click", function () {
+    renderDemo(currentLang);
+  });
+
+  langSelectEl.addEventListener("change", function () {
+    renderDemo(this.value);
+  });
+
+  renderDemo("python");
+})();
+</script>
+</body>
+</html>
